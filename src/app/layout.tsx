@@ -2,11 +2,12 @@
 import type { Metadata } from 'next';
 import { Prompt } from 'next/font/google';
 import './globals.css';
-import Header from '../components/Header';
-import Sidebar from '../components/Sidebar';
-import SocialButtons from '../components/SocialButtons';
-import TypingEffect from '../components/TypingEffect';
-import AboutMe from '../components/Aboutme';
+import Header from '@/components/Header';
+import Sidebar from '@/components/Sidebar';
+import SocialButtons from '@/components/SocialButtons';
+import TypingEffect from '@/components/TypingEffect';
+import AboutMe from '@/components/Aboutme';
+import TechBadges from '@/components/TechBadges';
 
 const quicksand = Prompt({
 	subsets: ['latin'],
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 					<Header />
 					<TypingEffect />
 					<SocialButtons />
+					<TechBadges />
 				</Sidebar>
 				<main>
 					{children}
