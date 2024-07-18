@@ -1,6 +1,6 @@
 // components/Sidebar.tsx
-const Sidebar = () => {
-	return <div className='fixed left-0 top-0 h-full w-16 bg-gray-900 flex flex-col items-center py-8'>{/* Links do menu */}</div>;
+const Sidebar = ({ children }: { children: React.ReactNode }) => {
+	return <div className='fixed  top-0 h-full w-52 max-w-60 bg-gray-900 flex flex-col items-center py-8'>{children}</div>;
 };
 
 export default Sidebar;

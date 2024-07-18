@@ -1,13 +1,16 @@
 // app/layout.tsx
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Prompt } from 'next/font/google';
 import './globals.css';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import SocialButtons from '../components/SocialButtons';
 import TypingEffect from '../components/TypingEffect';
 
-const inter = Inter({ subsets: ['latin'] });
+const quicksand = Prompt({
+	subsets: ['latin'],
+	weight: '500',
+});
 
 export const metadata: Metadata = {
 	title: 'Samuel D Siqueira - Desenvolvedor',
@@ -17,14 +20,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang='pt-BR'>
-			<body className={`${inter.className} min-h-screen bg-gray-800 text-white`}>
-				<Sidebar />
-				<main className='flex flex-col items-center mt-16'>
+			<body className={`${quicksand.className} min-h-screen bg-gray-800 text-white`}>
+				<Sidebar>
 					<Header />
 					<TypingEffect />
 					<SocialButtons />
-					{children}
-				</main>
+				</Sidebar>
+				<main>{children}</main>
 			</body>
 		</html>
 	);
