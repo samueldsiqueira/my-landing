@@ -1,4 +1,3 @@
-// app/layout.tsx
 import type { Metadata } from 'next';
 import { Prompt } from 'next/font/google';
 import './globals.css';
@@ -8,6 +7,7 @@ import SocialButtons from '@/components/SocialButtons';
 import TypingEffect from '@/components/TypingEffect';
 import AboutMe from '@/components/Aboutme';
 import TechBadges from '@/components/TechBadges';
+import GitHubRepos from '@/components/GithubRepos';
 
 const quicksand = Prompt({
 	subsets: ['latin'],
@@ -29,9 +29,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 					<SocialButtons />
 					<TechBadges />
 				</Sidebar>
-				<main>
+				<main className='ml-16 p-4'>
+					<AboutMe />
+					<GitHubRepos />
 					{children}
-					<AboutMe></AboutMe>
 				</main>
 			</body>
 		</html>
