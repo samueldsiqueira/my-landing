@@ -9,9 +9,9 @@ import AboutMe from '@/components/Aboutme';
 import TechBadges from '@/components/TechBadges';
 import GitHubRepos from '@/components/GithubRepos';
 
-const quicksand = Prompt({
+const prompt = Prompt({
 	subsets: ['latin'],
-	weight: '500',
+	weight: '200',
 });
 
 export const metadata: Metadata = {
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang='pt-BR'>
-			<body className={`${quicksand.className} min-h-screen bg-gray-800 text-white`}>
+			<body className={`${prompt.className} min-h-screen bg-gray-800 text-white`}>
 				<Sidebar>
 					<Header />
 					<TypingEffect />

@@ -5,8 +5,8 @@ import { ReactTyped } from 'react-typed';
 
 const TypingEffect = () => {
 	return (
-		<div className='text-xl mt-4'>
-			<ReactTyped strings={[`Samuel D' Siqueira `]} typeSpeed={80} backSpeed={80} loop />
+		<div className=' text-green-500 text-xl w-full h-12 text-center mt-4'>
+			<ReactTyped strings={[`Samuel D' Siqueira`, 'Software Developer']} typeSpeed={80} backSpeed={80} showCursor loop />
 		</div>
 	);
 };
