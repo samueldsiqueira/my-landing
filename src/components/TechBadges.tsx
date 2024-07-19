@@ -24,10 +24,10 @@ const TechBadges = () => {
 					<SiNodedotjs size={32} className='text-green-800' />
 				</li>
 				<li>
-					<SiPlaywright size={32} className='text-orange-600' />
+					<SiBun size={32} />
 				</li>
 				<li>
-					<SiBun size={32} />
+					<SiPlaywright size={32} className='text-orange-600' />
 				</li>
 				<li>
 					<SiPuppeteer size={32} className='text-green-300' />
