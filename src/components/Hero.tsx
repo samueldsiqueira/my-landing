@@ -18,7 +18,7 @@ const Hero = () => {
         />
       </motion.div>
       <motion.h1 initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }} className="text-5xl font-bold mb-4">
-        Samuel D' Siqueira
+        Samuel D&apos; Siqueira
       </motion.h1>
       <motion.div initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }} className="text-2xl mb-8 h-8">
         <TypeAnimation
