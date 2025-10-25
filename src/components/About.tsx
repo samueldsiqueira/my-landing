@@ -1,16 +1,38 @@
+"use client";
 import React from 'react';
+import { motion } from 'framer-motion';
 
 const About = () => {
   return (
     <section id="about" className="py-20 px-4 bg-black text-white">
       <div className="container mx-auto">
-        <h2 className="text-3xl font-bold mb-8 text-center text-purple-500">Sobre Mim</h2>
-        <p className="max-w-3xl mx-auto text-center">
-          Meu nome é Samuel D' Siqueira e sou Desenvolvedor Front-End. Minha jornada na tecnologia começou como jogador de jogos MMO, onde me deparei com um fórum com o código-fonte do jogo que estava jogando. Resolvi mergulhar e, com muita leitura e aprendizado, consegui fazer o código funcionar em diversas ocasiões.
-        </p>
-        <p className="max-w-3xl mx-auto text-center mt-4">
-          Posteriormente, atuei em funções de manutenção e suporte em empresas de telecomunicações. Porém, para aprofundar meu entendimento de sistemas e problemas, decidi me aprofundar no assunto e concluí o bootcamp da Kenzie Academy, onde me formei como Desenvolvedor Front-End. Atualmente, trabalho como estagiário na TIM Brasil, buscando ampliar meus conhecimentos no mundo da tecnologia e contribuir para o sucesso da equipe e da empresa.
-        </p>
+        <motion.h2
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-3xl font-bold mb-8 text-center text-purple-500"
+        >
+          Sobre Mim
+        </motion.h2>
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <p className="text-lg text-left">
+              Como Analista de Sistemas, minha carreira é focada em implementações estratégicas na interseção entre tecnologia e saúde. Atualmente, dedico-me a integrar soluções avançadas, incluindo agentes de Inteligência Artificial, para otimizar processos e criar valor. Além da minha atuação principal, também desenvolvo projetos de software como consultor para terceiros, buscando sempre aplicar as tecnologias mais atuais.
+            </p>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="hidden md:block"
+          >
+            <div className="w-full h-64 bg-gradient-to-r from-purple-900 to-black rounded-lg"></div>
+          </motion.div>
+        </div>
       </div>
     </section>
   );
