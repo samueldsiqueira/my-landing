@@ -1,18 +1,42 @@
+"use client";
 import React from 'react';
+import { motion } from 'framer-motion';
 
 const About = () => {
   return (
-    <section id="about" className="py-20 px-4 bg-black text-white">
+    <motion.section
+      id="about"
+      className="py-20 px-4 bg-black text-white"
+      initial={{ opacity: 0, y: 100 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8 }}
+      viewport={{ once: true }}
+    >
       <div className="container mx-auto">
         <h2 className="text-3xl font-bold mb-8 text-center text-purple-500">Sobre Mim</h2>
-        <p className="max-w-3xl mx-auto text-center">
-          Meu nome é Samuel D' Siqueira e sou Desenvolvedor Front-End. Minha jornada na tecnologia começou como jogador de jogos MMO, onde me deparei com um fórum com o código-fonte do jogo que estava jogando. Resolvi mergulhar e, com muita leitura e aprendizado, consegui fazer o código funcionar em diversas ocasiões.
-        </p>
-        <p className="max-w-3xl mx-auto text-center mt-4">
-          Posteriormente, atuei em funções de manutenção e suporte em empresas de telecomunicações. Porém, para aprofundar meu entendimento de sistemas e problemas, decidi me aprofundar no assunto e concluí o bootcamp da Kenzie Academy, onde me formei como Desenvolvedor Front-End. Atualmente, trabalho como estagiário na TIM Brasil, buscando ampliar meus conhecimentos no mundo da tecnologia e contribuir para o sucesso da equipe e da empresa.
-        </p>
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div>
+            <p className="text-lg text-left">
+              Como Analista de Sistemas, minha carreira é focada em implementações estratégicas na interseção entre tecnologia e saúde. Atualmente, dedico-me a integrar soluções avançadas, incluindo agentes de Inteligência Artificial, para otimizar processos e criar valor. Além da minha atuação principal, também desenvolvo projetos de software como consultor para terceiros, buscando sempre aplicar as tecnologias mais atuais.
+            </p>
+          </div>
+          <div className="hidden md:block relative">
+            <motion.div
+              className="absolute inset-0 bg-purple-900 rounded-full blur-3xl"
+              animate={{
+                scale: [1, 1.1, 1],
+                opacity: [0.5, 0.7, 0.5],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+          </div>
+        </div>
       </div>
-    </section>
+    </motion.section>
   );
 };
 
