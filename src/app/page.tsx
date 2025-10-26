@@ -7,7 +7,7 @@ import Contact from '../components/Contact';
 
 export default function Home() {
   return (
-    <main className="bg-black">
+    <main className="bg-gradient-to-b from-black via-gray-900 to-black">
       <Hero />
       <div className="h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent mx-auto w-3/4" />
       <About />

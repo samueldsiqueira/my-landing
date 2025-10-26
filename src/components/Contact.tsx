@@ -2,7 +2,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { SocialIcon } from 'react-social-icons';
-import { FaEnvelope, FaLinkedin, FaGithub } from 'react-icons/fa';
+import { FiMail, FiLinkedin, FiGithub } from 'react-icons/fi';
 
 const Contact = () => {
   return (
@@ -15,52 +15,53 @@ const Contact = () => {
       viewport={{ once: true }}
     >
       <div className="container mx-auto text-center">
-        <div className="flex items-center justify-center gap-3 mb-8">
-          <FaEnvelope className="text-purple-500 text-4xl" />
-          <h2 className="text-3xl font-bold text-purple-500">Contato</h2>
-        </div>
-        <div className="flex flex-col items-center gap-8">
-          <div className="flex justify-center gap-8">
-            <motion.div whileHover={{ scale: 1.2, rotate: 10 }} whileTap={{ scale: 0.9 }}>
-              <SocialIcon url="https://www.linkedin.com/in/samuel-d-siqueira" target="_blank" rel="noopener noreferrer" bgColor="#9333ea" style={{ height: 50, width: 50 }} />
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.2, rotate: -10 }} whileTap={{ scale: 0.9 }}>
-              <SocialIcon url="https://github.com/samueldsiqueira" target="_blank" rel="noopener noreferrer" bgColor="#9333ea" style={{ height: 50, width: 50 }} />
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.2 }} whileTap={{ scale: 0.9 }}>
-              <SocialIcon url="mailto:samueldsiqueira@gmail.com" target="_blank" rel="noopener noreferrer" bgColor="#9333ea" style={{ height: 50, width: 50 }} />
-            </motion.div>
-          </div>
-          <div className="flex flex-col md:flex-row gap-6 text-gray-300">
-            <motion.a
-              href="https://www.linkedin.com/in/samuel-d-siqueira"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 hover:text-purple-400 transition-colors"
-              whileHover={{ scale: 1.05 }}
-            >
-              <FaLinkedin className="text-xl" />
-              <span>LinkedIn</span>
-            </motion.a>
-            <motion.a
-              href="https://github.com/samueldsiqueira"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 hover:text-purple-400 transition-colors"
-              whileHover={{ scale: 1.05 }}
-            >
-              <FaGithub className="text-xl" />
-              <span>GitHub</span>
-            </motion.a>
-            <motion.a
-              href="mailto:samueldsiqueira@gmail.com"
-              className="flex items-center gap-2 hover:text-purple-400 transition-colors"
-              whileHover={{ scale: 1.05 }}
-            >
-              <FaEnvelope className="text-xl" />
-              <span>samueldsiqueira@gmail.com</span>
-            </motion.a>
-          </div>
+        <h2 className="text-4xl font-bold mb-4 text-purple-500">Entre em Contato</h2>
+        <p className="text-gray-300 mb-12 text-lg max-w-2xl mx-auto">
+          Interessado em trabalhar junto ou tem alguma questão? Fique à vontade para entrar em contato!
+        </p>
+        <div className="flex justify-center gap-8 flex-wrap">
+          <motion.div 
+            whileHover={{ scale: 1.1, rotate: 5 }} 
+            whileTap={{ scale: 0.95 }}
+            className="flex flex-col items-center gap-2"
+          >
+            <SocialIcon 
+              url="https://www.linkedin.com/in/samuel-d-siqueira" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              bgColor="#9333ea" 
+              style={{ height: 50, width: 50 }} 
+            />
+            <span className="text-sm text-gray-400">LinkedIn</span>
+          </motion.div>
+          <motion.div 
+            whileHover={{ scale: 1.1, rotate: -5 }} 
+            whileTap={{ scale: 0.95 }}
+            className="flex flex-col items-center gap-2"
+          >
+            <SocialIcon 
+              url="https://github.com/samueldsiqueira" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              bgColor="#9333ea" 
+              style={{ height: 50, width: 50 }} 
+            />
+            <span className="text-sm text-gray-400">GitHub</span>
+          </motion.div>
+          <motion.div 
+            whileHover={{ scale: 1.1 }} 
+            whileTap={{ scale: 0.95 }}
+            className="flex flex-col items-center gap-2"
+          >
+            <SocialIcon 
+              url="mailto:samueldsiqueira@gmail.com" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              bgColor="#9333ea" 
+              style={{ height: 50, width: 50 }} 
+            />
+            <span className="text-sm text-gray-400">Email</span>
+          </motion.div>
         </div>
       </div>
     </motion.section>
