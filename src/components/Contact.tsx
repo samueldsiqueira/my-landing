@@ -18,7 +18,7 @@ const Contact = () => {
         <div className="mb-6">
           <h2 className="text-3xl font-bold mb-3 text-purple-500">Entre em Contato</h2>
           <p className="text-gray-400 text-base max-w-xl mx-auto">
-            Interessado em trabalhar junto ou tem alguma questão? Entre em contato através das redes sociais acima.
+            Interessado em trabalhar junto ou tem alguma questão? Fique à vontade para entrar em contato!
           </p>
         </div>
         
