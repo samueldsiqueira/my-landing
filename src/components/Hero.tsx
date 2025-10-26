@@ -35,11 +35,11 @@ const Hero = () => {
         >
           <div className="absolute inset-0 bg-purple-600 rounded-full blur-2xl opacity-30 animate-pulse" />
           <Image
-            src="/profile.jfif"
+            src="/profile_picture.jpg"
             alt="Samuel D' Siqueira"
             width={180}
             height={180}
-            className="rounded-full mb-8 border-4 border-purple-500 shadow-2xl relative z-10"
+            className="rounded-full mb-8 border-4 border-purple-500 shadow-2xl relative z-10 mx-auto"
             priority
           />
         </motion.div>
