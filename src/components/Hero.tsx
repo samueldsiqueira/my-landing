@@ -9,16 +9,19 @@ const Hero = () => {
   return (
     <section className="min-h-screen flex flex-col justify-center items-center text-center bg-black text-white p-4">
       <motion.div initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        <Image
-          src="/profile.jfif"
-          alt="Samuel D' Siqueira"
-          width={150}
-          height={150}
-          className="rounded-full mb-8"
-        />
+        <div className="relative inline-block">
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full blur-lg opacity-75 animate-pulse"></div>
+          <Image
+            src="/profile.webp"
+            alt="Samuel D' Siqueira"
+            width={200}
+            height={200}
+            className="rounded-full mb-8 relative z-10 border-4 border-purple-500 shadow-2xl"
+          />
+        </div>
       </motion.div>
       <motion.h1 initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }} className="text-5xl font-bold mb-4">
-        Samuel D' Siqueira
+        Samuel D&apos; Siqueira
       </motion.h1>
       <motion.div initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }} className="text-2xl mb-8 h-8">
         <TypeAnimation

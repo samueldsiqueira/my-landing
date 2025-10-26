@@ -9,10 +9,15 @@ export default function Home() {
   return (
     <main className="bg-black">
       <Hero />
+      <div className="h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent mx-auto w-3/4" />
       <About />
+      <div className="h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent mx-auto w-3/4" />
       <Skills />
+      <div className="h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent mx-auto w-3/4" />
       <Projects />
+      <div className="h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent mx-auto w-3/4" />
       <Experience />
+      <div className="h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent mx-auto w-3/4" />
       <Contact />
     </main>
   );

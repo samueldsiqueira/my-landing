@@ -1,6 +1,7 @@
 "use client";
 import React from 'react';
 import { motion } from 'framer-motion';
+import { FaFolderOpen, FaGithub, FaExternalLinkAlt } from 'react-icons/fa';
 
 const projects = [
   {
@@ -41,21 +42,27 @@ const Projects = () => {
       viewport={{ once: true }}
     >
       <div className="container mx-auto">
-        <h2 className="text-3xl font-bold mb-8 text-center text-purple-500">Projetos</h2>
+        <div className="flex items-center justify-center gap-3 mb-8">
+          <FaFolderOpen className="text-purple-500 text-4xl" />
+          <h2 className="text-3xl font-bold text-center text-purple-500">Projetos</h2>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {projects.map((project, index) => (
             <motion.div
               key={index}
-              className="bg-gray-800 p-6 rounded-lg"
+              className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-lg shadow-lg hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105 hover:-translate-y-2"
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
             >
+              <div className="flex items-start justify-between mb-4">
+                <FaGithub className="text-purple-500 text-3xl" />
+              </div>
               <h3 className="text-xl font-bold mb-2">{project.name}</h3>
-              <p className="mb-4">{project.description || 'Clique para ver o repositório.'}</p>
-              <a href={project.url} target="_blank" rel="noopener noreferrer" className="text-purple-500 hover:underline">
-                Ver no GitHub
+              <p className="mb-4 text-gray-300">{project.description || 'Clique para ver o repositório.'}</p>
+              <a href={project.url} target="_blank" rel="noopener noreferrer" className="text-purple-500 hover:text-purple-400 flex items-center gap-2 transition-colors">
+                Ver no GitHub <FaExternalLinkAlt className="text-sm" />
               </a>
             </motion.div>
           ))}
