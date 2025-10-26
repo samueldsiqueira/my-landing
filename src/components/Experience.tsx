@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiBriefcase, FiCalendar, FiMapPin, FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { FiBriefcase, FiCalendar, FiMapPin, FiChevronDown } from 'react-icons/fi';
 
 interface Job {
   id: number;
@@ -39,7 +39,7 @@ Busco sempre alinhar tecnologia, desempenho e conformidade técnica, garantindo 
     duration: "2 anos 1 mês",
     description: `Integrante da equipe de engenharia de telecomunicações, minha função envolveu a análise de processos internos repetitivos para desenvolver automações eficientes.
 
-Desenvolvi projetos de automação de processos legados, empregando habilidades em Python e Javascript, utilizando bibliotecas como Playwright e Selenium para web scraping.
+Desenvolvi projetos de automação de processos legados, empregando habilidades em Python e JavaScript, utilizando bibliotecas como Playwright e Selenium para web scraping.
 
 Meu papel visou melhorar a eficiência operacional e contribuir para a inovação contínua por meio da automação inteligente.`
   },
@@ -129,11 +129,7 @@ const Experience = () => {
                             animate={{ rotate: expandedId === job.id ? 180 : 0 }}
                             transition={{ duration: 0.3 }}
                           >
-                            {expandedId === job.id ? (
-                              <FiChevronUp className="text-xl text-white" />
-                            ) : (
-                              <FiChevronDown className="text-xl text-white" />
-                            )}
+                            <FiChevronDown className="text-xl text-white" />
                           </motion.div>
                         </div>
                       </div>
