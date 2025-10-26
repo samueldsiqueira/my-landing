@@ -1,38 +1,26 @@
 "use client";
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiGithub, FiExternalLink } from 'react-icons/fi';
 import { AiOutlineCode } from 'react-icons/ai';
-
-const projects = [
-  {
-    name: 'center-rpg',
-    url: 'https://github.com/samueldsiqueira/center-rpg',
-    description: 'Forked from Project-Final-Kenzie/center-rpg'
-  },
-  {
-    name: 'nutshell-website',
-    url: 'https://github.com/samueldsiqueira/nutshell-website',
-    description: 'Forked from Gab0/nutshell-website'
-  },
-  {
-    name: 'kenzie-hub-samueldsiqueira',
-    url: 'https://github.com/samueldsiqueira/kenzie-hub-samueldsiqueira',
-    description: ''
-  },
-  {
-    name: 'Kenzie-hamburgueria',
-    url: 'https://github.com/samueldsiqueira/Kenzie-hamburgueria',
-    description: ''
-  },
-  {
-    name: 'nu-kenzie-samueldsiqueira',
-    url: 'https://github.com/samueldsiqueira/nu-kenzie-samueldsiqueira',
-    description: ''
-  }
-];
+import { SiVercel } from 'react-icons/si';
+import { fetchVercelProjects, getProjectUrl, getProjectPreviewImage, VercelProject } from '../services/vercelServices';
+import Image from 'next/image';
 
 const Projects = () => {
+  const [vercelProjects, setVercelProjects] = useState<VercelProject[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProjects = async () => {
+      const projects = await fetchVercelProjects();
+      setVercelProjects(projects);
+      setLoading(false);
+    };
+
+    loadProjects();
+  }, []);
+
   return (
     <motion.section
       id="projects"
@@ -44,35 +32,83 @@ const Projects = () => {
     >
       <div className="container mx-auto">
         <h2 className="text-4xl font-bold mb-12 text-center text-purple-500">Projetos</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {projects.map((project, index) => (
-            <motion.div
-              key={index}
-              className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-700 flex flex-col"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              whileHover={{ y: -5 }}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <AiOutlineCode className="text-3xl text-purple-500" />
-                <h3 className="text-xl font-bold">{project.name}</h3>
-              </div>
-              <p className="mb-4 flex-grow text-gray-300">{project.description || 'Clique para ver o repositório.'}</p>
-              <a 
-                href={project.url} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="text-purple-500 hover:text-purple-400 font-medium flex items-center gap-2 group transition-colors"
+        
+        {loading ? (
+          <div className="text-center text-gray-400">Carregando projetos...</div>
+        ) : vercelProjects.length === 0 ? (
+          <div className="text-center text-gray-400">Nenhum projeto encontrado.</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {vercelProjects.map((project, index) => (
+              <motion.div
+                key={project.id}
+                className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-700 flex flex-col overflow-hidden"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                whileHover={{ y: -5 }}
               >
-                <FiGithub className="text-xl" />
-                <span>Ver no GitHub</span>
-                <FiExternalLink className="text-sm group-hover:translate-x-1 transition-transform" />
-              </a>
-            </motion.div>
-          ))}
-        </div>
+                {/* Preview Image */}
+                <div className="relative w-full h-48 bg-gray-700">
+                  <Image
+                    src={getProjectPreviewImage(project)}
+                    alt={`${project.name} preview`}
+                    fill
+                    className="object-cover"
+                    unoptimized
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
+                  />
+                </div>
+
+                {/* Content */}
+                <div className="p-6 flex flex-col flex-grow">
+                  <div className="flex items-center gap-3 mb-4">
+                    <AiOutlineCode className="text-3xl text-purple-500" />
+                    <h3 className="text-xl font-bold">{project.name}</h3>
+                  </div>
+                  
+                  {project.framework && (
+                    <p className="mb-4 text-sm text-gray-400">
+                      Framework: <span className="text-purple-400">{project.framework}</span>
+                    </p>
+                  )}
+
+                  <div className="mt-auto space-y-2">
+                    {/* Vercel Deployment Link */}
+                    <a 
+                      href={getProjectUrl(project)} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="text-purple-500 hover:text-purple-400 font-medium flex items-center gap-2 group transition-colors"
+                    >
+                      <SiVercel className="text-xl" />
+                      <span>Ver no Vercel</span>
+                      <FiExternalLink className="text-sm group-hover:translate-x-1 transition-transform" />
+                    </a>
+
+                    {/* GitHub Link if available */}
+                    {project.link?.repo && (
+                      <a 
+                        href={`https://github.com/${project.link.org || project.link.repo}/${project.link.repo}`}
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-gray-400 hover:text-gray-300 font-medium flex items-center gap-2 group transition-colors"
+                      >
+                        <FiGithub className="text-xl" />
+                        <span>Ver no GitHub</span>
+                        <FiExternalLink className="text-sm group-hover:translate-x-1 transition-transform" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
     </motion.section>
   );
