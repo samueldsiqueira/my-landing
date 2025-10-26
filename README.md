@@ -19,9 +19,19 @@ cp .env.example .env.local
 
 1. Go to [Vercel Account Settings](https://vercel.com/account/tokens)
 2. Create a new token with the name "Portfolio Integration"
-3. Copy the token and add it to your `.env.local` file
+3. Ensure the token has access to:
+   - Read projects
+   - Read deployments
+4. Copy the token and add it to your `.env.local` file
 
-The Projects section will automatically fetch and display your Vercel projects (excluding "my-landing").
+Example `.env.local` configuration:
+```bash
+NEXT_PUBLIC_VERCEL_TOKEN=HbGTPDawtUAuY2QeNytgThId
+# Optional: If using a team account
+NEXT_PUBLIC_VERCEL_TEAM_ID=your_team_id
+```
+
+The Projects section will automatically fetch and display your Vercel projects with their production deployment URLs (excluding "my-landing").
 
 ### Running the Development Server
 
