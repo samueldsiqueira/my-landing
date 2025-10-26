@@ -11,7 +11,7 @@ cp .env.example .env.local
 
 2. Add your Vercel API token to `.env.local`:
 ```bash
-NEXT_PUBLIC_VERCEL_TOKEN=HbGTPDawtUAuY2QeNytgThId
+NEXT_PUBLIC_VERCEL_TOKEN=your_vercel_token_here
 ```
 
 3. (Optional) If using a team account, add your team ID:

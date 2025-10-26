@@ -90,6 +90,7 @@ export const fetchProjectDeployment = async (projectName: string): Promise<Verce
     };
 
     // Build URL to get deployments for specific project
+    // Note: projectId parameter accepts both project ID or project name/slug
     let url = `https://api.vercel.com/v6/deployments?projectId=${projectName}&limit=1&target=production`;
     if (VERCEL_TEAM_ID) {
       url += `&teamId=${VERCEL_TEAM_ID}`;

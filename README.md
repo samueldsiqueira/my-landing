@@ -26,7 +26,7 @@ cp .env.example .env.local
 
 Example `.env.local` configuration:
 ```bash
-NEXT_PUBLIC_VERCEL_TOKEN=HbGTPDawtUAuY2QeNytgThId
+NEXT_PUBLIC_VERCEL_TOKEN=your_vercel_token_here
 # Optional: If using a team account
 NEXT_PUBLIC_VERCEL_TEAM_ID=your_team_id
 ```
