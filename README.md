@@ -2,6 +2,29 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
+### Environment Setup
+
+1. Copy the `.env.example` file to `.env.local`:
+```bash
+cp .env.example .env.local
+```
+
+2. Configure the environment variables in `.env.local`:
+   - `NEXT_PUBLIC_GITHUB_USER`: Your GitHub username
+   - `NEXT_PUBLIC_GITHUB_TOKEN`: Your GitHub personal access token (optional, for higher API rate limits)
+   - `NEXT_PUBLIC_VERCEL_TOKEN`: Your Vercel API token (required for projects integration)
+   - `NEXT_PUBLIC_VERCEL_TEAM_ID`: Your Vercel team ID (optional, only if using a team account)
+
+### Getting Vercel API Token
+
+1. Go to [Vercel Account Settings](https://vercel.com/account/tokens)
+2. Create a new token with the name "Portfolio Integration"
+3. Copy the token and add it to your `.env.local` file
+
+The Projects section will automatically fetch and display your Vercel projects (excluding "my-landing").
+
+### Running the Development Server
+
 First, run the development server:
 
 ```bash
