@@ -1,6 +1,6 @@
-# Vercel API Integration Testing
+# Vercel API Integration Setup
 
-This document explains how to test the Vercel API integration.
+This document explains how to setup and test the Vercel API integration.
 
 ## Setup
 
@@ -9,12 +9,18 @@ This document explains how to test the Vercel API integration.
 cp .env.example .env.local
 ```
 
-2. Add your Vercel API token to `.env.local`:
+2. Get your Vercel API token from https://vercel.com/account/tokens
+   - Click "Create Token"
+   - Name it "Portfolio Integration" or similar
+   - Set scope to include projects and deployments read access
+   - Copy the generated token
+
+3. Add your Vercel API token to `.env.local`:
 ```bash
-NEXT_PUBLIC_VERCEL_TOKEN=HbGTPDawtUAuY2QeNytgThId
+NEXT_PUBLIC_VERCEL_TOKEN=your_actual_token_here
 ```
 
-3. (Optional) If using a team account, add your team ID:
+4. (Optional) If using a team account, add your team ID:
 ```bash
 NEXT_PUBLIC_VERCEL_TEAM_ID=your_team_id
 ```
@@ -93,3 +99,10 @@ npm run dev
 1. Generate a new token at https://vercel.com/account/tokens
 2. Update `.env.local` with the new token
 3. Restart the development server
+
+## Security Notes
+
+- **NEVER commit your `.env.local` file to git**
+- **NEVER share your API token publicly**
+- If you accidentally expose your token, revoke it immediately at https://vercel.com/account/tokens
+- The `.env.local` file is already in `.gitignore` to prevent accidental commits
