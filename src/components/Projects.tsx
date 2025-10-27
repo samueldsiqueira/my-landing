@@ -10,6 +10,7 @@ import Image from 'next/image';
 const Projects = () => {
   const [vercelProjects, setVercelProjects] = useState<VercelProject[]>([]);
   const [loading, setLoading] = useState(true);
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const loadProjects = async () => {
@@ -50,18 +51,21 @@ const Projects = () => {
                 whileHover={{ y: -5 }}
               >
                 {/* Preview Image */}
-                <div className="relative w-full h-48 bg-gray-700">
-                  <Image
-                    src={getProjectPreviewImage(project)}
-                    alt={`${project.name} preview`}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                    }}
-                  />
+                <div className="relative w-full h-48 bg-gray-700 flex items-center justify-center">
+                  {imageErrors[project.id] ? (
+                    <div className="text-6xl text-purple-500">🚀</div>
+                  ) : (
+                    <Image
+                      src={getProjectPreviewImage(project)}
+                      alt={`${project.name} preview`}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                      onError={() => {
+                        setImageErrors(prev => ({ ...prev, [project.id]: true }));
+                      }}
+                    />
+                  )}
                 </div>
 
                 {/* Content */}
