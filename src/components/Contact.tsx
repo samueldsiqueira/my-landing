@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FiMail, FiPhone } from 'react-icons/fi';
+import { FiMail } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 
 const Contact = () => {
