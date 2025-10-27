@@ -50,7 +50,7 @@ const Projects = () => {
                 whileHover={{ y: -5 }}
               >
                 {/* Preview Image */}
-                <div className="relative w-full h-48 bg-gray-700">
+                <div className="relative w-full h-48 bg-gray-700 flex items-center justify-center">
                   <Image
                     src={getProjectPreviewImage(project)}
                     alt={`${project.name} preview`}
@@ -60,6 +60,14 @@ const Projects = () => {
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.style.display = 'none';
+                      // Show a placeholder icon instead
+                      const parent = target.parentElement;
+                      if (parent && !parent.querySelector('.placeholder-icon')) {
+                        const icon = document.createElement('div');
+                        icon.className = 'placeholder-icon text-6xl text-purple-500';
+                        icon.innerHTML = '🚀';
+                        parent.appendChild(icon);
+                      }
                     }}
                   />
                 </div>

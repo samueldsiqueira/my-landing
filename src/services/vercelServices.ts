@@ -130,6 +130,9 @@ export const getProjectUrl = (project: VercelProject): string => {
 
 export const getProjectPreviewImage = (project: VercelProject): string => {
   const projectUrl = getProjectUrl(project);
-  // Use Vercel's OG image API or a screenshot service
-  return `https://v1.screenshot.11ty.dev/${encodeURIComponent(projectUrl)}/opengraph/`;
+  
+  // Use thum.io - a free, reliable screenshot service
+  // width=1200, crop height=630 (standard OG image size)
+  // This captures the initial page load without waiting for auth redirects
+  return `https://image.thum.io/get/width/1200/crop/630/${encodeURIComponent(projectUrl)}`;
 };
