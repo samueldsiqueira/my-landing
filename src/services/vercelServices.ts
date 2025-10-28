@@ -131,8 +131,8 @@ export const getProjectUrl = (project: VercelProject): string => {
 export const getProjectPreviewImage = (project: VercelProject): string => {
   const projectUrl = getProjectUrl(project);
   
-  // Use thum.io - a free, reliable screenshot service
-  // width=1200, crop height=630 (standard OG image size)
-  // This captures the initial page load without waiting for auth redirects
-  return `https://image.thum.io/get/width/1200/crop/630/${encodeURIComponent(projectUrl)}`;
+  // Try to use the project's native Open Graph image first
+  // This matches what Vercel dashboard shows - the actual OG image from the deployment
+  // Standard Next.js OG image path (most common for Vercel projects)
+  return `${projectUrl}/opengraph-image.png`;
 };
