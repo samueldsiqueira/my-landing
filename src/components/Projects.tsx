@@ -46,16 +46,6 @@ const Projects = () => {
     return imagePaths[attempt] || getProjectPreviewImage(project);
   };
 
-  useEffect(() => {
-    const loadProjects = async () => {
-      const projects = await fetchVercelProjects();
-      setVercelProjects(projects);
-      setLoading(false);
-    };
-
-    loadProjects();
-  }, []);
-
   return (
     <motion.section
       id="projects"
