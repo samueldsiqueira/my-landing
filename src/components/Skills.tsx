@@ -11,7 +11,10 @@ import {
   SiNodedotjs,
   SiPython,
   SiGit,
-  SiDocker
+  SiDocker,
+  SiPostgresql,
+  SiMariadb,
+  SiRabbitmq
 } from 'react-icons/si';
 
 const skills = [
@@ -24,7 +27,10 @@ const skills = [
   { name: 'Node.js', icon: SiNodedotjs, color: '#339933' },
   { name: 'Python', icon: SiPython, color: '#3776AB' },
   { name: 'Git', icon: SiGit, color: '#F05032' },
-  { name: 'Docker', icon: SiDocker, color: '#2496ED' }
+  { name: 'Docker', icon: SiDocker, color: '#2496ED' },
+  { name: 'PostgreSQL', icon: SiPostgresql, color: '#4169E1' },
+  { name: 'MariaDB', icon: SiMariadb, color: '#003545' },
+  { name: 'RabbitMQ', icon: SiRabbitmq, color: '#FF6600' }
 ];
 
 const Skills = () => {

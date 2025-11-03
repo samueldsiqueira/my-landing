@@ -15,6 +15,7 @@ import {
 	SiDocker,
 	SiPostgresql,
 	SiMariadb,
+	SiRabbitmq,
 } from 'react-icons/si';
 
 const TechBadges = () => {
@@ -71,6 +72,9 @@ const TechBadges = () => {
 				</li>
 				<li className='w-10'>
 					<SiMariadb size={32} className='bg-blue-500 rounded text-black' />
+				</li>
+				<li className='w-10'>
+					<SiRabbitmq size={32} className='bg-gray-100 rounded text-orange-600' />
 				</li>
 			</ul>
 		</div>
