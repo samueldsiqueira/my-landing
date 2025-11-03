@@ -131,8 +131,8 @@ export const getProjectUrl = (project: VercelProject): string => {
 export const getProjectPreviewImage = (project: VercelProject): string => {
   const projectUrl = getProjectUrl(project);
   
-  // Use thum.io - a free, reliable screenshot service
-  // width=1200, crop height=630 (standard OG image size)
-  // This captures the initial page load without waiting for auth redirects
-  return `https://image.thum.io/get/width/1200/crop/630/${encodeURIComponent(projectUrl)}`;
+  // Use screen-shot.xyz - a free, open-source screenshot service
+  // No API key required, CORS-friendly
+  // This captures actual screenshots of the deployed projects
+  return `https://api.screen-shot.xyz/take?url=${encodeURIComponent(projectUrl)}&width=1200&height=630`;
 };
