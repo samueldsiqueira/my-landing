@@ -74,7 +74,7 @@ const TechBadges = () => {
 					<SiMariadb size={32} className='bg-blue-500 rounded text-black' />
 				</li>
 				<li className='w-10'>
-					<SiRabbitmq size={32} className='bg-white rounded text-orange-600' />
+					<SiRabbitmq size={32} className='bg-gray-100 rounded text-orange-600' />
 				</li>
 			</ul>
 		</div>
