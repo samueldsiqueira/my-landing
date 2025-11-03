@@ -4,14 +4,13 @@ import { motion } from 'framer-motion';
 import { FiGithub, FiExternalLink } from 'react-icons/fi';
 import { AiOutlineCode } from 'react-icons/ai';
 import { SiVercel } from 'react-icons/si';
-import { fetchVercelProjects, getProjectUrl, getProjectPreviewImage, getProjectPreviewImagePaths, VercelProject } from '../services/vercelServices';
+import { fetchVercelProjects, getProjectUrl, getProjectPreviewImage, VercelProject } from '../services/vercelServices';
 import Image from 'next/image';
 
 const Projects = () => {
   const [vercelProjects, setVercelProjects] = useState<VercelProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
-  const [imageAttempts, setImageAttempts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     const loadProjects = async () => {
@@ -22,29 +21,6 @@ const Projects = () => {
 
     loadProjects();
   }, []);
-
-  const handleImageError = (projectId: string) => {
-    const currentAttempt = imageAttempts[projectId] || 0;
-    const project = vercelProjects.find(p => p.id === projectId);
-    
-    if (project) {
-      const imagePaths = getProjectPreviewImagePaths(project);
-      
-      // Try next image path
-      if (currentAttempt < imagePaths.length - 1) {
-        setImageAttempts(prev => ({ ...prev, [projectId]: currentAttempt + 1 }));
-      } else {
-        // All attempts failed, show fallback
-        setImageErrors(prev => ({ ...prev, [projectId]: true }));
-      }
-    }
-  };
-
-  const getImageSource = (project: VercelProject): string => {
-    const attempt = imageAttempts[project.id] || 0;
-    const imagePaths = getProjectPreviewImagePaths(project);
-    return imagePaths[attempt] || getProjectPreviewImage(project);
-  };
 
   return (
     <motion.section
@@ -80,13 +56,14 @@ const Projects = () => {
                     <div className="text-6xl text-purple-500">🚀</div>
                   ) : (
                     <Image
-                      key={`${project.id}-${imageAttempts[project.id] || 0}`}
-                      src={getImageSource(project)}
+                      src={getProjectPreviewImage(project)}
                       alt={`${project.name} preview`}
                       fill
                       className="object-cover"
                       unoptimized
-                      onError={() => handleImageError(project.id)}
+                      onError={() => {
+                        setImageErrors(prev => ({ ...prev, [project.id]: true }));
+                      }}
                     />
                   )}
                 </div>

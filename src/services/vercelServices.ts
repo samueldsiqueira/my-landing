@@ -128,28 +128,11 @@ export const getProjectUrl = (project: VercelProject): string => {
   return `https://${project.name}.vercel.app`;
 };
 
-// Get possible OG image paths for a project
-export const getProjectPreviewImagePaths = (project: VercelProject): string[] => {
-  const projectUrl = getProjectUrl(project);
-  
-  // Return array of possible OG image paths to try
-  // These are standard paths used by Next.js and Vercel projects
-  // The Vercel dashboard shows images from these paths
-  return [
-    `${projectUrl}/opengraph-image.png`,
-    `${projectUrl}/opengraph-image.jpg`,
-    `${projectUrl}/twitter-image.png`,
-    `${projectUrl}/twitter-image.jpg`,
-    `${projectUrl}/og.png`,
-    `${projectUrl}/api/og`,
-  ];
-};
-
 export const getProjectPreviewImage = (project: VercelProject): string => {
   const projectUrl = getProjectUrl(project);
   
-  // Try to use the project's native Open Graph image first
-  // This matches what Vercel dashboard shows - the actual OG image from the deployment
-  // Standard Next.js OG image path (most common for Vercel projects)
-  return `${projectUrl}/opengraph-image.png`;
+  // Use screen-shot.xyz - a free, open-source screenshot service
+  // No API key required, CORS-friendly
+  // This captures actual screenshots of the deployed projects
+  return `https://api.screen-shot.xyz/take?url=${encodeURIComponent(projectUrl)}&width=1200&height=630`;
 };
