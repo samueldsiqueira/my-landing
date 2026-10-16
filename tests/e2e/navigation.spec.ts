@@ -25,10 +25,21 @@ test.describe('navegação por cenas (desktop)', () => {
   test('um gesto de trackpad (com inércia) avança exatamente uma cena', async ({ page }) => {
     await openStage(page);
     await settle(page);
-    for (let i = 0; i < 40; i++) {
-      await page.mouse.wheel(0, i < 10 ? 30 : 8);
-      await page.waitForTimeout(16);
-    }
+    // Disparado de dentro da página a cada ~16 ms, como um trackpad: o espaçamento entre eventos
+    // não depende da latência do protocolo de automação.
+    await page.evaluate(
+      () =>
+        new Promise<void>((resolve) => {
+          let i = 0;
+          const target = document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2) ?? document.body;
+          const tick = () => {
+            target.dispatchEvent(new WheelEvent('wheel', { deltaY: i < 10 ? 30 : 8, bubbles: true }));
+            if (++i < 40) setTimeout(tick, 16);
+            else resolve();
+          };
+          tick();
+        }),
+    );
     await page.waitForTimeout(1200);
     expect(await currentScene(page)).toBe('about');
   });
