@@ -136,6 +136,10 @@ animada e deixe o estático como base.
   de CPU parada). Para tremor use a classe global `boil` (ciclo de 15 s); se precisar de outro
   loop, faça um ciclo ≥ 10 s ou dispare animações curtas por JS só quando a cena estiver visível.
 - Keyframes com `var()` não rodam no compositor: use valores fixos em animações contínuas.
+- **Cenas fora de quadro não são renderizadas** (`content-visibility: hidden`; no modo leitura,
+  `auto`). Não meça (`getBoundingClientRect`, `offsetWidth`) peças de uma cena antes de ela
+  chegar: isso força o layout que o navegador estava pulando. Meça depois da troca de
+  `data-scene`, como a máquina faz no FLIP. As animações dessas cenas também ficam paradas.
 
 ## Tokens
 

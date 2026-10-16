@@ -7,7 +7,8 @@
 
 /* .canvas é o container das consultas (@container canvas): nunca dimensionar aqui. */
 .canvas {
-  --t: 1;
+  /* Primeira visita ~1,6 s; na revisita, menos ainda. */
+  --t: 0.7;
   /* Só tokens da paleta: o fio é mimeo clareado com papel (sob a luz), a pauta é mimeo
      translúcido, o giz é a cor da régua. */
   --thread: color-mix(in oklab, var(--color-mimeo) 58%, var(--color-paper));

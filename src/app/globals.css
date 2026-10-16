@@ -157,10 +157,13 @@ html[data-mode='stage'] body {
   overscroll-behavior: none;
 }
 
+/* Cenas fora de quadro: o navegador pula estilo, layout e pintura delas (e as animações não
+   rodam), mas o conteúdo continua no HTML para buscadores e para o modo leitura. */
 html[data-mode='stage'] .scene {
   position: absolute;
   inset: 0;
   visibility: hidden;
+  content-visibility: hidden;
 }
 
 html[data-mode='stage'][data-scene='inicio'] #inicio,
@@ -171,6 +174,13 @@ html[data-mode='stage'][data-scene='experience'] #experience,
 html[data-mode='stage'][data-scene='contact'] #contact,
 html[data-mode='stage'] .scene[data-leaving] {
   visibility: visible;
+  content-visibility: visible;
+}
+
+/* Página única: cada cena só é renderizada quando se aproxima da tela. */
+html[data-mode='read'] .scene {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 100svh;
 }
 
 html[data-mode='stage'] .scene[data-leaving] {
@@ -1121,6 +1131,7 @@ html[data-motion='reduced'] *::after {
   .scene {
     position: relative !important;
     visibility: visible !important;
+    content-visibility: visible !important;
     break-inside: avoid;
   }
   .scene-scroll {

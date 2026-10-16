@@ -1,12 +1,13 @@
 /* =========================================================================
    Cena 1 — Abertura "Montagem"
    Composição: estilos-base (pose final). Coreografia: blocos "ENTRADA" e "SAÍDA".
-   Quadros a 12 fps (var(--frame)); --t encurta os atrasos na revisita.
+   Quadros a 12 fps (var(--frame)); --t comprime os atrasos (primeira visita e, mais, a revisita).
    ========================================================================= */
 
 /* .canvas é o container das consultas (@container canvas): nunca dimensionar aqui. */
 .canvas {
-  --t: 1;
+  /* Primeira visita: a montagem leva ~1,8 s (33 quadros comprimidos); na revisita, menos ainda. */
+  --t: 0.6;
   /* Composição alta (padrão; também no modo leitura). */
   --F: min(22cqw, 7.5rem);
   --W: min(60cqw, 19rem);
