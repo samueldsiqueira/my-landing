@@ -24,7 +24,7 @@ export default function Opening() {
       <div className={s.frame}>
         <div className={s.photoSlot}>
           <div className={s.photoAnim} data-shared="photo">
-            <Paper seed="inicio-photo" depth={1.8} className={s.photo}>
+            <Paper seed="inicio-photo" depth={1.8} clipContent className={s.photo}>
               <HalftonePhoto priority sizes="(min-width: 1100px) 32vw, 62vw" />
             </Paper>
             <Tape className={cx(s.tape, s.tapeA)} />

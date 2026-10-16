@@ -42,7 +42,8 @@
 }
 
 .photo {
-  filter: drop-shadow(5px 8px 0 var(--shadow));
+  --paper-shadow-x: 5px;
+  --paper-shadow-y: 8px;
 }
 
 .tape {

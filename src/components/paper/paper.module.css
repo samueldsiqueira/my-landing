@@ -26,28 +26,35 @@
 /* ---------- papel ---------- */
 .paper {
   position: relative;
-  filter: drop-shadow(4px 6px 0 var(--shadow));
-}
-
-.sheet {
-  position: relative;
-  height: 100%;
+  isolation: isolate;
   color: var(--color-ink);
 }
 
-.paper .sheet {
+.shade,
+.surface {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.shade {
+  background: var(--shadow);
+  translate: var(--paper-shadow-x, 4px) var(--paper-shadow-y, 6px);
+}
+
+.surface {
   background-color: var(--color-paper);
   background-image: url('/img/paper-grain.webp');
   background-size: 256px;
   background-blend-mode: multiply;
 }
 
-.paper .kraft {
+.surface.kraft {
   background-color: var(--color-kraft);
 }
 
-.paper .zebra {
-  background-color: var(--color-paper);
+.surface.zebra {
   background-image:
     url('/img/paper-grain.webp'), repeating-linear-gradient(var(--color-paper) 0 1.5em, var(--color-zebra) 1.5em 3em);
   background-size:
@@ -55,8 +62,13 @@
     100% 3em;
 }
 
-.paper .none {
+.surface.none {
   background: none;
+}
+
+.body {
+  position: relative;
+  height: 100%;
 }
 
 /* ---------- fita crepe ---------- */

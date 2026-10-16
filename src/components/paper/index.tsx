@@ -105,19 +105,25 @@ interface PaperProps extends HTMLAttributes<HTMLDivElement> {
   edge?: 'scissor' | 'torn-top' | 'straight';
   depth?: number;
   tone?: 'paper' | 'kraft' | 'zebra' | 'none';
+  /** Recorta também o conteúdo (fotos e imagens que vão até a borda). Texto: deixe false. */
+  clipContent?: boolean;
+  /** Classe do miolo, onde fica o conteúdo. */
   sheetClassName?: string;
   children?: ReactNode;
 }
 
 /**
- * Folha de papel com sombra dura. A sombra fica no invólucro (filter) e o recorte no
- * miolo (clip-path), porque clip-path no mesmo elemento cortaria a própria sombra.
+ * Folha de papel com sombra dura, em três camadas: a sombra (cópia do recorte deslocada),
+ * a superfície recortada e, por cima, o conteúdo. O recorte nunca alcança o texto: o
+ * padding que a cena define no className fica dentro da folha.
+ * Sombra: --paper-shadow-x / --paper-shadow-y no className (padrão 4px 6px).
  */
 export function Paper({
   seed,
   edge = 'scissor',
   depth,
   tone = 'paper',
+  clipContent = false,
   className,
   sheetClassName,
   children,
@@ -131,7 +137,9 @@ export function Paper({
         : undefined;
   return (
     <div className={cx(s.paper, className)} {...rest}>
-      <div className={cx(s.sheet, s[tone], sheetClassName)} style={{ clipPath }}>
+      {tone !== 'none' && <span className={s.shade} style={{ clipPath }} aria-hidden="true" />}
+      <span className={cx(s.surface, s[tone])} style={{ clipPath }} aria-hidden="true" />
+      <div className={cx(s.body, sheetClassName)} style={clipContent ? { clipPath } : undefined}>
         {children}
       </div>
     </div>

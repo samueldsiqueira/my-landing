@@ -35,12 +35,12 @@ um novo arranjo da mesa. Este documento é o contrato para escrever ou alterar u
 </Scene>
 ```
 
-- `.scene-canvas` (o `className` passado a `Scene`) é o **container** das consultas
-  (`container-name: canvas`). **Nunca dimensione o canvas** (largura, max-width, margens): a
-  consulta mede ele mesmo. Use um filho `.frame` para a composição.
-- O canvas já desconta a interface (régua, índice, barra). No palco ele tem altura definida
-  (`max(100%, var(--canvas-min-h))`); se o conteúdo não couber, a cena rola por dentro e a troca
-  de cena só acontece na borda da rolagem.
+- A área de rolagem (`.scene-scroll`) é o **container** das consultas (`container-name: canvas`):
+  no palco, `cqw`/`cqh` medem a área livre da cena, já sem a interface (régua, índice, barra).
+- `.scene-canvas` (o `className` passado a `Scene`) **cresce com o conteúdo** (`min-height: 100%`):
+  se o texto não couber, a cena rola por dentro e o fim nunca fica atrás da barra; a troca de
+  cena só acontece na borda da rolagem. Centralize com `margin: auto` (não com
+  `place-items: center`, que empurra o excesso para cima, fora do alcance da rolagem).
 - Título: um `h1` (abertura) ou `h2` com `headingProps(id)` — é o alvo de foco ao trocar de cena.
 
 ### Duas composições, não uma reduzida
@@ -50,7 +50,7 @@ um novo arranjo da mesa. Este documento é o contrato para escrever ou alterar u
 | **Alta** (padrão) | retrato, telas estreitas e **modo leitura**                        | fluxo normal, `cqw`; limite a largura (`max-width` ~30–44rem no `.frame`) |
 | **Larga**         | `@container canvas (min-width: 760px) and (min-aspect-ratio: 1/1)` | posicionamento absoluto em `cqw`/`cqh` dentro do `.frame`                 |
 
-A consulta larga depende de `aspect-ratio`, que só existe no palco (container de tamanho). No
+A consulta larga depende de `aspect-ratio`, que só existe no palco (a área de rolagem é container de tamanho). No
 modo leitura vale sempre a composição alta — de propósito: vira um documento legível.
 
 ## Gramática de movimento
@@ -138,8 +138,19 @@ Cores (`src/app/globals.css`, `@theme`): `--color-mat` #23463A, `--color-paper` 
 `--color-ruler` #CFE0B4. Sombras: `--shadow`, `--shadow-soft`. Fita: `--tape`.
 Fontes: Archivo variável (`font-stretch` 62–125%, peso 100–900) para tudo; classe `.dot` (Doto,
 matricial) só no que é "impresso" por impressora matricial.
-Primitivas em `src/components/paper`: `CutLetters`, `Paper` (recorte a tesoura, tons
-`paper`/`kraft`/`zebra`), `Tape`, `Dymo`, `Pin`, `HalftonePhoto`, `cx`, `headingProps`.
+Primitivas em `src/components/paper`: `CutLetters`, `Paper`, `Tape`, `Dymo`, `Pin`, `HalftonePhoto`,
+`cx`, `headingProps`.
+
+### Papel (`Paper`)
+
+- Três camadas: sombra dura (cópia do recorte deslocada), superfície recortada e o conteúdo por
+  cima. **O recorte nunca alcança o texto**: o `padding` vai no `className` (ou no `sheetClassName`)
+  e fica dentro da folha. Deixe pelo menos 16–20 px entre o texto e qualquer borda.
+- `clipContent` recorta também o conteúdo — só para imagens que vão até a borda (fotos).
+- Sombra: `--paper-shadow-x`/`--paper-shadow-y` no `className` (padrão 4px 6px). Não use
+  `filter: drop-shadow` numa `Paper`.
+- Tons: `paper`, `kraft`, `zebra`, `none`. Texto sobre papel sempre em `--color-ink`
+  (violeta `--color-mimeo` só para destaques e links). Nada de cinzas lavados nem cores fora dos tokens.
 
 ## QA
 

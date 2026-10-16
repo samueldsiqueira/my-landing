@@ -33,15 +33,13 @@
   --tape: rgb(232 221 181 / 0.86);
   --shadow: rgb(8 20 15 / 0.45);
   --shadow-soft: rgb(8 20 15 / 0.28);
-  --focus: var(--color-mimeo-light);
+  --focus: var(--color-mimeo);
 
   /* Área livre para as composições, descontando a interface (réguas, índice, barra). */
   --inset-top: 28px;
   --inset-right: 16px;
   --inset-bottom: calc(84px + env(safe-area-inset-bottom));
   --inset-left: 16px;
-  /* Abaixo desta altura, a cena rola por dentro em vez de espremer a composição. */
-  --canvas-min-h: 30rem;
 }
 
 /* Telas baixas (celular deitado): barra inferior mais fina. */
@@ -59,7 +57,6 @@
     --inset-right: 40px;
     --inset-bottom: 88px;
     --inset-left: 200px;
-    --canvas-min-h: 36rem;
   }
 }
 
@@ -92,12 +89,16 @@ body {
 }
 
 :focus-visible {
+  /* Anel em duas cores da paleta: aparece tanto sobre o papel quanto sobre a esteira. */
   outline: 3px solid var(--focus);
-  outline-offset: 3px;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--color-paper);
 }
 
-[data-scene-heading]:focus-visible {
-  outline-offset: 6px;
+/* O título recebe foco ao trocar de cena (leitores de tela, ordem de Tab), mas não é um controle. */
+[data-scene-heading]:focus {
+  outline: none;
+  box-shadow: none;
 }
 
 a {
@@ -135,13 +136,16 @@ a {
   position: relative;
 }
 
+/* A área de rolagem é o container das consultas (@container canvas): a área livre da cena,
+   já sem a interface. O canvas dentro dela cresce com o conteúdo, então a rolagem sempre
+   alcança o fim do texto sem escondê-lo atrás da barra. */
 .scene-scroll {
+  container: canvas / inline-size;
   padding: var(--inset-top) var(--inset-right) var(--inset-bottom) var(--inset-left);
 }
 
 .scene-canvas {
   position: relative;
-  container: canvas / inline-size;
   min-height: calc(100svh - var(--inset-top) - var(--inset-bottom));
 }
 
@@ -183,6 +187,7 @@ html[data-rewind] .scene *::after {
 html[data-mode='stage'] .scene-scroll {
   position: absolute;
   inset: 0;
+  container-type: size;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -195,9 +200,7 @@ html[data-mode='stage'] .scene-scroll:focus-visible {
 }
 
 html[data-mode='stage'] .scene-canvas {
-  container-type: size;
-  min-height: 0;
-  height: max(100%, var(--canvas-min-h));
+  min-height: 100%;
 }
 
 /* =========================================================================
@@ -466,10 +469,10 @@ html[data-motion='reduced'] *::after {
   .scene-scroll {
     position: static !important;
     overflow: visible !important;
+    container-type: inline-size !important;
   }
   .scene-canvas {
-    height: auto !important;
-    container-type: inline-size !important;
+    min-height: 0 !important;
   }
   *,
   *::before,
