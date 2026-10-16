@@ -9,7 +9,7 @@ import type { SceneId } from '@/content/profile';
 export function Scene({ id, className, children }: { id: SceneId; className?: string; children: ReactNode }) {
   return (
     <section id={id} data-id={id} className="scene" aria-labelledby={`${id}-title`}>
-      <div className="scene-scroll">
+      <div className="scene-scroll" role="group" aria-labelledby={`${id}-title`}>
         <div className={className ? `scene-canvas ${className}` : 'scene-canvas'}>{children}</div>
       </div>
     </section>

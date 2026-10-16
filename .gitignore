@@ -44,3 +44,6 @@ screenshots/
 qa-shots/
 test-results/
 playwright-report/
+
+# worktrees de agentes
+.claude/worktrees/

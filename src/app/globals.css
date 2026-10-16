@@ -190,6 +190,10 @@ html[data-mode='stage'] .scene-scroll {
   scrollbar-color: rgb(207 224 180 / 0.4) transparent;
 }
 
+html[data-mode='stage'] .scene-scroll:focus-visible {
+  outline-offset: -6px;
+}
+
 html[data-mode='stage'] .scene-canvas {
   container-type: size;
   min-height: 0;

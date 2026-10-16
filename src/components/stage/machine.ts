@@ -72,6 +72,14 @@ export const resolveTarget = (target: number | string): number | null => {
   return index >= 0 ? index : null;
 };
 
+/** A área da cena só entra na ordem de Tab quando de fato rola (teclado consegue rolar). */
+const syncScrollable = (id: SceneId) => {
+  const scroller = sceneEl(id)?.querySelector<HTMLElement>('.scene-scroll');
+  if (!scroller) return;
+  if (scroller.scrollHeight > scroller.clientHeight + 1) scroller.tabIndex = 0;
+  else scroller.removeAttribute('tabindex');
+};
+
 const announce = (index: number) => {
   const live = document.getElementById('stage-live');
   if (live) live.textContent = `${scenes[index].label}, cena ${index + 1} de ${sceneIds.length}`;
@@ -159,6 +167,7 @@ const arrive = async (to: number, { dir, source, moveFocus, shared, run }: Arriv
 
   const scroller = toEl.querySelector<HTMLElement>('.scene-scroll');
   if (scroller) scroller.scrollTop = dir > 0 || source !== 'wheel' ? 0 : scroller.scrollHeight;
+  syncScrollable(toId);
 
   announce(to);
   if (moveFocus) toEl.querySelector<HTMLElement>('[data-scene-heading]')?.focus({ preventScroll: true });
@@ -271,6 +280,12 @@ export function init() {
   document.addEventListener('animationend', (event) => {
     if (event.animationName === 'hand-sweep') root.removeAttribute('data-hand');
   });
+  let resizeTimer = 0;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(() => syncScrollable(sceneIds[state.cur]), 150);
+  });
+  syncScrollable(sceneIds[state.cur]);
   if (readMode() === 'stage') void trackEnter(sceneIds[state.cur], state.token);
 }
 
