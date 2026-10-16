@@ -1,69 +1,43 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Samuel D' Siqueira — portfólio
 
-## Getting Started
+Landing page pessoal em forma de animação stop-motion em papel: cada seção é uma cena montada
+sobre uma esteira de corte, trocada por roda do mouse, teclado, toque ou pelo índice.
 
-### Environment Setup
+- **Stack:** Next.js 16 (App Router), React 19, Tailwind CSS 4, TypeScript.
+- **Animação:** CSS puro (`@keyframes` com `step-end`, pose a pose a 12 fps), sem biblioteca.
+- **Guia das cenas e da gramática de movimento:** [`docs/MOTION.md`](docs/MOTION.md).
 
-1. Copy the `.env.example` file to `.env.local`:
-```bash
-cp .env.example .env.local
-```
-
-2. Configure the environment variables in `.env.local`:
-   - `NEXT_PUBLIC_GITHUB_USER`: Your GitHub username
-   - `NEXT_PUBLIC_GITHUB_TOKEN`: Your GitHub personal access token (optional, for higher API rate limits)
-   - `NEXT_PUBLIC_VERCEL_TOKEN`: Your Vercel API token (required for projects integration)
-   - `NEXT_PUBLIC_VERCEL_TEAM_ID`: Your Vercel team ID (optional, only if using a team account)
-
-### Getting Vercel API Token
-
-1. Go to [Vercel Account Settings](https://vercel.com/account/tokens)
-2. Create a new token with the name "Portfolio Integration"
-3. Ensure the token has access to:
-   - Read projects
-   - Read deployments
-4. Copy the token and add it to your `.env.local` file
-
-Example `.env.local` configuration:
-```bash
-NEXT_PUBLIC_VERCEL_TOKEN=HbGTPDawtUAuY2QeNytgThId
-# Optional: If using a team account
-NEXT_PUBLIC_VERCEL_TEAM_ID=your_team_id
-```
-
-The Projects section will automatically fetch and display your Vercel projects with their production deployment URLs (excluding "my-landing").
-
-### Running the Development Server
-
-First, run the development server:
+## Rodando
 
 ```bash
+npm install
+cp .env.example .env.local   # opcional: projetos da Vercel
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Scripts: `npm run build`, `npm start`, `npm run lint`, `npm run typecheck`, `npm run test:e2e`,
+`npm run assets` (regenera a foto em meio-tom e as texturas; requer ImageMagick).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Projetos da Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+A cena "Projetos" lista os projetos da sua conta na Vercel, buscados **no servidor** e
+atualizados a cada hora (ISR). O token nunca vai para o navegador.
 
-## Learn More
+1. Crie um token em <https://vercel.com/account/tokens> com leitura de projetos e deployments.
+2. Defina `VERCEL_API_TOKEN` (e `VERCEL_TEAM_ID`, se for conta de time) nas variáveis do projeto
+   na Vercel e/ou em `.env.local`. **Não use o prefixo `NEXT_PUBLIC_`.**
+3. Opcional: ajuste títulos, descrições, ordem ou oculte projetos em `src/content/projects.ts`.
 
-To learn more about Next.js, take a look at the following resources:
+Sem token, a cena mostra um convite para os repositórios no GitHub.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Conteúdo
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Textos, cargos, experiências e tecnologias ficam em `src/content/profile.ts`. A duração de cada
+emprego é calculada automaticamente a partir das datas.
 
-## Deploy on Vercel
+## Modos de visualização
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- **Cenas** (padrão com JavaScript): uma cena por vez, em tela cheia.
+- **Página única:** `?modo=leitura`, ou o link "Ver em uma página". Também é o que buscadores,
+  leitores sem JavaScript e a impressão recebem.
+- **Movimento reduzido:** segue `prefers-reduced-motion` e pode ser ligado no botão da interface.

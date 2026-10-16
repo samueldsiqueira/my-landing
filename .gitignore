@@ -39,3 +39,8 @@ next-env.d.ts
 
 # screenshots
 screenshots/
+
+# QA / testes
+qa-shots/
+test-results/
+playwright-report/

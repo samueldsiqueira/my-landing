@@ -1,0 +1,519 @@
+/* =========================================================================
+   Cena 1 — Abertura "Montagem"
+   Composição: estilos-base (pose final). Coreografia: blocos "ENTRADA" e "SAÍDA".
+   Quadros a 12 fps (var(--frame)); --t encurta os atrasos na revisita.
+   ========================================================================= */
+
+/* .canvas é o container das consultas (@container canvas): nunca dimensionar aqui. */
+.canvas {
+  --t: 1;
+  /* Composição alta (padrão; também no modo leitura). */
+  --F: min(22cqw, 7.5rem);
+  --W: min(60cqw, 19rem);
+  display: flex;
+  flex-direction: column;
+}
+
+.frame {
+  position: relative;
+  width: 100%;
+  max-width: 30rem;
+  margin: auto;
+  padding-top: 4px;
+}
+
+:global(html[data-seen~='inicio']) .canvas {
+  --t: 0.28;
+}
+
+/* ---------- foto ---------- */
+.photoSlot {
+  position: absolute;
+  z-index: 1;
+  top: calc(var(--F) * 0.68);
+  left: 50%;
+  width: var(--W);
+  translate: -44% 0;
+  rotate: 4deg;
+}
+
+.photoAnim {
+  position: relative;
+}
+
+.photo {
+  filter: drop-shadow(5px 8px 0 var(--shadow));
+}
+
+.tape {
+  font-size: clamp(12px, 3.6cqw, 16px);
+}
+
+.tapeA {
+  left: -2.2em;
+  top: 0.9em;
+  rotate: -38deg;
+}
+
+.tapeB {
+  right: -1.9em;
+  bottom: 1.4em;
+  rotate: -32deg;
+}
+
+/* ---------- nome ---------- */
+.name {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+}
+
+.first {
+  font-size: var(--F);
+  font-stretch: 112%;
+}
+
+.second {
+  margin-top: calc(var(--F) * 0.68 + var(--W) * 1.14 - var(--F) * 0.86 + 0.6rem);
+  font-size: calc(var(--F) * 0.7);
+  font-stretch: 100%;
+}
+
+.letter :global(.boil) {
+  --boil-x: 0.7px;
+  --boil-r: 0.5deg;
+}
+
+.letter[data-near] {
+  text-shadow: 0.07em 0.11em 0 var(--shadow-soft);
+}
+
+.letter[data-near] > span {
+  transform: translateY(-0.05em) scale(1.05);
+  transition: transform calc(var(--frame) * 2) steps(2, jump-end);
+}
+
+/* ---------- cargos (Dymo) ---------- */
+.roles {
+  position: relative;
+  margin-top: 1.2rem;
+  font-size: clamp(13px, 3.7cqw, 17px);
+}
+
+.roles .dymo {
+  letter-spacing: 0.13em;
+}
+
+.dymoStack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5em;
+}
+
+.dymo:nth-child(2) {
+  rotate: 1.2deg;
+  translate: 0.6em 0;
+}
+
+.dymo:nth-child(3) {
+  rotate: -0.8deg;
+}
+
+/* Com movimento, as etiquetas se sobrepõem e se revezam (uma perfurada, depois arrancada). */
+:global(html[data-mode='stage'][data-motion='full']) .dymoStack {
+  display: grid;
+}
+
+:global(html[data-mode='stage'][data-motion='full']) .dymo {
+  grid-area: 1 / 1;
+  rotate: -1.5deg;
+  translate: 0 0;
+}
+
+/* ---------- links (etiquetas kraft) ---------- */
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 1.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.links li:nth-child(1) {
+  rotate: -3deg;
+}
+.links li:nth-child(2) {
+  rotate: 2deg;
+  translate: 0 5px;
+}
+.links li:nth-child(3) {
+  rotate: -1deg;
+}
+
+.tag {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px 0 24px;
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--color-ink);
+  text-decoration: none;
+  background: var(--color-kraft);
+  clip-path: polygon(11px 0, 100% 0, 100% 100%, 11px 100%, 0 50%);
+  filter: drop-shadow(3px 4px 0 var(--shadow));
+}
+
+.tag::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-radius: 50%;
+  background: var(--color-mat);
+}
+
+.tag:hover {
+  background: #d4ab76;
+}
+
+.tag:focus-visible {
+  outline: none;
+  background: var(--color-paper);
+  box-shadow: inset 0 0 0 3px var(--color-mimeo);
+}
+
+/* ---------- tira de formulário contínuo ---------- */
+.printout {
+  width: min(13rem, 70%);
+  margin: 1.4rem 0 1.5rem auto;
+  rotate: 3deg;
+  font-size: 14px;
+}
+
+.printout ul {
+  margin: 0;
+  padding: 0.75em 1.6em 0.9em;
+  list-style: none;
+  line-height: 1.5em;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  background:
+    radial-gradient(circle, var(--color-mat) 3.2px, transparent 3.6px) left 4px top 6px / 14px 18px repeat-y,
+    radial-gradient(circle, var(--color-mat) 3.2px, transparent 3.6px) right 4px top 6px / 14px 18px repeat-y;
+}
+
+/* =========================================================================
+   Composição larga (palco em tela paisagem): foto à esquerda, nome cruzando a borda dela.
+   ========================================================================= */
+@container canvas (min-width: 760px) and (min-aspect-ratio: 1/1) {
+  .frame {
+    position: absolute;
+    inset: 0;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .photoSlot {
+    top: 9cqh;
+    left: 4cqw;
+    width: min(31cqw, 62cqh);
+    translate: 0 0;
+    rotate: -4deg;
+  }
+
+  .name {
+    position: absolute;
+    left: 33cqw;
+    top: 16cqh;
+  }
+
+  .first {
+    font-size: min(13.6cqw, 23cqh);
+    font-stretch: 125%;
+  }
+
+  .second {
+    margin-top: 0;
+    font-size: min(9.8cqw, 16.5cqh);
+  }
+
+  .roles .dymo {
+    letter-spacing: 0.18em;
+  }
+
+  .roles {
+    position: absolute;
+    left: 34.5cqw;
+    top: 63cqh;
+    margin: 0;
+    font-size: clamp(15px, min(1.7cqw, 2.8cqh), 22px);
+  }
+
+  .links {
+    position: absolute;
+    left: 35cqw;
+    top: 76cqh;
+    margin: 0;
+  }
+
+  .printout {
+    position: absolute;
+    right: 3cqw;
+    top: 60cqh;
+    width: clamp(13rem, 19cqw, 16rem);
+    margin: 0;
+    rotate: 4deg;
+    font-size: 15px;
+  }
+}
+
+/* =========================================================================
+   ENTRADA — sequência de 33 quadros (protótipo aprovado)
+   q1–3 sombra da mão (global) · q3–6 foto em 4 poses · q7–8 fitas batem
+   q7–19 letras caem, uma por quadro · q19 Dymo perfura · q27–29 etiquetas · q30–33 formulário
+   ========================================================================= */
+
+@keyframes photo-in {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-38vw, 55vh) rotate(-12deg) scale(1.12);
+  }
+  40% {
+    opacity: 1;
+    transform: translate(-12vw, 16vh) rotate(-5deg) scale(1.06);
+  }
+  60% {
+    opacity: 1;
+    transform: translate(1vw, -1.5vh) rotate(2.5deg) scale(1.01);
+  }
+  80%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes tape-slap {
+  0% {
+    opacity: 0;
+  }
+  33.333% {
+    opacity: 1;
+    transform: translateY(-6px) scale(1.35);
+  }
+  66.666%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes letter-drop {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+    transform: translateY(-0.2em) scale(1.32);
+    text-shadow: 0.11em 0.17em 0 var(--shadow-soft);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(0.02em) scale(1.05, 0.9);
+    text-shadow: 0.02em 0.03em 0 var(--shadow);
+  }
+  75%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Perfura (10 passos), segura, é arrancada em 2 quadros e some até a próxima volta. */
+@keyframes dymo-cycle {
+  0% {
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+    animation-timing-function: steps(10, end);
+  }
+  9.26% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    opacity: 1;
+    transform: none;
+  }
+  30% {
+    transform: translate(2px, -6px) rotate(-5deg);
+  }
+  31% {
+    transform: translate(18px, -34px) rotate(-14deg);
+    opacity: 1;
+  }
+  32%,
+  100% {
+    transform: translate(18px, -34px) rotate(-14deg);
+    opacity: 0;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+}
+
+@keyframes tag-drop {
+  0% {
+    opacity: 0;
+  }
+  33.333% {
+    opacity: 1;
+    transform: translateY(-14px) scale(1.18);
+  }
+  66.666%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes strip-in {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+    transform: translateX(46vw) rotate(9deg);
+  }
+  40% {
+    opacity: 1;
+    transform: translateX(11vw) rotate(-2deg);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(-0.6vw) rotate(1deg);
+  }
+  80%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='inicio'] #inicio) .photoAnim:not([data-flip]) {
+  animation: photo-in calc(var(--frame) * 5) step-end both;
+  animation-delay: calc(var(--frame) * 2 * var(--t));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='inicio'] #inicio) .tape {
+  animation: tape-slap calc(var(--frame) * 3) step-end both;
+  animation-delay: calc(var(--frame) * 6 * var(--t));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='inicio'] #inicio) .tapeB {
+  animation-delay: calc(var(--frame) * 7 * var(--t));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='inicio'] #inicio) .letter {
+  animation: letter-drop calc(var(--frame) * 4) step-end both;
+  animation-delay: calc(var(--frame) * (6 + var(--i)) * var(--t));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='inicio'] #inicio) .second .letter {
+  animation-delay: calc(var(--frame) * (3 + var(--i)) * var(--t));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='inicio'] #inicio) .dymo {
+  animation: dymo-cycle 9s step-end infinite both;
+  animation-delay: calc(var(--frame) * 18 * var(--t) + var(--k) * 3s);
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='inicio'] #inicio) .links li {
+  animation: tag-drop calc(var(--frame) * 3) step-end both;
+  animation-delay: calc(var(--frame) * (26 + var(--k)) * var(--t));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='inicio'] #inicio) .printout {
+  animation: strip-in calc(var(--frame) * 5) step-end both;
+  animation-delay: calc(var(--frame) * 28 * var(--t));
+}
+
+/* Tocar na foto: as fitas batem de novo. */
+:global(html[data-mode='stage'][data-motion='full'][data-scene='inicio'] #inicio) .photoAnim[data-retape] .tape {
+  animation: tape-slap calc(var(--frame) * 3) step-end both;
+  animation-delay: 0s;
+}
+
+/* =========================================================================
+   SAÍDA — as letras são arrancadas para cima, as etiquetas caem, o formulário desliza.
+   A foto viaja para a cena seguinte (data-shared), então some aqui no 1º quadro.
+   ========================================================================= */
+@keyframes letter-off {
+  0% {
+    transform: none;
+  }
+  33.333% {
+    transform: translateY(-0.08em) scale(1.06);
+    text-shadow: 0.09em 0.14em 0 var(--shadow-soft);
+  }
+  66.666% {
+    transform: translate(calc(var(--jx) * 4), -42vh) rotate(calc(var(--jr) * 5));
+  }
+  100% {
+    transform: translate(calc(var(--jx) * 9), -110vh) rotate(calc(var(--jr) * 9));
+    opacity: 0;
+  }
+}
+
+@keyframes drop-off {
+  0% {
+    transform: none;
+  }
+  50% {
+    transform: translateY(30vh) rotate(8deg);
+  }
+  100% {
+    transform: translateY(90vh) rotate(16deg);
+    opacity: 0;
+  }
+}
+
+@keyframes slide-off {
+  0% {
+    transform: none;
+  }
+  50% {
+    transform: translateX(30vw) rotate(6deg);
+  }
+  100% {
+    transform: translateX(80vw) rotate(10deg);
+    opacity: 0;
+  }
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='inicio'] #inicio) .canvas {
+  animation: none;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='inicio'] #inicio) .letter {
+  animation: letter-off calc(var(--frame) * 3) step-end forwards;
+  animation-delay: calc(var(--frame) * 0.5 * var(--boil-phase));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='inicio'] #inicio) .links li,
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='inicio'] #inicio) .roles {
+  animation: drop-off calc(var(--frame) * 2) step-end forwards;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='inicio'] #inicio) .printout {
+  animation: slide-off calc(var(--frame) * 2) step-end forwards;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='inicio'] #inicio) .photoSlot {
+  animation: drop-off calc(var(--frame) * 2) step-end forwards;
+}

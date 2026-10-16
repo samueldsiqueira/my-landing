@@ -1,101 +1,475 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@import 'swiper/css';
-@import 'swiper/css/navigation';
-@import 'swiper/css/pagination';
+@import 'tailwindcss';
 
-/* A página é uma apresentação em tela única: o scroll troca de cena */
-html,
-body {
-  height: 100%;
-  overflow: hidden;
-  overscroll-behavior: none;
-  background: #000;
+/* =========================================================================
+   Tokens — "Mesa de Montagem"
+   ========================================================================= */
+@theme {
+  --color-mat: #23463a;
+  --color-mat-deep: #1a382e;
+  --color-ruler: #cfe0b4;
+  --color-paper: #f6f6f1;
+  --color-paper-shade: #e6e6de;
+  --color-kraft: #c59a63;
+  --color-kraft-deep: #9e7646;
+  --color-ink: #17161c;
+  --color-ink-soft: #4a4857;
+  --color-mimeo: #3a27a6;
+  --color-mimeo-light: #8e7cf0;
+  --color-zebra: #ddebd8;
+  --color-alert: #c8412b;
+
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-dot: var(--font-doto), ui-monospace, monospace;
 }
 
-/* --- Stop motion --- */
+:root {
+  /* Cadência: movimentos a 12 fps ("em dois"), tremor de quadros parados a 8 fps. */
+  --frame: 83.333ms;
+  --boil-frame: 125ms;
+  --dir: 1;
 
-/* "Boil": tremida quadro a quadro típica de animação feita à mão */
-@keyframes boil {
-  0% { transform: translate(0, 0) rotate(0deg); }
-  25% { transform: translate(0.6px, -0.6px) rotate(-0.4deg); }
-  50% { transform: translate(-0.6px, 0.4px) rotate(0.3deg); }
-  75% { transform: translate(0.4px, 0.6px) rotate(-0.2deg); }
+  --mat-line: rgb(214 232 196 / 0.1);
+  --mat-major: rgb(214 232 196 / 0.24);
+  --tape: rgb(232 221 181 / 0.86);
+  --shadow: rgb(8 20 15 / 0.45);
+  --shadow-soft: rgb(8 20 15 / 0.28);
+  --focus: var(--color-mimeo-light);
+
+  /* Área livre para as composições, descontando a interface (réguas, índice, barra). */
+  --inset-top: 28px;
+  --inset-right: 16px;
+  --inset-bottom: calc(84px + env(safe-area-inset-bottom));
+  --inset-left: 16px;
+  /* Abaixo desta altura, a cena rola por dentro em vez de espremer a composição. */
+  --canvas-min-h: 30rem;
 }
 
-.boil {
-  display: inline-block;
-  animation: boil 0.5s steps(1) infinite;
-}
-
-/* Granulado de película, trocando de quadro a ~8 fps */
-@keyframes grain {
-  0% { background-position: 0 0; }
-  20% { background-position: -40px 30px; }
-  40% { background-position: 25px -50px; }
-  60% { background-position: -60px -10px; }
-  80% { background-position: 45px 55px; }
-}
-
-.grain {
-  opacity: 0.08;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  animation: grain 0.6s steps(1) infinite;
-}
-
-.vignette {
-  background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.7) 100%);
-}
-
-/* Indicador de "role" pulando em 3 quadros */
-@keyframes hop {
-  0%, 100% { transform: translateY(0); }
-  33% { transform: translateY(4px); }
-  66% { transform: translateY(8px); }
-}
-
-.hop {
-  animation: hop 0.9s steps(1) infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .boil,
-  .grain,
-  .hop {
-    animation: none;
+/* Telas baixas (celular deitado): barra inferior mais fina. */
+@media (max-height: 500px) {
+  :root {
+    --inset-top: 24px;
+    --inset-bottom: calc(60px + env(safe-area-inset-bottom));
   }
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 10px;
+/* Interface de mesa (régua lateral com índice) em telas largas e altas o bastante. */
+@media (min-width: 1100px) and (min-height: 640px) {
+  :root {
+    --inset-top: 48px;
+    --inset-right: 40px;
+    --inset-bottom: 88px;
+    --inset-left: 200px;
+    --canvas-min-h: 36rem;
+  }
 }
 
-::-webkit-scrollbar-track {
-  background: #1a1a1a;
+html[data-dir='-1'] {
+  --dir: -1;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #9333ea;
-  border-radius: 5px;
+/* =========================================================================
+   Base
+   ========================================================================= */
+html {
+  background: var(--color-mat);
+  color: var(--color-paper);
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #a855f7;
+body {
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.6;
+  background: var(--color-mat);
+  min-height: 100svh;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Adicione estilos adicionais aqui, se necessário */
-.swiper-container {
-    width: 100%;
-    height: 100%;
+::selection {
+  background: var(--color-mimeo);
+  color: var(--color-paper);
 }
 
-.swiper-slide {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #1a1a1a;
-    padding: 16px;
-    border-radius: 8px;
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+[data-scene-heading]:focus-visible {
+  outline-offset: 6px;
+}
+
+a {
+  color: inherit;
+}
+
+.skip-link {
+  position: fixed;
+  left: 12px;
+  top: 12px;
+  z-index: 100;
+  padding: 10px 16px;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-weight: 600;
+  translate: 0 -200%;
+}
+
+.skip-link:focus-visible {
+  translate: 0 0;
+}
+
+/* Texto impresso por matricial (formulários, cabeçalhos de registro). */
+.dot {
+  font-family: var(--font-dot);
+  font-variation-settings: 'ROND' 100;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* =========================================================================
+   Palco: modos "stage" (cenas) e "read" (página única, padrão sem JS)
+   ========================================================================= */
+.scene {
+  position: relative;
+}
+
+.scene-scroll {
+  padding: var(--inset-top) var(--inset-right) var(--inset-bottom) var(--inset-left);
+}
+
+.scene-canvas {
+  position: relative;
+  container: canvas / inline-size;
+  min-height: calc(100svh - var(--inset-top) - var(--inset-bottom));
+}
+
+html[data-mode='stage'],
+html[data-mode='stage'] body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+html[data-mode='stage'] .scene {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+}
+
+html[data-mode='stage'][data-scene='inicio'] #inicio,
+html[data-mode='stage'][data-scene='about'] #about,
+html[data-mode='stage'][data-scene='skills'] #skills,
+html[data-mode='stage'][data-scene='projects'] #projects,
+html[data-mode='stage'][data-scene='experience'] #experience,
+html[data-mode='stage'][data-scene='contact'] #contact,
+html[data-mode='stage'] .scene[data-leaving] {
+  visibility: visible;
+}
+
+html[data-mode='stage'] .scene[data-leaving] {
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Rebobinar: cada cena passa por dois quadros já montada, sem coreografia. */
+html[data-rewind] .scene *,
+html[data-rewind] .scene *::before,
+html[data-rewind] .scene *::after {
+  animation: none !important;
+}
+
+html[data-mode='stage'] .scene-scroll {
+  position: absolute;
+  inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(207 224 180 / 0.4) transparent;
+}
+
+html[data-mode='stage'] .scene-canvas {
+  container-type: size;
+  min-height: 0;
+  height: max(100%, var(--canvas-min-h));
+}
+
+/* =========================================================================
+   Esteira de corte e "câmera" (cada cena é um novo enquadramento: corte seco)
+   ========================================================================= */
+.mat {
+  position: fixed;
+  inset: -6%;
+  z-index: 0;
+  pointer-events: none;
+  background-color: var(--color-mat);
+  background-image:
+    linear-gradient(var(--mat-major) 1px, transparent 1px),
+    linear-gradient(90deg, var(--mat-major) 1px, transparent 1px),
+    linear-gradient(var(--mat-line) 1px, transparent 1px), linear-gradient(90deg, var(--mat-line) 1px, transparent 1px);
+  background-size:
+    160px 160px,
+    160px 160px,
+    32px 32px,
+    32px 32px;
+  background-position: 6% 4%;
+}
+
+.mat::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(45deg, transparent 0 639px, rgb(214 232 196 / 0.07) 639px 640px);
+}
+
+/* Luz de cima, como uma luminária sobre o set. */
+.mat::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(110% 85% at 40% 32%, rgb(255 255 240 / 0.09), transparent 58%),
+    radial-gradient(140% 120% at 50% 50%, transparent 52%, rgb(0 0 0 / 0.38));
+}
+
+html[data-mode='stage'][data-scene='about'] .mat {
+  translate: -1.4% 0.9%;
+  rotate: -0.7deg;
+}
+html[data-mode='stage'][data-scene='skills'] .mat {
+  translate: 0.8% -1.2%;
+  rotate: 0.5deg;
+}
+html[data-mode='stage'][data-scene='projects'] .mat {
+  translate: -0.6% -0.4%;
+  rotate: -1.2deg;
+  scale: 1.03;
+}
+html[data-mode='stage'][data-scene='experience'] .mat {
+  translate: 1.2% 0.6%;
+  rotate: 0.9deg;
+}
+html[data-mode='stage'][data-scene='contact'] .mat {
+  scale: 0.96;
+}
+
+/* =========================================================================
+   Gramática de movimento — keyframes globais
+   Convenções (ver docs/MOTION.md):
+   - animation-timing-function: step-end -> cada keyframe é uma pose segurada até a próxima.
+   - estilos-base = pose final; as animações descrevem o caminho até ela (fill-mode both).
+   - `transform` é da coreografia; composição usa as propriedades translate/rotate/scale.
+   ========================================================================= */
+
+/* Tremor de quadros parados ("boil"). Use num elemento interno sem translate/rotate próprios. */
+@keyframes boil {
+  0% {
+    translate: 0 0;
+    rotate: 0deg;
+  }
+  33.333% {
+    translate: var(--boil-x, 0.6px) calc(var(--boil-x, 0.6px) * -1);
+    rotate: calc(var(--boil-r, 0.4deg) * -1);
+  }
+  66.666% {
+    translate: calc(var(--boil-x, 0.6px) * -0.7) calc(var(--boil-x, 0.6px) * 0.6);
+    rotate: calc(var(--boil-r, 0.4deg) * 0.8);
+  }
+}
+
+html[data-mode='stage'][data-motion='full'] .boil {
+  animation: boil calc(var(--boil-frame) * 3) step-end infinite;
+  animation-delay: calc(var(--boil-frame) * var(--boil-phase, 0) * -1);
+}
+
+/* Oscilação de exposição entre fotos: no máximo ~3% de luminância, nunca um flash. */
+.flicker {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  background: #fff8e0;
+  opacity: 0;
+}
+
+@keyframes flicker {
+  0% {
+    opacity: 0.018;
+  }
+  12.5% {
+    opacity: 0.004;
+  }
+  25% {
+    opacity: 0.026;
+  }
+  37.5% {
+    opacity: 0.01;
+  }
+  50% {
+    opacity: 0.022;
+  }
+  62.5% {
+    opacity: 0;
+  }
+  75% {
+    opacity: 0.016;
+  }
+  87.5% {
+    opacity: 0.028;
+  }
+}
+
+html[data-mode='stage'][data-motion='full'] .flicker {
+  animation: flicker calc(var(--boil-frame) * 8) step-end infinite;
+}
+
+/* Sombra da mão do animador cruzando o set entre dois quadros. */
+.hand {
+  position: fixed;
+  top: -20vh;
+  left: 0;
+  width: 80vw;
+  height: 140vh;
+  z-index: 30;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(36% 28% at 50% 42%, rgb(0 0 0 / 0.42), transparent 72%);
+  filter: blur(16px);
+}
+
+html[data-dir='-1'] .hand {
+  scale: -1 1;
+}
+
+@keyframes hand-sweep {
+  0% {
+    opacity: 0;
+    transform: translateX(110vw) rotate(-12deg);
+  }
+  20% {
+    opacity: 1;
+    transform: translateX(78vw) rotate(-12deg);
+  }
+  40% {
+    opacity: 1;
+    transform: translateX(36vw) rotate(-9deg);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(-6vw) rotate(-14deg);
+  }
+  80% {
+    opacity: 0.8;
+    transform: translateX(-56vw) rotate(-15deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-90vw) rotate(-15deg);
+  }
+}
+
+html[data-mode='stage'][data-motion='full'][data-hand] .hand {
+  animation: hand-sweep calc(var(--frame) * 5) step-end both;
+  animation-delay: var(--frame);
+}
+
+/* Elemento compartilhado entre cenas (data-shared): o Director mede a posição na cena
+   anterior e preenche --flip-x/--flip-y/--flip-s; a peça viaja em 4 poses até o lugar. */
+@keyframes flip-in {
+  0% {
+    transform: translate(var(--flip-x, 0px), var(--flip-y, 0px)) scale(var(--flip-s, 1));
+  }
+  25% {
+    transform: translate(calc(var(--flip-x, 0px) * 0.5), calc(var(--flip-y, 0px) * 0.5))
+      scale(calc(1 + (var(--flip-s, 1) - 1) * 0.5));
+  }
+  50% {
+    transform: translate(calc(var(--flip-x, 0px) * -0.05), calc(var(--flip-y, 0px) * -0.05)) scale(1.03);
+  }
+  75%,
+  100% {
+    transform: none;
+  }
+}
+
+html[data-mode='stage'][data-motion='full'] [data-flip] {
+  animation: flip-in calc(var(--frame) * 4) step-end both;
+}
+
+/* Saída padrão de uma cena: a composição é levantada e arrastada para fora do quadro.
+   Cada cena pode substituir com a própria saída. */
+@keyframes scene-leave {
+  0% {
+    transform: none;
+  }
+  25% {
+    transform: translateY(calc(-1.2% * var(--dir))) scale(1.012);
+  }
+  50% {
+    transform: translateY(calc(-28% * var(--dir))) rotate(calc(-1.6deg * var(--dir)));
+  }
+  75% {
+    transform: translateY(calc(-72% * var(--dir))) rotate(calc(-3.5deg * var(--dir)));
+  }
+  100% {
+    transform: translateY(calc(-125% * var(--dir))) rotate(calc(-5deg * var(--dir)));
+    opacity: 0;
+  }
+}
+
+html[data-mode='stage'][data-motion='full'] .scene[data-leaving] .scene-canvas {
+  animation: scene-leave calc(var(--frame) * 4) step-end forwards;
+}
+
+/* A peça compartilhada da cena que sai some no primeiro quadro: quem viaja é a da cena seguinte. */
+html[data-mode='stage'][data-motion='full'] .scene[data-leaving] [data-shared] {
+  visibility: hidden;
+}
+
+/* =========================================================================
+   Movimento reduzido: nenhuma animação nem transição; estilos-base = composição final.
+   ========================================================================= */
+html[data-motion='reduced'] *,
+html[data-motion='reduced'] *::before,
+html[data-motion='reduced'] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* =========================================================================
+   Impressão: sempre a versão de página única.
+   ========================================================================= */
+@media print {
+  html,
+  body {
+    height: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+  .mat,
+  .flicker,
+  .hand,
+  [data-chrome] {
+    display: none !important;
+  }
+  .scene {
+    position: relative !important;
+    visibility: visible !important;
+    break-inside: avoid;
+  }
+  .scene-scroll {
+    position: static !important;
+    overflow: visible !important;
+  }
+  .scene-canvas {
+    height: auto !important;
+    container-type: inline-size !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+  }
 }
