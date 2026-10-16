@@ -1,0 +1,40 @@
+/* Estilo provisório das cenas ainda não compostas. Remover quando todas tiverem composição própria. */
+.canvas {
+  display: grid;
+  place-items: center;
+}
+
+.sheet {
+  width: min(42rem, 100%);
+  padding: 28px 32px;
+}
+
+.title {
+  margin-bottom: 16px;
+  font-size: clamp(2.2rem, 5cqw, 3.6rem);
+  font-weight: 900;
+  font-stretch: 112%;
+  line-height: 1;
+  color: var(--color-ink);
+}
+
+.list {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list h3 {
+  font-weight: 750;
+}
+
+.list p {
+  color: var(--color-ink-soft);
+}
+
+.list a {
+  color: var(--color-mimeo);
+  font-weight: 600;
+}

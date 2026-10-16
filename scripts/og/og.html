@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <title>Open Graph</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Doto:ROND,wght@100,700&display=block"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+      }
+      body {
+        position: relative;
+        font-family: 'Archivo', sans-serif;
+        background-color: #23463a;
+        background-image:
+          linear-gradient(rgb(214 232 196 / 0.24) 1px, transparent 1px),
+          linear-gradient(90deg, rgb(214 232 196 / 0.24) 1px, transparent 1px),
+          linear-gradient(rgb(214 232 196 / 0.1) 1px, transparent 1px),
+          linear-gradient(90deg, rgb(214 232 196 / 0.1) 1px, transparent 1px);
+        background-size:
+          160px 160px,
+          160px 160px,
+          32px 32px,
+          32px 32px;
+        background-position: 20px 10px;
+      }
+      body::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(110% 85% at 40% 32%, rgb(255 255 240 / 0.09), transparent 58%),
+          radial-gradient(140% 120% at 50% 50%, transparent 52%, rgb(0 0 0 / 0.38));
+      }
+      .photo {
+        position: absolute;
+        left: 70px;
+        top: 70px;
+        width: 380px;
+        rotate: -4deg;
+        filter: drop-shadow(6px 9px 0 rgb(8 20 15 / 0.45));
+      }
+      .photo img {
+        display: block;
+        width: 100%;
+        clip-path: polygon(
+          0 1%,
+          25% 0,
+          50% 1.2%,
+          75% 0.3%,
+          100% 1%,
+          99% 25%,
+          100% 50%,
+          98.8% 75%,
+          100% 99%,
+          75% 100%,
+          50% 98.9%,
+          25% 100%,
+          1% 99%,
+          0 75%,
+          1.1% 50%,
+          0 25%
+        );
+      }
+      .tape {
+        position: absolute;
+        width: 120px;
+        height: 34px;
+        background: rgb(232 221 181 / 0.86);
+        z-index: 2;
+      }
+      .name {
+        position: absolute;
+        left: 418px;
+        top: 128px;
+        z-index: 3;
+        color: #f6f6f1;
+        font-weight: 900;
+        line-height: 0.84;
+      }
+      .name span {
+        display: inline-block;
+        text-shadow: 0.035em 0.05em 0 rgb(8 20 15 / 0.45);
+      }
+      .first,
+      .second {
+        white-space: nowrap;
+      }
+      .first {
+        font-size: 138px;
+        font-stretch: 125%;
+      }
+      .second {
+        font-size: 100px;
+      }
+      .dymo {
+        position: absolute;
+        left: 428px;
+        top: 392px;
+        z-index: 3;
+        display: inline-flex;
+        align-items: center;
+        height: 52px;
+        padding: 0 22px;
+        rotate: -1.5deg;
+        font-weight: 700;
+        font-stretch: 112%;
+        font-size: 25px;
+        letter-spacing: 0.18em;
+        color: #f2efff;
+        background: linear-gradient(#4a37b8, #3a27a6 40%, #2c1d86);
+        text-shadow:
+          0 -1px 0 rgb(0 0 0 / 0.45),
+          0 1px 0 rgb(255 255 255 / 0.35);
+        box-shadow: 4px 6px 0 rgb(8 20 15 / 0.45);
+        clip-path: polygon(0 0, 100% 0, 98.6% 50%, 100% 100%, 0 100%, 1.4% 50%);
+      }
+      .strip {
+        position: absolute;
+        right: 64px;
+        top: 452px;
+        z-index: 3;
+        width: 280px;
+        padding: 14px 32px;
+        rotate: 4deg;
+        font-family: 'Doto', monospace;
+        font-variation-settings: 'ROND' 100;
+        font-weight: 700;
+        font-size: 19px;
+        line-height: 1.5;
+        color: #17161c;
+        background:
+          radial-gradient(circle, #23463a 3.6px, transparent 4px) left 6px top 8px / 16px 20px repeat-y,
+          radial-gradient(circle, #23463a 3.6px, transparent 4px) right 6px top 8px / 16px 20px repeat-y,
+          repeating-linear-gradient(#f6f6f1 0 28px, #ddebd8 28px 56px);
+        filter: drop-shadow(4px 6px 0 rgb(8 20 15 / 0.45));
+      }
+    </style>
+  </head>
+  <body>
+    <div class="photo">
+      <img src="../../public/img/samuel-halftone.png" alt="" />
+      <span class="tape" style="left: -36px; top: 16px; rotate: -38deg"></span>
+      <span class="tape" style="right: -30px; bottom: 26px; rotate: -32deg"></span>
+    </div>
+    <div class="name">
+      <div class="first" id="first">Samuel</div>
+      <div class="second" id="second">D' Siqueira</div>
+    </div>
+    <span class="dymo">ANALISTA DE SISTEMAS</span>
+    <div class="strip">SAÚDE + SISTEMAS<br />AGENTES DE IA<br />DESDE 2017</div>
+    <script>
+      let seed = 7;
+      const rand = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+      for (const id of ['first', 'second']) {
+        const el = document.getElementById(id);
+        el.innerHTML = [...el.textContent]
+          .map((ch) =>
+            ch === ' '
+              ? ' '
+              : `<span style="translate:${(rand() * 6 - 3).toFixed(1)}px ${(rand() * 12 - 6).toFixed(1)}px;rotate:${(rand() * 7 - 3.5).toFixed(1)}deg">${ch}</span>`,
+          )
+          .join('');
+      }
+    </script>
+  </body>
+</html>

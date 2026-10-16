@@ -1,0 +1,597 @@
+/* Interface do palco. Breakpoint de "mesa": (min-width: 1100px) and (min-height: 640px). */
+
+.scenes {
+  position: relative;
+  z-index: 10;
+}
+
+:global(html[data-mode='stage']) .scenes {
+  position: fixed;
+  inset: 0;
+}
+
+/* ---------- elementos que só existem no modo cenas ---------- */
+.rulerTop,
+.index,
+.tools,
+.sequence,
+.bar {
+  display: none;
+}
+
+:global(html[data-mode='stage']) .rulerTop,
+:global(html[data-mode='stage']) .bar {
+  display: block;
+}
+
+/* ---------- régua superior ---------- */
+.rulerTop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 24px;
+  z-index: 20;
+  pointer-events: none;
+  background-image:
+    linear-gradient(90deg, var(--color-ruler) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(207 224 180 / 0.5) 1px, transparent 1px);
+  background-size:
+    32px 10px,
+    6.4px 5px;
+  background-repeat: repeat-x;
+  background-position:
+    0 14px,
+    0 19px;
+}
+
+.rulerTop span {
+  display: none;
+  position: absolute;
+  top: 9px;
+  left: calc(var(--n) * 32px);
+  translate: -50% 0;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--color-ruler);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- índice lateral (mesa) ---------- */
+.index {
+  position: fixed;
+  top: 48px;
+  left: 0;
+  bottom: 0;
+  width: 64px;
+  z-index: 20;
+  background-image:
+    linear-gradient(var(--color-ruler) 1px, transparent 1px),
+    linear-gradient(rgb(207 224 180 / 0.5) 1px, transparent 1px);
+  background-size:
+    12px 32px,
+    6px 6.4px;
+  background-repeat: repeat-y;
+  background-position:
+    52px 0,
+    58px 0;
+}
+
+.index ol {
+  position: absolute;
+  top: 96px;
+  left: 0;
+  width: 196px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.index a {
+  display: flex;
+  align-items: center;
+  height: 56px;
+  color: var(--color-ruler);
+  text-decoration: none;
+}
+
+.indexNumber {
+  width: 26px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.indexLabel {
+  margin-left: 48px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.index a:hover .indexLabel,
+.index a[aria-current] .indexLabel {
+  color: var(--color-paper);
+}
+
+.index a[aria-current] .indexLabel {
+  font-weight: 650;
+}
+
+.pin {
+  position: absolute;
+  top: calc(96px + 17px);
+  left: 30px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle at 35% 32%, #a597f5, var(--color-mimeo) 58%, #1d1366);
+  box-shadow: 3px 4px 0 var(--shadow);
+  translate: 0 calc(var(--i, 0) * 56px);
+  transition: translate calc(var(--frame) * 3) steps(3, jump-end);
+}
+
+/* ---------- ferramentas (mesa) ---------- */
+.tools {
+  position: fixed;
+  left: 74px;
+  bottom: 22px;
+  z-index: 20;
+}
+
+.tools > * + * {
+  margin-top: 6px;
+}
+
+.toolLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  font-size: 14px;
+  color: var(--color-ruler);
+  text-underline-offset: 3px;
+}
+
+.toolLink:hover {
+  color: var(--color-paper);
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  font-size: 14px;
+  color: var(--color-ruler);
+  cursor: pointer;
+}
+
+.toggle:hover {
+  color: var(--color-paper);
+}
+
+.switch {
+  position: relative;
+  width: 34px;
+  height: 18px;
+  flex: none;
+  border-radius: 9px;
+  background: rgb(207 224 180 / 0.22);
+  box-shadow: inset 0 0 0 1px rgb(207 224 180 / 0.5);
+}
+
+.switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-ruler);
+}
+
+.toggle[aria-pressed='true'] .switch {
+  background: var(--color-mimeo);
+  box-shadow: none;
+}
+
+.toggle[aria-pressed='true'] .switch::after {
+  left: 19px;
+  background: var(--color-paper);
+}
+
+/* ---------- sequência: anterior / próxima (mesa) ---------- */
+.sequence {
+  position: fixed;
+  right: 40px;
+  bottom: 22px;
+  z-index: 20;
+  display: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.prev {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  font-size: 14px;
+  color: var(--color-ruler);
+  cursor: pointer;
+}
+
+.prev:hover {
+  color: var(--color-paper);
+}
+
+.next {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 4px 0;
+  color: var(--color-paper);
+  text-align: right;
+  cursor: pointer;
+}
+
+.next small {
+  font-size: 13px;
+  color: var(--color-ruler);
+}
+
+.next strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+  font-weight: 750;
+  font-stretch: 112%;
+  line-height: 1.15;
+}
+
+.next strong svg {
+  font-size: 22px;
+}
+
+.next:hover strong svg,
+.next:focus-visible strong svg {
+  translate: 0 3px;
+}
+
+.hint {
+  display: none;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--color-ruler);
+  opacity: 0.85;
+}
+
+:global(html[data-seen='']) .hint {
+  display: block;
+}
+
+/* ---------- barra inferior (telas compactas) ---------- */
+.bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  height: calc(72px + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  filter: drop-shadow(0 -3px 0 var(--shadow));
+}
+
+.bar {
+  display: none;
+}
+
+:global(html[data-mode='stage']) .bar {
+  display: grid;
+  grid-template-columns: 64px 1fr 64px;
+  align-items: center;
+  clip-path: polygon(
+    0 7px,
+    3% 1px,
+    9% 6px,
+    17% 2px,
+    26% 7px,
+    34% 2px,
+    45% 6px,
+    53% 0,
+    62% 5px,
+    71% 1px,
+    80% 7px,
+    89% 2px,
+    95% 6px,
+    100% 0,
+    100% 100%,
+    0 100%
+  );
+}
+
+.bar button {
+  display: grid;
+  place-items: center;
+  height: 64px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.bar button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.bar button:focus-visible {
+  outline-color: var(--color-mimeo);
+  outline-offset: -6px;
+}
+
+.where {
+  line-height: 1.15;
+}
+
+.where strong {
+  display: block;
+  font-size: 18px;
+  font-weight: 750;
+  font-stretch: 112%;
+}
+
+.where small {
+  font-size: 13px;
+  color: var(--color-ink-soft);
+}
+
+@media (max-height: 500px) {
+  .bar {
+    height: calc(56px + env(safe-area-inset-bottom));
+  }
+
+  .bar button {
+    height: 52px;
+  }
+
+  .where strong {
+    display: inline;
+    font-size: 16px;
+  }
+
+  .where small {
+    margin-left: 8px;
+  }
+}
+
+/* ---------- folha de índice (telas compactas) ---------- */
+.sheet {
+  margin: auto 0 0;
+  width: 100%;
+  max-width: 100%;
+  max-height: 100dvh;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink);
+}
+
+.sheet::backdrop {
+  background: rgb(8 20 15 / 0.62);
+}
+
+.sheetPaper {
+  padding: 20px 20px calc(24px + env(safe-area-inset-bottom));
+  background: var(--color-paper);
+  clip-path: polygon(
+    0 8px,
+    4% 2px,
+    11% 7px,
+    19% 1px,
+    28% 6px,
+    37% 2px,
+    48% 8px,
+    57% 1px,
+    66% 6px,
+    75% 2px,
+    84% 7px,
+    92% 1px,
+    100% 6px,
+    100% 100%,
+    0 100%
+  );
+}
+
+.sheet[open] .sheetPaper {
+  animation: sheet-in calc(var(--frame) * 3) step-end both;
+}
+
+@keyframes sheet-in {
+  0% {
+    transform: translateY(70%);
+  }
+  33.333% {
+    transform: translateY(18%);
+  }
+  66.666% {
+    transform: translateY(-2%);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+.sheetHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.sheetHead h2 {
+  font-size: 22px;
+  font-weight: 800;
+  font-stretch: 112%;
+}
+
+.sheetHead button {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.sheet ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sheet li a {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 52px;
+  font-size: 19px;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px dashed rgb(23 22 28 / 0.18);
+}
+
+.sheet li a span {
+  width: 22px;
+  font-size: 14px;
+  color: var(--color-ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.sheet li a[aria-current] {
+  color: var(--color-mimeo);
+}
+
+.sheet :focus-visible {
+  outline-color: var(--color-mimeo);
+}
+
+.sheetTools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-top: 16px;
+  font-size: 15px;
+}
+
+.sheetTools a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-underline-offset: 3px;
+}
+
+.sheetToggle {
+  color: var(--color-ink);
+  min-height: 44px;
+}
+
+.sheetToggle:hover {
+  color: var(--color-ink);
+}
+
+.sheetToggle .switch {
+  background: rgb(23 22 28 / 0.12);
+  box-shadow: inset 0 0 0 1px rgb(23 22 28 / 0.35);
+}
+
+.sheetToggle .switch::after {
+  background: var(--color-ink-soft);
+}
+
+/* ---------- barra do modo leitura ---------- */
+.readbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 24px;
+  padding: 12px 16px;
+  background: var(--color-mat-deep);
+  box-shadow: 0 1px 0 rgb(207 224 180 / 0.2);
+  font-size: 15px;
+}
+
+:global(html[data-mode='stage']) .readbar {
+  display: none;
+}
+
+.readName {
+  font-weight: 750;
+  font-stretch: 112%;
+  text-decoration: none;
+}
+
+.readbar ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 18px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.readbar ul a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  color: var(--color-ruler);
+  text-decoration: none;
+}
+
+.readbar ul a:hover {
+  color: var(--color-paper);
+  text-decoration: underline;
+}
+
+.readSwitch {
+  margin-left: auto;
+  color: var(--color-ruler);
+  text-underline-offset: 3px;
+}
+
+/* ---------- mesa: troca a barra pela régua com índice ---------- */
+@media (min-width: 1100px) and (min-height: 640px) {
+  :global(html[data-mode='stage']) .rulerTop {
+    left: 64px;
+    height: 48px;
+    background-position:
+      0 36px,
+      0 42px;
+  }
+
+  .rulerTop span {
+    display: block;
+  }
+
+  :global(html[data-mode='stage']) .index,
+  :global(html[data-mode='stage']) .tools {
+    display: block;
+  }
+
+  :global(html[data-mode='stage']) .sequence {
+    display: flex;
+  }
+
+  :global(html[data-mode='stage']) .bar {
+    display: none;
+  }
+}

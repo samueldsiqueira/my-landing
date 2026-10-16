@@ -1,0 +1,132 @@
+/* ---------- letras recortadas ---------- */
+.cut {
+  display: block;
+  margin: 0;
+  font-weight: 900;
+  line-height: 0.86;
+  color: var(--color-paper);
+}
+
+.word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.letter {
+  display: inline-block;
+  translate: var(--jx, 0) var(--jy, 0);
+  rotate: var(--jr, 0deg);
+  text-shadow: 0.035em 0.05em 0 var(--shadow);
+}
+
+.glyph {
+  display: inline-block;
+}
+
+/* ---------- papel ---------- */
+.paper {
+  position: relative;
+  filter: drop-shadow(4px 6px 0 var(--shadow));
+}
+
+.sheet {
+  position: relative;
+  height: 100%;
+  color: var(--color-ink);
+}
+
+.paper .sheet {
+  background-color: var(--color-paper);
+  background-image: url('/img/paper-grain.webp');
+  background-size: 256px;
+  background-blend-mode: multiply;
+}
+
+.paper .kraft {
+  background-color: var(--color-kraft);
+}
+
+.paper .zebra {
+  background-color: var(--color-paper);
+  background-image:
+    url('/img/paper-grain.webp'), repeating-linear-gradient(var(--color-paper) 0 1.5em, var(--color-zebra) 1.5em 3em);
+  background-size:
+    256px,
+    100% 3em;
+}
+
+.paper .none {
+  background: none;
+}
+
+/* ---------- fita crepe ---------- */
+.tape {
+  position: absolute;
+  display: block;
+  width: 7.5em;
+  height: 2.1em;
+  font-size: 16px;
+  background: var(--tape);
+  clip-path: polygon(
+    0 8%,
+    4% 0,
+    8% 10%,
+    12% 0,
+    16% 6%,
+    84% 4%,
+    88% 0,
+    92% 10%,
+    96% 0,
+    100% 8%,
+    100% 92%,
+    96% 100%,
+    92% 90%,
+    88% 100%,
+    84% 94%,
+    16% 96%,
+    12% 100%,
+    8% 90%,
+    4% 100%,
+    0 92%
+  );
+  z-index: 2;
+}
+
+/* ---------- etiqueta Dymo ---------- */
+.dymo {
+  display: inline-flex;
+  align-items: center;
+  height: 2.1em;
+  padding: 0 0.9em;
+  font-weight: 700;
+  font-stretch: 112%;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #f2efff;
+  background: linear-gradient(#4a37b8, var(--color-mimeo) 40%, #2c1d86);
+  text-shadow:
+    0 -1px 0 rgb(0 0 0 / 0.45),
+    0 1px 0 rgb(255 255 255 / 0.35);
+  box-shadow: 3px 5px 0 var(--shadow);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 0.35em) 50%, 100% 100%, 0 100%, 0.35em 50%);
+}
+
+/* ---------- alfinete ---------- */
+.pin {
+  position: absolute;
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 32%, #a597f5, var(--color-mimeo) 58%, #1d1366);
+  box-shadow: 3px 4px 0 var(--shadow);
+  z-index: 3;
+}
+
+/* ---------- foto em meio-tom ---------- */
+.halftone {
+  display: block;
+  width: 100%;
+  height: auto;
+}
