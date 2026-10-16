@@ -1,0 +1,1109 @@
+/* =========================================================================
+   Cena 5 — Experiência "Formulário contínuo"
+   Composição: estilos-base (pose final). Coreografia: blocos "ENTRADA" e "SAÍDA".
+   Quadros a 12 fps (var(--frame)). Todo o papel segue uma grade de linhas (--lh):
+   cada bloco mede um múltiplo de --lh, então o texto cai sempre dentro das faixas zebradas.
+   ========================================================================= */
+
+/* .canvas é o container das consultas (@container canvas): nunca dimensionar aqui. */
+.canvas {
+  display: flex;
+  flex-direction: column;
+}
+
+.frame {
+  /* Composição alta (padrão; também no modo leitura). */
+  --lh: 24px;
+  --dot-size: 12.5px;
+  --body-size: 15px;
+  --strip: 28px;
+  --gutter: 16px;
+  --hole: 5px;
+  --pitch: calc(var(--lh) * 2);
+  --pad-top: calc(var(--lh) * 2);
+  --stub-h: calc(var(--pad-top) - 3px);
+  --tilt: -0.3deg;
+  --ruler-h: 80px;
+  --bleed: 0px;
+  /* Atrasos de entrada (quadros): na composição alta o papel sai de baixo da régua, então a
+     régua pousa primeiro; na larga o papel desce da borda da tela e abre a cena. */
+  --d-ruler: 0;
+  --d-paper: 1;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: 42rem;
+  margin: 0 auto;
+}
+
+/* ---------- título (letras recortadas sobre a esteira) ---------- */
+.title {
+  position: relative;
+  z-index: 3;
+  align-self: flex-start;
+  margin: 2px 0 0;
+  font-size: clamp(2.4rem, 12.6cqw, 4.2rem);
+  font-stretch: 108%;
+}
+
+.letter :global(.boil) {
+  --boil-x: 0.6px;
+  --boil-r: 0.4deg;
+}
+
+/* ---------- régua de acrílico ---------- */
+.timeline {
+  position: relative;
+  z-index: 3;
+  flex: none;
+  height: calc(var(--ruler-h) + 6px);
+  margin-top: 14px;
+}
+
+.ruler {
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--ruler-h);
+  rotate: -0.4deg;
+}
+
+/* A sombra aparece através do acrílico, deslocada (luz de cima, à esquerda). */
+.ruler::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background: var(--shadow-soft);
+  opacity: 0.6;
+  translate: 2px 4px;
+}
+
+.acrylic {
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--color-paper) 16%, transparent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--color-paper) 45%, transparent),
+    inset 0 2px 0 color-mix(in srgb, var(--color-paper) 22%, transparent);
+  overflow: hidden;
+}
+
+.ticksH,
+.ticksV {
+  position: absolute;
+  overflow: visible;
+  fill: none;
+  stroke: var(--color-ruler);
+  stroke-width: 1;
+}
+
+.ticksH path,
+.ticksV path {
+  vector-effect: non-scaling-stroke;
+}
+
+.ticksH {
+  left: 0;
+  right: 0;
+  top: 1px;
+  width: 100%;
+  height: 12px;
+}
+
+.ticksV {
+  display: none;
+}
+
+.year {
+  position: absolute;
+  top: 13px;
+  left: calc(var(--p) * 1%);
+  translate: -50% 0;
+  font-size: 11px;
+  font-weight: 600;
+  font-stretch: 80%;
+  line-height: 14px;
+  color: var(--color-ruler);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- períodos (fita crepe sobre a régua) ---------- */
+.track {
+  position: absolute;
+  inset: 26px 0 auto;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.seg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--a) * 1%);
+  width: calc((var(--b) - var(--a)) * 1%);
+}
+
+.segLink {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  color: var(--color-ink);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tape {
+  position: absolute;
+  inset: 4px 0 auto;
+  height: 28px;
+  background: var(--tape);
+  clip-path: var(--clip-h);
+  rotate: var(--tr);
+  translate: 0 var(--to);
+}
+
+.segLink:hover .tape {
+  background: color-mix(in srgb, var(--tape) 55%, var(--color-paper));
+}
+
+.segLink[aria-current] .tape {
+  background: var(--color-paper);
+}
+
+.segText {
+  position: relative;
+  padding-top: 11px;
+  font-size: 13px;
+  font-weight: 700;
+  font-stretch: 82%;
+  line-height: 14px;
+  white-space: nowrap;
+}
+
+/* Na régua horizontal só cabe a primeira palavra da empresa; o resto fica para leitores de tela. */
+.segRest,
+.segRole {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.segLink[aria-current] .segText {
+  color: var(--color-mimeo);
+}
+
+.segLink:focus-visible {
+  outline-offset: 2px;
+}
+
+.pin {
+  left: 50%;
+  top: 30px;
+  translate: -50% 0;
+  opacity: 0;
+}
+
+.segLink[aria-current] .pin {
+  opacity: 1;
+}
+
+/* ---------- formulário contínuo ---------- */
+.feedSlot {
+  position: relative;
+  z-index: 1;
+  margin: -12px calc(var(--bleed) * -1) 0;
+  rotate: var(--tilt);
+  /* Só o topo é cortado: o papel sai de baixo da régua / da borda da tela. */
+  clip-path: inset(0 -60px -60px -60px);
+}
+
+.sheet {
+  position: relative;
+  box-shadow: 5px 7px 0 var(--shadow);
+  transform-origin: 30% 0;
+}
+
+.sheet:focus-visible {
+  outline: 3px solid var(--color-mimeo);
+  outline-offset: -3px;
+}
+
+.form {
+  position: relative;
+  padding: var(--pad-top) calc(var(--strip) + var(--gutter)) calc(var(--lh) * 2);
+  font-size: var(--body-size);
+  line-height: var(--lh);
+  color: var(--color-ink);
+  background-color: var(--color-paper);
+  background-image:
+    url('/img/paper-grain.webp'),
+    linear-gradient(color-mix(in srgb, var(--color-ink) 30%, transparent) 50%, transparent 50%),
+    linear-gradient(color-mix(in srgb, var(--color-ink) 30%, transparent) 50%, transparent 50%),
+    repeating-linear-gradient(
+      var(--color-paper) 0 calc(var(--lh) * 3),
+      var(--color-zebra) calc(var(--lh) * 3) calc(var(--lh) * 6)
+    );
+  background-size:
+    256px,
+    1px 6px,
+    1px 6px,
+    calc(100% - var(--strip) * 2) 100%;
+  background-position:
+    0 0,
+    var(--strip) 0,
+    calc(100% - var(--strip)) 0,
+    center top;
+  background-repeat: repeat, repeat-y, repeat-y, no-repeat;
+  background-blend-mode: multiply, normal, normal, normal;
+  /* Furos de tração de verdade: a esteira aparece por eles. */
+  mask-image:
+    radial-gradient(circle, transparent var(--hole), #000 calc(var(--hole) + 0.6px)),
+    radial-gradient(circle, transparent var(--hole), #000 calc(var(--hole) + 0.6px)),
+    linear-gradient(#000, #000);
+  mask-size:
+    var(--strip) var(--pitch),
+    var(--strip) var(--pitch),
+    calc(100% - var(--strip) * 2 + 2px) 100%;
+  mask-position:
+    left top,
+    right top,
+    center top;
+  mask-repeat: repeat-y, repeat-y, no-repeat;
+}
+
+/* Impressão matricial: pontos quadrados e fita bem carregada (legível, nunca cinza). */
+.form :global(.dot) {
+  font-weight: 900;
+  font-variation-settings: 'ROND' 0;
+}
+
+/* Cada salto de linha dá um tranco de tração (≤ 1 px), na hora. */
+.sheet[data-feeding='odd'] .form {
+  translate: 0.8px 0;
+}
+
+.printHead {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  column-gap: 2ch;
+  margin: 0;
+  font-size: var(--dot-size);
+  line-height: var(--lh);
+  text-transform: uppercase;
+  color: var(--color-mimeo);
+}
+
+.records {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.record {
+  position: relative;
+  padding: calc(var(--lh) * 2) 0 var(--lh);
+  /* Modo leitura: a âncora da régua não deixa o registro sob a barra fixa do topo. */
+  scroll-margin-top: 7rem;
+}
+
+/* O registro em andamento ganha uma linha em branco a mais: espaço para o carimbo. */
+.current {
+  padding-top: calc(var(--lh) * 3);
+}
+
+/* Picotagem entre registros, de borda a borda (inclusive nas tiras de tração). */
+.record + .record::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: calc((var(--strip) + var(--gutter)) * -1);
+  right: calc((var(--strip) + var(--gutter)) * -1);
+  height: 2px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--color-ink) 45%, transparent) 55%, transparent 55%) 0 0 /
+    7px 2px repeat-x;
+}
+
+.recTitle {
+  margin: 0;
+  font-size: var(--dot-size);
+  line-height: var(--lh);
+  text-transform: uppercase;
+  color: var(--color-mimeo);
+}
+
+/* ---------- carimbo "Em andamento": nas duas linhas em branco acima do registro, nunca sobre texto ---------- */
+.stampSlot {
+  position: absolute;
+  top: 0;
+  right: 4px;
+  display: flex;
+  align-items: center;
+  height: calc(var(--lh) * 3);
+  margin: 0;
+}
+
+.stamp,
+.stampShadow {
+  rotate: -5deg;
+}
+
+.stamp {
+  display: block;
+  padding: 3px 9px 2px;
+  border: 2.5px solid var(--color-mimeo);
+  border-radius: 5px;
+  outline: 1px solid var(--color-mimeo);
+  outline-offset: 2px;
+  font-size: var(--stamp-size, 14px);
+  font-weight: 800;
+  font-stretch: 112%;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  color: var(--color-mimeo);
+  mix-blend-mode: multiply;
+  /* Tinta irregular: a granulação do papel vaza pela impressão. */
+  mask-image: url('/img/paper-grain.webp');
+  mask-size: 180px;
+  mask-mode: luminance;
+}
+
+.stampShadow {
+  position: absolute;
+  inset: 6px -4px;
+  border-radius: 6px;
+  background: var(--shadow);
+  opacity: 0;
+}
+
+/* ---------- campos impressos ---------- */
+.fields {
+  display: grid;
+  grid-template-columns: 13ch 1fr;
+  margin: 0;
+  font-size: var(--dot-size);
+  line-height: var(--lh);
+  text-transform: uppercase;
+}
+
+.fields dt {
+  display: flex;
+  white-space: nowrap;
+}
+
+/* Pontilhado até a coluna do valor, com um espaço antes dele. */
+.fields dt > span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  margin: 0 1ch;
+}
+
+/* Grupos que não se partem no fim da linha: "(2 ANOS E 1 MÊS)". */
+.keep {
+  white-space: nowrap;
+}
+
+.fields dd {
+  margin: 0;
+}
+
+.rule {
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: var(--dot-size);
+  line-height: var(--lh);
+  color: var(--color-ink);
+}
+
+.desc {
+  max-width: 68ch;
+}
+
+.desc p {
+  margin: var(--lh) 0 0;
+}
+
+.desc p:first-child {
+  margin-top: 0;
+}
+
+.note {
+  margin: var(--lh) 0 0;
+  max-width: 60ch;
+  font-size: var(--dot-size);
+  line-height: var(--lh);
+  text-transform: uppercase;
+}
+
+.end {
+  margin: calc(var(--lh) * 2) 0 0;
+  font-size: var(--dot-size);
+  line-height: var(--lh);
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--color-mimeo);
+}
+
+/* ---------- canhoto (fica preso na impressora quando o papel é rasgado) ---------- */
+.stub {
+  position: absolute;
+  z-index: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: calc(var(--stub-h) + 6px);
+  opacity: 0;
+  background-color: var(--color-paper);
+  background-image:
+    radial-gradient(circle, var(--color-mat) var(--hole), transparent calc(var(--hole) + 0.6px)),
+    radial-gradient(circle, var(--color-mat) var(--hole), transparent calc(var(--hole) + 0.6px)),
+    url('/img/paper-grain.webp');
+  background-size:
+    var(--strip) var(--pitch),
+    var(--strip) var(--pitch),
+    256px;
+  background-position:
+    left top,
+    right top,
+    0 0;
+  background-repeat: repeat-y, repeat-y, repeat;
+  background-blend-mode: normal, normal, multiply;
+  clip-path: var(--stub);
+}
+
+/* A dobra do formulário sanfonado, onde o papel some por baixo. */
+.fold {
+  display: none;
+}
+
+/* =========================================================================
+   Palco (composição alta): o papel tem altura fixa e rola por dentro.
+   ========================================================================= */
+:global(html[data-mode='stage']) .frame {
+  --tilt: -0.6deg;
+  --bleed: 8px;
+}
+
+:global(html[data-mode='stage']) .feedSlot {
+  flex: 1 1 0;
+  min-height: 16rem;
+  transform-origin: 50% 0;
+}
+
+:global(html[data-mode='stage']) .sheet {
+  position: absolute;
+  inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+:global(html[data-mode='stage']) .sheet::-webkit-scrollbar {
+  display: none;
+}
+
+/* Rabo em branco: o último registro consegue subir até o topo do papel. */
+:global(html[data-mode='stage']) .form {
+  padding-bottom: max(calc(var(--lh) * 3), 40cqh);
+}
+
+:global(html[data-mode='stage']) .fold {
+  display: block;
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 22px;
+  pointer-events: none;
+  background: linear-gradient(transparent, color-mix(in srgb, var(--color-mat-deep) 26%, transparent));
+}
+
+/* =========================================================================
+   Composição larga (palco em tela paisagem): régua vertical à esquerda, papel à direita
+   descendo da borda de cima da tela.
+   ========================================================================= */
+@container canvas (min-width: 760px) and (min-aspect-ratio: 1/1) {
+  .frame,
+  :global(html[data-mode='stage']) .frame {
+    --dot-size: clamp(13px, 1.25cqw, 15px);
+    --body-size: clamp(15px, 1.3cqw, 16px);
+    --strip: clamp(28px, 2.9cqw, 38px);
+    --gutter: clamp(16px, 1.9cqw, 26px);
+    --hole: clamp(5px, 0.5cqw, 6.5px);
+    --pad-top: calc(var(--lh) * 3);
+    --tilt: -1.2deg;
+    --ruler-w: 82px;
+    --bleed: 0px;
+    --stamp-size: clamp(13px, 1.3cqw, 16px);
+    --d-ruler: 1;
+    --d-paper: 0;
+
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    display: block;
+    width: min(100cqw, 84rem);
+    max-width: none;
+    margin: 0;
+    translate: -50% 0;
+  }
+
+  @supports (width: round(up, 10px, 24px)) {
+    .frame,
+    :global(html[data-mode='stage']) .frame {
+      --pad-top: calc(round(up, var(--inset-top), var(--lh)) + var(--lh));
+    }
+  }
+
+  .title {
+    position: absolute;
+    left: 2%;
+    top: 3cqh;
+    margin: 0;
+    font-size: clamp(2.8rem, min(5cqw, 10cqh), 4.6rem);
+    font-stretch: 112%;
+  }
+
+  .timeline {
+    position: absolute;
+    left: 3%;
+    top: calc(6cqh + clamp(2.8rem, min(5cqw, 10cqh), 4.6rem));
+    bottom: 4cqh;
+    width: 38%;
+    height: auto;
+    margin: 0;
+  }
+
+  .ruler {
+    inset: 0 auto 0 0;
+    width: var(--ruler-w);
+    height: auto;
+    rotate: 0.5deg;
+  }
+
+  .ticksH {
+    display: none;
+  }
+
+  .ticksV {
+    display: block;
+    top: 0;
+    bottom: 0;
+    left: 1px;
+    width: 12px;
+    height: 100%;
+  }
+
+  .year {
+    top: calc((100 - var(--p)) * 1%);
+    left: 16px;
+    translate: 0 -50%;
+  }
+
+  .track {
+    inset: 0 0 0 calc(var(--ruler-w) - 30px);
+    height: auto;
+  }
+
+  .seg {
+    top: calc((100 - var(--b)) * 1%);
+    bottom: auto;
+    left: 0;
+    right: 0;
+    width: auto;
+    height: calc((var(--b) - var(--a)) * 1%);
+  }
+
+  .segLink {
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 50px;
+  }
+
+  .tape {
+    inset: 0 auto 0 0;
+    width: 28px;
+    height: auto;
+    clip-path: var(--clip-v);
+    translate: var(--to) 0;
+  }
+
+  .segText {
+    padding: 0;
+    font-size: 16px;
+    font-weight: 600;
+    font-stretch: 100%;
+    line-height: 20px;
+    white-space: normal;
+    color: var(--color-paper);
+  }
+
+  .segRest {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+  }
+
+  .segRole {
+    position: static;
+    display: block;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    margin-top: 2px;
+    font-size: 14px;
+    font-weight: 450;
+    line-height: 18px;
+    white-space: normal;
+    color: var(--color-ruler);
+  }
+
+  .segLink[aria-current] .segText {
+    color: var(--color-paper);
+  }
+
+  .segLink[aria-current] .segName {
+    font-weight: 800;
+  }
+
+  .segLink:hover .segName {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .pin {
+    left: 4px;
+    top: 50%;
+    translate: 0 -50%;
+  }
+
+  .feedSlot {
+    position: absolute;
+    top: calc(var(--inset-top) * -1);
+    bottom: 0;
+    right: 1%;
+    width: min(55%, 46rem);
+    margin: 0;
+    transform-origin: 50% 0;
+  }
+
+  .form,
+  :global(html[data-mode='stage']) .form {
+    padding-bottom: max(calc(var(--lh) * 3), 50cqh);
+  }
+
+  /* Mesa: os controles de sequência ocupam o canto inferior direito; o papel termina antes. */
+  @media (min-width: 1100px) and (min-height: 640px) {
+    .feedSlot {
+      bottom: 64px;
+    }
+  }
+}
+
+/* Paisagem baixa (celular deitado): os períodos ficam curtos demais para empresa + cargo; o
+   cargo continua no nome acessível e no registro impresso. */
+@container canvas (min-width: 760px) and (min-aspect-ratio: 1/1) and (max-height: 520px) {
+  .segRole {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* =========================================================================
+   ENTRADA — 13 quadros
+   q1–q3 título cai · q2–q4 régua cai (a sombra vem junto, através do acrílico)
+   q1–q8 o papel é impresso para baixo em 8 saltos de linha · q5/q6/q7 fitas batem (ordem
+   cronológica) · q9–q11 alfinete crava no período atual · q10 sombra do carimbo, q11 bate.
+   ========================================================================= */
+@keyframes exp-drop {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+    transform: translate(-5px, -10px) scale(1.05);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(0, 1px) scale(1.004, 0.985);
+  }
+  75%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes exp-drop-shadow {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.55;
+    transform: translate(12px, 18px) scale(1.04);
+  }
+  50%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes exp-print {
+  0% {
+    opacity: 0;
+  }
+  11.111% {
+    opacity: 1;
+    transform: translate(0.6px, -88%);
+  }
+  22.222% {
+    opacity: 1;
+    transform: translate(-0.6px, -76%);
+  }
+  33.333% {
+    opacity: 1;
+    transform: translate(0.6px, -64%);
+  }
+  44.444% {
+    opacity: 1;
+    transform: translate(-0.6px, -52%);
+  }
+  55.555% {
+    opacity: 1;
+    transform: translate(0.6px, -40%);
+  }
+  66.666% {
+    opacity: 1;
+    transform: translate(-0.6px, -28%);
+  }
+  77.777% {
+    opacity: 1;
+    transform: translate(0.6px, -16%);
+  }
+  88.888% {
+    opacity: 1;
+    transform: translate(-0.6px, -6%);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes exp-print-short {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+    transform: translate(0.6px, -34%);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-0.6px, -10%);
+  }
+  75%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes exp-slap {
+  0% {
+    opacity: 0;
+  }
+  33.333% {
+    opacity: 1;
+    transform: translate(-3px, -6px) scale(1.1);
+  }
+  66.666%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes exp-pin {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+    transform: translate(-6px, -12px) scale(1.45);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08, 0.88);
+  }
+  75%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes exp-stamp {
+  0%,
+  25% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.07);
+  }
+  75%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes exp-stamp-shadow {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.32;
+    transform: translate(9px, 12px) scale(1.12);
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='experience'] #experience) .title {
+  animation: exp-drop calc(var(--frame) * 4) step-end both;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='experience'] #experience) .ruler,
+:global(html[data-mode='stage'][data-motion='full'][data-scene='experience'] #experience) .ruler::before {
+  animation: exp-drop calc(var(--frame) * 4) step-end both;
+  animation-delay: calc(var(--frame) * var(--d-ruler));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='experience'] #experience) .ruler::before {
+  animation-name: exp-drop-shadow;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='experience'] #experience) .sheet {
+  animation: exp-print calc(var(--frame) * 9) step-end both;
+  animation-delay: calc(var(--frame) * var(--d-paper));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='experience'] #experience) .seg {
+  animation: exp-slap calc(var(--frame) * 3) step-end both;
+  animation-delay: calc(var(--frame) * (4 + var(--k)));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='experience'] #experience)
+  .track:not([data-picked])
+  [aria-current]
+  .pin {
+  animation: exp-pin calc(var(--frame) * 4) step-end both;
+  animation-delay: calc(var(--frame) * 8);
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='experience'] #experience) .stamp {
+  animation: exp-stamp calc(var(--frame) * 4) step-end both;
+  animation-delay: calc(var(--frame) * 9);
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='experience'] #experience) .stampShadow {
+  animation: exp-stamp-shadow calc(var(--frame) * 4) step-end both;
+  animation-delay: calc(var(--frame) * 9);
+}
+
+/* Revisita: título e régua já estão na mesa; o papel desce em 3 saltos e o resto vem junto. */
+:global(html[data-mode='stage'][data-motion='full'][data-scene='experience'][data-seen~='experience'] #experience)
+  .title,
+:global(html[data-mode='stage'][data-motion='full'][data-scene='experience'][data-seen~='experience'] #experience)
+  .ruler,
+:global(html[data-mode='stage'][data-motion='full'][data-scene='experience'][data-seen~='experience'] #experience)
+  .ruler::before,
+:global(html[data-mode='stage'][data-motion='full'][data-scene='experience'][data-seen~='experience'] #experience)
+  .stampShadow {
+  animation: none;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='experience'][data-seen~='experience'] #experience)
+  .sheet {
+  animation: exp-print-short calc(var(--frame) * 4) step-end both;
+  animation-delay: 0s;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='experience'][data-seen~='experience'] #experience)
+  .seg {
+  animation-delay: var(--frame);
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='experience'][data-seen~='experience'] #experience)
+  .track:not([data-picked])
+  [aria-current]
+  .pin,
+:global(html[data-mode='stage'][data-motion='full'][data-scene='experience'][data-seen~='experience'] #experience)
+  .stamp {
+  animation-delay: calc(var(--frame) * 3);
+}
+
+/* Escolha do visitante: o alfinete é arrancado e cravado no período escolhido (3 quadros). */
+@keyframes exp-pin-press {
+  0% {
+    opacity: 1;
+    transform: translate(-5px, -10px) scale(1.4);
+  }
+  33.333% {
+    opacity: 1;
+    transform: scale(1.08, 0.88);
+  }
+  66.666%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+:global(html[data-mode='stage'][data-motion='full']) .track[data-picked] [aria-current] .pin {
+  animation: exp-pin-press calc(var(--frame) * 3) step-end both;
+}
+
+/* =========================================================================
+   SAÍDA — avançando: o papel é puxado, rasga na picotagem (o canhoto fica na impressora) e
+   cai; título e régua são tirados da mesa. Voltando: o papel é recolhido pela impressora em
+   saltos de linha. 5–6 quadros (500 ms, abaixo do teto de 700 ms).
+   ========================================================================= */
+@keyframes exp-tear {
+  0% {
+    transform: translateY(5px) rotate(0.3deg);
+  }
+  20% {
+    transform: translateY(16px) rotate(0.9deg);
+    clip-path: var(--tear);
+  }
+  40% {
+    transform: translateY(26vh) rotate(3deg);
+    clip-path: var(--tear);
+  }
+  60% {
+    transform: translateY(64vh) rotate(6deg);
+    clip-path: var(--tear);
+  }
+  80%,
+  100% {
+    transform: translateY(115vh) rotate(9deg);
+    clip-path: var(--tear);
+    opacity: 0;
+  }
+}
+
+@keyframes exp-stub {
+  0% {
+    opacity: 0;
+  }
+  20%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes exp-retract {
+  0% {
+    transform: none;
+  }
+  20% {
+    transform: translate(0.6px, -14%);
+  }
+  40% {
+    transform: translate(-0.6px, -36%);
+  }
+  60% {
+    transform: translate(0.6px, -62%);
+  }
+  80%,
+  100% {
+    transform: translate(0, -100%);
+    opacity: 0;
+  }
+}
+
+@keyframes exp-pick-off {
+  0% {
+    transform: none;
+  }
+  20% {
+    transform: translate(-4px, -8px) scale(1.04);
+  }
+  40% {
+    transform: translate(-30vw, -3vh) rotate(-4deg);
+  }
+  60% {
+    transform: translate(-72vw, -6vh) rotate(-7deg);
+  }
+  80%,
+  100% {
+    transform: translate(-120vw, -8vh) rotate(-9deg);
+    opacity: 0;
+  }
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='experience'] #experience) .canvas {
+  animation: none;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='experience'] #experience) .sheet {
+  animation: exp-tear calc(var(--frame) * 5) step-end forwards;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='experience'] #experience) .stub {
+  animation: exp-stub calc(var(--frame) * 5) step-end forwards;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='experience'][data-dir='-1'] #experience) .sheet {
+  animation-name: exp-retract;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='experience'][data-dir='-1'] #experience) .stub {
+  animation: none;
+}
+
+/* Na composição larga, título e régua são tirados da mesa (a régua um quadro depois: não é a
+   mesma mão). Na alta a régua é a "boca" da impressora: fica, com o canhoto preso embaixo. */
+@container canvas (min-width: 760px) and (min-aspect-ratio: 1/1) {
+  :global(html[data-mode='stage'][data-motion='full'][data-leaving='experience'] #experience) .timeline,
+  :global(html[data-mode='stage'][data-motion='full'][data-leaving='experience'] #experience) .title {
+    animation: exp-pick-off calc(var(--frame) * 5) step-end forwards;
+  }
+
+  :global(html[data-mode='stage'][data-motion='full'][data-leaving='experience'] #experience) .timeline {
+    animation-delay: var(--frame);
+  }
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='experience'] #experience) .fold {
+  opacity: 0;
+}
