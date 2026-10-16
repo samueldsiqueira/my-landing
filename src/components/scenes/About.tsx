@@ -68,10 +68,13 @@ export default function About() {
           {about.map((item, k) => (
             <li key={item.id} className={cx(s.slot, slots[k])}>
               <div className={s.cardMove}>
-                <Paper seed={`about-${item.id}`} edge="straight" className={s.card} sheetClassName={s.cardSheet}>
-                  {k === 0 && <span className={s.photoRoom} aria-hidden="true" />}
-                  <h3 className={s.cardTitle}>{item.title}</h3>
-                  <p className={s.cardText}>{item.text}</p>
+                {/* Margens do texto num miolo próprio: não dependem da estrutura interna de Paper. */}
+                <Paper seed={`about-${item.id}`} edge="straight">
+                  <div className={s.cardBody}>
+                    {k === 0 && <span className={s.photoRoom} aria-hidden="true" />}
+                    <h3 className={s.cardTitle}>{item.title}</h3>
+                    <p className={s.cardText}>{item.text}</p>
+                  </div>
                 </Paper>
               </div>
 
@@ -79,9 +82,11 @@ export default function About() {
                 <div className={s.photoMove}>
                   <div className={s.photo} data-shared="photo">
                     <div className={s.photoPrint}>
-                      <Paper seed="about-photo" edge="straight" sheetClassName={s.photoSheet}>
-                        <div className={s.photoCrop}>
-                          <HalftonePhoto alt="" sizes="96px" />
+                      <Paper seed="about-photo" edge="straight">
+                        <div className={s.photoMat}>
+                          <div className={s.photoCrop}>
+                            <HalftonePhoto alt="" sizes="96px" />
+                          </div>
                         </div>
                       </Paper>
                     </div>

@@ -8,11 +8,13 @@
 /* .canvas é o container das consultas (@container canvas): nunca dimensionar aqui. */
 .canvas {
   --t: 1;
-  --thread: #8a77f4;
-  --thread-hi: #c9bffb;
-  --rule: rgb(112 96 226 / 0.36);
-  --rule-red: rgb(200 65 43 / 0.78);
-  --chalk: rgb(207 224 180 / 0.24);
+  /* Só tokens da paleta: o fio é mimeo clareado com papel (sob a luz), a pauta é mimeo
+     translúcido, o giz é a cor da régua. */
+  --thread: color-mix(in oklab, var(--color-mimeo) 58%, var(--color-paper));
+  --thread-hi: color-mix(in oklab, var(--color-mimeo) 16%, var(--color-paper));
+  --rule: color-mix(in srgb, var(--color-mimeo) 26%, transparent);
+  --rule-head: color-mix(in srgb, var(--color-mimeo) 72%, transparent);
+  --chalk: color-mix(in srgb, var(--color-ruler) 24%, transparent);
   display: flex;
   flex-direction: column;
 }
@@ -164,7 +166,7 @@
 }
 
 .barGreen {
-  fill: #cfe5c6;
+  fill: var(--color-zebra);
 }
 
 /* Pontos da matricial: cada fiada com um passo diferente, para parecer letra e não traço. */
@@ -263,36 +265,31 @@
   rotate: -0.9deg;
 }
 
-.slot .card {
-  filter: drop-shadow(3px 5px 0 var(--shadow));
-}
-
-.cardSheet {
-  border-radius: 4px;
-  padding: 0.75em 1.05em 0.2em;
+.cardBody {
+  /* margem do texto até a borda do papel (a pauta atravessa a ficha de borda a borda) */
+  --pad: 18px;
+  padding: var(--pad) var(--pad) 6px;
   font-size: clamp(14.5px, 4cqw, 16px);
   line-height: 1.55;
 }
 
 .cardTitle {
-  margin: 0 -1.05em 0.3em;
-  padding: 0 1.05em 0.32em;
+  margin: 0 calc(var(--pad) * -1) 0.3em;
+  /* o alfinete fica no canto do título: o texto não passa por baixo dele */
+  padding: 0 calc(var(--pad) + var(--pin-r, 0px)) 0.32em calc(var(--pad) + var(--pin-l, 0px));
   font-size: 1.1em;
   font-weight: 760;
   font-stretch: 104%;
   line-height: 1.25;
   color: var(--color-ink);
-  border-bottom: 2px solid var(--rule-red);
-  /* o alfinete fica no canto do título: o texto não passa por baixo dele */
-  padding-left: calc(1.05em + var(--pin-l, 0px));
-  padding-right: calc(1.05em + var(--pin-r, 0px));
+  border-bottom: 2px solid var(--rule-head);
 }
 
 /* Pauta: uma linha por linha de texto, mais uma em branco no fim da ficha. */
 .cardText {
-  margin: 0 -1.05em;
-  padding: 0 1.05em 1lh;
-  color: var(--color-ink-soft);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad) 1lh;
+  color: var(--color-ink);
   background: linear-gradient(transparent calc(100% - 1px), var(--rule) calc(100% - 1px)) 0 0 / 100% 1lh;
 }
 
@@ -300,7 +297,8 @@
 .photoRoom {
   float: left;
   width: calc(var(--pw) - 4px);
-  height: calc(var(--pw) * 0.78 - 0.75em);
+  /* termina logo abaixo da foto, que começa 0,6 foto acima da ficha */
+  height: calc(var(--pw) * 0.74 + 6px - var(--pad));
   margin: 0 10px 2px -6px;
 }
 
@@ -314,7 +312,7 @@
   rotate: -4deg;
 }
 
-.photoSheet {
+.photoMat {
   padding: 3px;
 }
 
@@ -339,7 +337,11 @@
   margin-left: -11px;
   rotate: 7deg;
   border-radius: 1px;
-  background: linear-gradient(#f4f4f0, #a9a9b2 55%, #6f6f7a);
+  background: linear-gradient(
+    var(--color-paper),
+    color-mix(in oklab, var(--color-ink) 38%, var(--color-paper)) 55%,
+    color-mix(in oklab, var(--color-ink) 62%, var(--color-paper))
+  );
   box-shadow: 1px 2px 0 var(--shadow);
 }
 
@@ -592,7 +594,8 @@
     transform-origin: var(--pin-in) var(--pin-in);
   }
 
-  .cardSheet {
+  .cardBody {
+    --pad: clamp(16px, calc(var(--u) * 1.4), 20px);
     font-size: clamp(12px, calc(var(--u) * 1.22), 16.5px);
   }
 
