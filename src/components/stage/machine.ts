@@ -122,6 +122,8 @@ const trackEnter = async (id: SceneId, run: number) => {
   if (!el) return;
   state.phase = 'entering';
   state.entering = readMotion() === 'full' ? finiteAnimations(el) : [];
+  // Já há outra navegação pedida: não faz o visitante esperar a entrada inteira desta cena.
+  if (state.queued !== null) finishEnter();
   await settle(state.entering);
   if (state.token !== run) return;
   state.entering = [];

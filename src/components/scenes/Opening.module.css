@@ -223,7 +223,7 @@
   }
 
   .photoSlot {
-    top: 9cqh;
+    top: 13cqh;
     left: 4cqw;
     width: min(31cqw, 62cqh);
     translate: 0 0;
@@ -233,7 +233,7 @@
   .name {
     position: absolute;
     left: 33cqw;
-    top: 16cqh;
+    top: 20cqh;
   }
 
   .first {
@@ -253,7 +253,7 @@
   .roles {
     position: absolute;
     left: 34.5cqw;
-    top: 63cqh;
+    top: 67cqh;
     margin: 0;
     font-size: clamp(15px, min(1.7cqw, 2.8cqh), 22px);
   }
@@ -261,14 +261,14 @@
   .links {
     position: absolute;
     left: 35cqw;
-    top: 76cqh;
+    top: 80cqh;
     margin: 0;
   }
 
   .printout {
     position: absolute;
     right: 3cqw;
-    top: 60cqh;
+    top: 63cqh;
     width: clamp(13rem, 19cqw, 16rem);
     margin: 0;
     rotate: 4deg;
