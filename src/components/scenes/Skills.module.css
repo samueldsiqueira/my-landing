@@ -1,0 +1,942 @@
+/* =========================================================================
+   Cena 3 — Tecnologias "Carimbos"
+   Uma ficha técnica de repartição impressa em mimeógrafo; o carimbo de madeira (herói)
+   bate cada tecnologia nos quadros. Estilos-base = ficha carimbada (pose final).
+   Coreografia: blocos ENTRADA, REVISITA, SAÍDA e TOQUE. A agenda (--at, --first-slam...)
+   vem do Skills.tsx, calculada a partir do conteúdo.
+   ========================================================================= */
+
+/* .canvas é o container das consultas (@container canvas): nunca dimensionar aqui. */
+.canvas {
+  /* Ficha impressa em duas cores: texto em tinta preta, fios em violeta de mimeógrafo. */
+  --rule: color-mix(in oklab, var(--color-mimeo) 48%, var(--color-paper));
+  --rule-soft: color-mix(in oklab, var(--color-mimeo) 26%, var(--color-paper));
+  display: flex;
+  flex-direction: column;
+}
+
+.sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Composição alta (padrão; também no modo leitura). --v: 1% da largura, até 5,6px. */
+.frame {
+  --v: min(1cqw, 5.6px);
+  --stamp-w: calc(var(--v) * 24);
+  --back-x: -18%;
+  --back-y: 62%;
+  position: relative;
+  width: 100%;
+  max-width: 36rem;
+  margin: auto;
+  padding: calc(var(--v) * 8) 0 calc(var(--v) * 4);
+}
+
+/* No palco a altura também limita --v (ficha alta ≈ 49v + 8,1v por grupo + 16,5v por linha
+   de quadros), para caber sem rolar. Os dois contadores vêm do conteúdo (Skills.tsx).
+   Abaixo de 3,2px a letra ficaria miúda: em telas muito baixas a cena rola por dentro. */
+:global(html[data-mode='stage']) .frame {
+  --v: min(1cqw, 5.6px, max(3.2px, 100cqh / (49 + var(--groups, 4) * 8.1 + var(--tall-rows, 7) * 16.5)));
+}
+
+/* ---------- carimbo (recorte de papel visto de lado) ---------- */
+.stamp {
+  /* Madeira e borracha: só tons das cores da paleta (kraft, tinta, papel, mimeógrafo). */
+  --wood: color-mix(in oklab, var(--color-kraft) 88%, var(--color-ink));
+  --wood-deep: color-mix(in oklab, var(--color-kraft) 74%, var(--color-ink));
+  --wood-dark: color-mix(in oklab, var(--color-kraft) 55%, var(--color-ink));
+  --wood-light: color-mix(in oklab, var(--color-kraft) 55%, var(--color-paper));
+  --rubber-edge: color-mix(in oklab, var(--color-mimeo) 62%, var(--color-ink));
+  position: relative;
+  display: block;
+  width: var(--stamp-w);
+  aspect-ratio: 100 / 104;
+}
+
+.stamp svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.stampShadow {
+  fill: var(--shadow);
+  translate: 5px 6px;
+}
+
+.stampBody {
+  transform-origin: 50% 93%;
+}
+
+/* ---------- a ficha ---------- */
+.formSlot {
+  position: relative;
+  rotate: -0.6deg;
+}
+
+.form {
+  position: relative;
+  /* Margem da folha: nenhum texto a menos de ~20px da borda do papel, mesmo em 360px. */
+  padding: max(14px, calc(var(--v) * 2.6));
+  color: var(--color-ink);
+  background-color: var(--color-paper);
+  background-image: url('/img/paper-grain.webp');
+  background-size: 256px;
+  background-blend-mode: multiply;
+  box-shadow: 5px 7px 0 var(--shadow);
+}
+
+.header {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: calc(var(--v) * 3);
+  min-height: calc(var(--v) * 31);
+  padding: calc(var(--v) * 3) calc(var(--v) * 33) calc(var(--v) * 3) calc(var(--v) * 3.2);
+  border: 1.5px solid var(--rule);
+}
+
+.title {
+  margin: 0;
+  font-size: calc(var(--v) * 10.4);
+  font-weight: 850;
+  font-stretch: 86%;
+  line-height: 0.92;
+  letter-spacing: -0.012em;
+  color: var(--color-ink);
+}
+
+.title:focus-visible {
+  outline-color: var(--color-mimeo);
+}
+
+.owner {
+  position: relative;
+  display: grid;
+  justify-items: start;
+  gap: 3px;
+}
+
+.cellLabel {
+  font-size: max(11px, calc(var(--v) * 2.9));
+  font-weight: 500;
+  font-stretch: 92%;
+  line-height: 1.1;
+}
+
+/* ---------- linhas dos grupos ---------- */
+.rows {
+  display: grid;
+}
+
+.row {
+  border: 1.5px solid var(--rule);
+  border-top: 0;
+}
+
+.label {
+  margin: 0;
+  padding: calc(var(--v) * 2) calc(var(--v) * 3.2) calc(var(--v) * 1.6);
+  font-size: max(13px, calc(var(--v) * 3.9));
+  font-weight: 720;
+  font-stretch: 92%;
+  line-height: 1.15;
+  color: var(--color-ink);
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+/* Quadros impressos para os carimbos (os vazios continuam em branco, como numa ficha). */
+.slots {
+  --cell-h: max(calc(var(--v) * 16.5), 46px);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: var(--cell-h);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background-image:
+    linear-gradient(90deg, var(--rule-soft) 1px, transparent 1px), linear-gradient(var(--rule-soft) 1px, transparent 1px);
+  background-size: calc(100% / 3) var(--cell-h);
+}
+
+.slot {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+}
+
+/* ---------- impressões de carimbo (tinta violeta, granulada, pressão desigual) ---------- */
+.imprint,
+.idStamp {
+  color: var(--color-mimeo);
+  mix-blend-mode: multiply;
+  /* pressão desigual ∩ (granulado + 60%): falhas de tinta sem quebrar as letras. */
+  mask-image:
+    linear-gradient(var(--press, 120deg), rgb(0 0 0 / var(--weak, 0.75)), #000 64%), url('/img/ink-grain.png'),
+    linear-gradient(rgb(0 0 0 / 0.6), rgb(0 0 0 / 0.6));
+  mask-size:
+    100% 100%,
+    220px,
+    100% 100%;
+  mask-position:
+    0 0,
+    var(--mx, 0) var(--my, 0),
+    0 0;
+  mask-repeat: no-repeat, repeat, no-repeat;
+  mask-composite: intersect, add;
+}
+
+.imprint {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 2px;
+  width: min(80%, calc(var(--v) * 27));
+  min-height: 80%;
+  padding: 4px 3px 3px;
+  border: 2.5px solid currentColor;
+  border-radius: 5px;
+  outline: 1.2px solid currentColor;
+  outline-offset: -6px;
+  translate: var(--ox) var(--oy);
+  rotate: var(--rot);
+}
+
+/* react-icons desenha em 1em: o tamanho vem do font-size (evita o mínimo automático do grid). */
+.icon {
+  display: block;
+  width: 1em;
+  height: 1em;
+  font-size: calc(var(--v) * 5.4);
+}
+
+.name {
+  max-width: 100%;
+  font-size: max(11.5px, calc(var(--v) * 3.5));
+  font-weight: 850;
+  font-stretch: 74%;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+/* Carimbo de identificação: linha da assinatura, nome e cargo. */
+.idWrap {
+  position: relative;
+  display: grid;
+  justify-self: start;
+}
+
+.idStamp {
+  --press: 200deg;
+  --weak: 0.75;
+  --mx: 61px;
+  --my: 17px;
+  display: grid;
+  padding: 4px 6px 0 2px;
+  border-top: 1.5px solid currentColor;
+  rotate: -1.6deg;
+  translate: 2px 1px;
+}
+
+.idName {
+  font-size: max(12px, calc(var(--v) * 3.5));
+  font-weight: 800;
+  font-stretch: 82%;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.idRole {
+  font-size: max(11px, calc(var(--v) * 3));
+  font-weight: 500;
+  font-stretch: 88%;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* ---------- almofada e carimbo em repouso ---------- */
+.props {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  right: calc(var(--v) * 3);
+  width: calc(var(--v) * 30);
+  height: calc(var(--stamp-w) * 1.04 + var(--v) * 8);
+  pointer-events: none;
+}
+
+.pad {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-rows: 38fr 62fr;
+  height: calc(var(--v) * 21);
+  filter: drop-shadow(4px 6px 0 var(--shadow));
+  rotate: 2.5deg;
+}
+
+/* Almofada de lata preta, tampa aberta para trás (vista de cima). Só cores da paleta:
+   tinta, tinta suave, kraft, mimeógrafo; o fio de luz da borda é papel translúcido. */
+.padLid {
+  position: relative;
+  border-radius: 7px 7px 2px 2px;
+  background: var(--color-ink-soft);
+  box-shadow:
+    inset 0 0 0 1.5px color-mix(in srgb, var(--color-paper) 26%, transparent),
+    inset 0 -3px 0 color-mix(in srgb, var(--color-ink) 45%, transparent);
+}
+
+.padLabel {
+  position: absolute;
+  inset: 24% 62% 24% 9%;
+  background:
+    linear-gradient(var(--color-mimeo), var(--color-mimeo)) 18% 34% / 60% 14% no-repeat,
+    linear-gradient(var(--color-mimeo), var(--color-mimeo)) 18% 68% / 36% 14% no-repeat,
+    var(--color-kraft);
+}
+
+.padCase {
+  position: relative;
+  border-radius: 2px 2px 7px 7px;
+  background: var(--color-ink);
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--color-paper) 30%, transparent);
+}
+
+.felt {
+  position: absolute;
+  inset: 16% 7% 14%;
+  border-radius: 3px;
+  background: var(--color-mimeo);
+  mask-image: url('/img/ink-grain.png'), linear-gradient(rgb(0 0 0 / 0.78), rgb(0 0 0 / 0.78));
+  mask-size: 80px, 100% 100%;
+  mask-composite: add;
+}
+
+.rest {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--v) * 5.5);
+  translate: -50% 0;
+}
+
+.restAway,
+.restTap,
+.restIn,
+.restBack {
+  display: block;
+  transform-origin: 50% 93%;
+}
+
+/* Tremor de quadro parado (classe global boil): o carimbo em repouso respira. */
+.restStamp {
+  --boil-x: 0.5px;
+  --boil-r: 0.35deg;
+  --boil-phase: 1;
+}
+
+/* Cópias do carimbo sobre cada quadro: só existem no palco com movimento. */
+.ghost,
+.headGhost,
+.tapStamp {
+  display: none;
+}
+
+/* =========================================================================
+   Composição larga (palco em tela paisagem): ficha grande girada, carimbo ao lado.
+   Unidade --u: a ficha foi desenhada em 70u × 51u.
+   ========================================================================= */
+@container canvas (min-width: 760px) and (min-aspect-ratio: 1/1) {
+  .frame {
+    --u: max(8.4px, min(1cqw, 1.75cqh));
+    --stamp-w: calc(var(--u) * 12.5);
+    --back-x: -82%;
+    --back-y: 26%;
+    position: absolute;
+    inset: 0;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .formSlot {
+    position: absolute;
+    left: calc(50cqw - var(--u) * 47);
+    top: calc(50cqh - var(--u) * 25.5);
+    width: calc(var(--u) * 70);
+    rotate: -1.2deg;
+  }
+
+  .form {
+    padding: calc(var(--u) * 1.8) calc(var(--u) * 2) calc(var(--u) * 2) calc(var(--u) * 4.2);
+    background-image:
+      radial-gradient(circle at calc(var(--u) * 2.1) 27%, var(--color-mat-deep) calc(var(--u) * 0.62), transparent calc(var(--u) * 0.62 + 0.8px)),
+      radial-gradient(circle at calc(var(--u) * 2.1) 73%, var(--color-mat-deep) calc(var(--u) * 0.62), transparent calc(var(--u) * 0.62 + 0.8px)),
+      url('/img/paper-grain.webp');
+    background-size:
+      100% 100%,
+      100% 100%,
+      256px;
+    background-repeat: no-repeat, no-repeat, repeat;
+    background-blend-mode: normal, normal, multiply;
+  }
+
+  .header {
+    grid-template-columns: 1fr calc(var(--u) * 19);
+    align-content: stretch;
+    gap: 0;
+    min-height: 0;
+    height: calc(var(--u) * 11);
+    padding: 0;
+  }
+
+  .title {
+    align-self: center;
+    padding: 0 calc(var(--u) * 2);
+    font-size: calc(var(--u) * 5.6);
+    font-stretch: 112%;
+  }
+
+  .owner {
+    align-content: start;
+    gap: calc(var(--u) * 0.9);
+    padding: calc(var(--u) * 1.2) calc(var(--u) * 1.5);
+    border-left: 1.5px solid var(--rule);
+  }
+
+  .cellLabel {
+    font-size: max(11px, calc(var(--u) * 1.05));
+  }
+
+  .idName {
+    font-size: max(12px, calc(var(--u) * 1.32));
+  }
+
+  .idRole {
+    font-size: max(11px, calc(var(--u) * 1.1));
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: calc(var(--u) * 14) 1fr;
+    height: calc(var(--u) * 9);
+  }
+
+  .label {
+    padding: calc(var(--u) * 1.2) calc(var(--u) * 1.5);
+    font-size: max(12px, calc(var(--u) * 1.42));
+    border-bottom: 0;
+    border-right: 1.5px solid var(--rule);
+  }
+
+  .slots {
+    grid-template-columns: repeat(var(--cols), 1fr);
+    grid-auto-rows: 100%;
+    background-image: linear-gradient(90deg, var(--rule-soft) 1px, transparent 1px);
+    background-size: calc(100% / var(--cols)) 100%;
+  }
+
+  .imprint {
+    width: 90%;
+    min-height: 70%;
+    gap: calc(var(--u) * 0.3);
+    padding: calc(var(--u) * 0.5) 3px calc(var(--u) * 0.35);
+  }
+
+  .icon {
+    font-size: calc(var(--u) * 2.5);
+  }
+
+  .name {
+    font-size: max(11px, calc(var(--u) * 1.22));
+    font-stretch: 66%;
+  }
+
+  .props {
+    top: calc(50cqh - var(--u) * 7);
+    left: calc(50cqw + var(--u) * 25.5);
+    right: auto;
+    width: calc(var(--u) * 16.5);
+    height: calc(var(--stamp-w) * 1.04 + var(--u) * 4.4);
+  }
+
+  .pad {
+    height: calc(var(--u) * 13);
+    rotate: 5deg;
+  }
+
+  .rest {
+    bottom: calc(var(--u) * 3.6);
+  }
+}
+
+/* =========================================================================
+   Peças só do palco com movimento (cópias do carimbo).
+   ========================================================================= */
+:global(html[data-mode='stage'][data-motion='full'] #skills) .ghost,
+:global(html[data-mode='stage'][data-motion='full'] #skills) .headGhost,
+:global(html[data-mode='stage'][data-motion='full'] #skills) .tapStamp {
+  display: block;
+  position: absolute;
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+}
+
+:global(html[data-mode='stage'][data-motion='full'] #skills) .ghost,
+:global(html[data-mode='stage'][data-motion='full'] #skills) .headGhost {
+  left: 50%;
+  bottom: 6%;
+  translate: -50% 0;
+}
+
+:global(html[data-mode='stage'][data-motion='full'] #skills) .headGhost {
+  bottom: -3px;
+}
+
+:global(html[data-mode='stage'][data-motion='full'] #skills) .tapStamp {
+  left: var(--tx, 50%);
+  top: var(--ty, 50%);
+  translate: -50% -94%;
+}
+
+:global(html[data-mode='stage'][data-motion='full'] #skills) .slot {
+  cursor: pointer;
+}
+
+/* =========================================================================
+   ENTRADA — 28 quadros (com o conteúdo atual)
+   q1–3 a ficha desliza para a mesa · q1–2 almofada e carimbo caem, o carimbo se entinta
+   q3 carimbo sobe sobre o 1º quadro · q4–12 1º grupo: sobe/bate, a ficha treme ≤ 2px
+   q13–24 o ritmo acelera: uma impressão por quadro · q25–27 o carimbo volta à almofada
+   ========================================================================= */
+
+@keyframes form-in {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+    transform: translate(12vw, 64vh) rotate(9deg) scale(1.03);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-0.7vw, -1.4vh) rotate(-1.3deg);
+  }
+  75%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes prop-drop {
+  0% {
+    opacity: 0;
+  }
+  33.333% {
+    opacity: 1;
+    transform: translateY(-14px) scale(1.12);
+  }
+  66.666%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Cai sobre a almofada (alto, sombra junto), achata 1 quadro ao entintar. */
+@keyframes stamp-drop {
+  0% {
+    opacity: 0;
+  }
+  33.333% {
+    opacity: 1;
+    transform: translateY(-38%) scale(1.1);
+  }
+  66.666% {
+    opacity: 1;
+    transform: scale(1.06, 0.88);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Janela de visibilidade de uma cópia do carimbo (estado-base: invisível). Termina no
+   próprio estado-base com fill forwards: a animação continua "em vigor" e o QA consegue
+   voltar a ela (seek) mesmo depois de terminada. */
+@keyframes stamp-on {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Janela em que o carimbo de repouso some (está trabalhando sobre a ficha). */
+@keyframes stamp-away {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Antecipação (sobe, maior) e batida (achata 1 quadro). A sombra fica na mesa. */
+@keyframes stamp-lift-slam {
+  0% {
+    transform: translateY(-26%) scale(1.07);
+  }
+  50%,
+  100% {
+    transform: scale(1.06, 0.88);
+  }
+}
+
+/* Sombra do carimbo erguido: mais longe, menor e mais clara; na batida volta a colar. */
+@keyframes shadow-lift {
+  0% {
+    opacity: 0.5;
+    transform: translate(7%, 2%) scale(0.95);
+  }
+  50%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes stamp-slam {
+  from,
+  to {
+    transform: scale(1.06, 0.88);
+  }
+}
+
+/* Volta à almofada: em trânsito, achata, assenta. */
+@keyframes stamp-back {
+  0% {
+    transform: translate(var(--back-x), var(--back-y)) translateY(-20%) scale(1.08);
+  }
+  33.333% {
+    transform: scale(1.05, 0.9);
+  }
+  66.666%,
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes imprint-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* A folha cede sob a batida: 1 quadro deslocada, ≤ 2px. */
+@keyframes shake-slow {
+  0% {
+    transform: translate(1.2px, 1.4px);
+  }
+  50%,
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes shake-rapid {
+  0% {
+    transform: translate(1.3px, -0.9px);
+  }
+  50% {
+    transform: translate(-1px, 1.3px);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='skills']:not([data-leaving]):not([data-seen~='skills'])
+    #skills)
+  .formSlot {
+  animation: form-in calc(var(--frame) * 4) step-end both;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='skills']:not([data-leaving]):not([data-seen~='skills'])
+    #skills)
+  .pad {
+  animation: prop-drop calc(var(--frame) * 3) step-end both;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='skills']:not([data-leaving]):not([data-seen~='skills'])
+    #skills)
+  .restIn {
+  animation: stamp-drop calc(var(--frame) * 3) step-end both;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='skills']:not([data-leaving]):not([data-seen~='skills'])
+    #skills)
+  .restAway {
+  animation: stamp-away calc(var(--frame) * (var(--last-slam) - var(--first-slam) + 2)) step-end forwards;
+  animation-delay: calc(var(--frame) * (var(--first-slam) - 1));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='skills']:not([data-leaving]):not([data-seen~='skills'])
+    #skills)
+  .restBack {
+  animation: stamp-back calc(var(--frame) * 3) step-end forwards;
+  animation-delay: calc(var(--frame) * (var(--last-slam) + 1));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='skills']:not([data-leaving]):not([data-seen~='skills'])
+    #skills)
+  .slow
+  .ghost {
+  animation: stamp-on calc(var(--frame) * 2) step-end forwards;
+  animation-delay: calc(var(--frame) * (var(--at) - 1));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='skills']:not([data-leaving]):not([data-seen~='skills'])
+    #skills)
+  .slow
+  .ghostBody {
+  animation: stamp-lift-slam calc(var(--frame) * 2) step-end forwards;
+  animation-delay: calc(var(--frame) * (var(--at) - 1));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='skills']:not([data-leaving]):not([data-seen~='skills'])
+    #skills)
+  .slow
+  .ghost
+  .stampShadow {
+  animation: shadow-lift calc(var(--frame) * 2) step-end forwards;
+  animation-delay: calc(var(--frame) * (var(--at) - 1));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='skills']:not([data-leaving]):not([data-seen~='skills'])
+    #skills)
+  .rapid
+  .ghost {
+  animation: stamp-on var(--frame) step-end forwards;
+  animation-delay: calc(var(--frame) * var(--at));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='skills']:not([data-leaving]):not([data-seen~='skills'])
+    #skills)
+  .rapid
+  .ghostBody {
+  animation: stamp-slam var(--frame) step-end forwards;
+  animation-delay: calc(var(--frame) * var(--at));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='skills']:not([data-leaving]):not([data-seen~='skills'])
+    #skills)
+  .imprint {
+  animation: imprint-in var(--frame) step-end both;
+  animation-delay: calc(var(--frame) * var(--at));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='skills']:not([data-leaving]):not([data-seen~='skills'])
+    #skills)
+  .formShake {
+  animation-name: shake-slow, shake-rapid;
+  animation-duration: calc(var(--frame) * 2);
+  animation-timing-function: step-end;
+  animation-delay: calc(var(--frame) * var(--first-slam)), calc(var(--frame) * var(--rapid-start));
+  animation-iteration-count: var(--slow-iter), var(--rapid-iter);
+}
+
+/* =========================================================================
+   REVISITA — impressões já estão lá; o carimbo bate uma vez no campo do responsável.
+   q1 ficha (overshoot) · q2 assenta · q3 sobe sobre o cabeçalho · q4 bate · q5–7 volta
+   ========================================================================= */
+@keyframes form-in-again {
+  0% {
+    opacity: 0;
+  }
+  33.333% {
+    opacity: 1;
+    transform: translate(-0.5vw, -1.1vh) rotate(-0.9deg);
+  }
+  66.666%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes appear {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='skills'][data-seen~='skills']:not([data-leaving]) #skills)
+  .formSlot {
+  animation: form-in-again calc(var(--frame) * 3) step-end both;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='skills'][data-seen~='skills']:not([data-leaving]) #skills)
+  .props {
+  animation: appear var(--frame) step-end both;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='skills'][data-seen~='skills']:not([data-leaving]) #skills)
+  .restAway {
+  animation: stamp-away calc(var(--frame) * 2) step-end forwards;
+  animation-delay: calc(var(--frame) * 3);
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='skills'][data-seen~='skills']:not([data-leaving]) #skills)
+  .headGhost {
+  animation: stamp-on calc(var(--frame) * 2) step-end forwards;
+  animation-delay: calc(var(--frame) * 3);
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='skills'][data-seen~='skills']:not([data-leaving]) #skills)
+  .headGhostBody {
+  animation: stamp-lift-slam calc(var(--frame) * 2) step-end forwards;
+  animation-delay: calc(var(--frame) * 3);
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='skills'][data-seen~='skills']:not([data-leaving]) #skills)
+  .headGhost
+  .stampShadow {
+  animation: shadow-lift calc(var(--frame) * 2) step-end forwards;
+  animation-delay: calc(var(--frame) * 3);
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='skills'][data-seen~='skills']:not([data-leaving]) #skills)
+  .formShake {
+  animation: shake-slow calc(var(--frame) * 2) step-end;
+  animation-delay: calc(var(--frame) * 4);
+  animation-iteration-count: 0.5;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='skills'][data-seen~='skills']:not([data-leaving]) #skills)
+  .restBack {
+  animation: stamp-back calc(var(--frame) * 3) step-end forwards;
+  animation-delay: calc(var(--frame) * 5);
+}
+
+/* =========================================================================
+   SAÍDA — a ficha é puxada por um canto (3 quadros, girando); almofada e carimbo
+   são recolhidos logo atrás. Indo em frente puxa pelo canto de cima; voltando, pelo de baixo.
+   ========================================================================= */
+@keyframes form-pull {
+  0% {
+    transform: translate(calc(0.5vw * var(--dir)), calc(-0.9vh * var(--dir))) rotate(-1.6deg) scale(1.012);
+  }
+  33.333% {
+    transform: translate(calc(7vw * var(--dir)), calc(-34vh * var(--dir))) rotate(-9deg);
+  }
+  66.666% {
+    transform: translate(calc(15vw * var(--dir)), calc(-86vh * var(--dir))) rotate(-17deg);
+  }
+  100% {
+    transform: translate(calc(19vw * var(--dir)), calc(-135vh * var(--dir))) rotate(-22deg);
+    opacity: 0;
+  }
+}
+
+@keyframes props-off {
+  0% {
+    transform: translateY(-8px) scale(1.05);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(calc(9vw * var(--dir)), calc(-42vh * var(--dir))) rotate(8deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(14vw * var(--dir)), calc(-105vh * var(--dir))) rotate(15deg);
+  }
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='skills'] #skills) .canvas {
+  animation: none;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='skills'] #skills) .formSlot {
+  transform-origin: 100% 0%;
+  animation: form-pull calc(var(--frame) * 3) step-end forwards;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-dir='-1'][data-leaving='skills'] #skills) .formSlot {
+  transform-origin: 0% 100%;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='skills'] #skills) .props {
+  animation: props-off calc(var(--frame) * 2) step-end forwards;
+  animation-delay: var(--frame);
+}
+
+/* =========================================================================
+   TOQUE (SkillsStampTap) — clicar numa impressão: o carimbo sobe, bate, sai (3 quadros).
+   Fora de data-scene de propósito: voltar à cena não repete o toque.
+   ========================================================================= */
+@keyframes tap-body {
+  0% {
+    transform: translateY(-26%) scale(1.07);
+  }
+  33.333% {
+    transform: scale(1.06, 0.88);
+  }
+  66.666%,
+  100% {
+    transform: translateY(-34%) scale(1.08);
+  }
+}
+
+:global(html[data-mode='stage'][data-motion='full'] #skills) .frame[data-tap] .tapStamp {
+  animation: stamp-on calc(var(--frame) * 3) step-end;
+}
+
+:global(html[data-mode='stage'][data-motion='full'] #skills) .frame[data-tap] .tapBody {
+  animation: tap-body calc(var(--frame) * 3) step-end;
+}
+
+@keyframes tap-shadow {
+  0%,
+  66.666%,
+  100% {
+    opacity: 0.5;
+    transform: translate(7%, 2%) scale(0.95);
+  }
+  33.333% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+:global(html[data-mode='stage'][data-motion='full'] #skills) .frame[data-tap] .tapStamp .stampShadow {
+  animation: tap-shadow calc(var(--frame) * 3) step-end;
+}
+
+:global(html[data-mode='stage'][data-motion='full'] #skills) .frame[data-tap] .restTap {
+  animation: stamp-away calc(var(--frame) * 3) step-end;
+}
+
+:global(html[data-mode='stage'][data-motion='full'] #skills) .frame[data-tap] .formTap {
+  animation: shake-slow calc(var(--frame) * 2) step-end;
+  animation-delay: var(--frame);
+  animation-iteration-count: 0.5;
+}
