@@ -1,0 +1,1024 @@
+/* =========================================================================
+   Cena 2 — Sobre "Interseção"
+   Palavra cruzada: TECNOLOGIA (formulário contínuo) × SAÚDE (foto em meio-tom) no E.
+   Do cruzamento saem fios violeta até três fichas pautadas.
+   Estilos-base = pose final. Coreografia nos blocos ENTRADA e SAÍDA (quadros a 12 fps).
+   ========================================================================= */
+
+/* .canvas é o container das consultas (@container canvas): nunca dimensionar aqui. */
+.canvas {
+  --t: 1;
+  --thread: #8a77f4;
+  --thread-hi: #c9bffb;
+  --rule: rgb(112 96 226 / 0.36);
+  --rule-red: rgb(200 65 43 / 0.78);
+  --chalk: rgb(207 224 180 / 0.24);
+  display: flex;
+  flex-direction: column;
+}
+
+:global(html[data-seen~='about']) .canvas {
+  --t: 0.4;
+}
+
+/* =========================================================================
+   Composição alta (padrão; também no modo leitura): a cruzada transposta.
+   TECNOLOGIA desce pela coluna da direita, SAÚDE atravessa na 2ª linha e termina no E.
+   As fichas empilham à esquerda da coluna, presas por um único fio.
+   ========================================================================= */
+.frame {
+  /* lado de uma casa da cruzada */
+  --c: min(20cqw, 5.4rem);
+  /* folga entre as fichas e a coluna de TECNOLOGIA, entre SAÚDE e a 1ª ficha, entre fichas */
+  --gap: 14px;
+  --card-gap: 18px;
+  /* distância do alfinete ao canto da ficha; largura da foto 3×4 (que sobra acima da 1ª ficha) */
+  --pin-in: 12px;
+  --pw: clamp(56px, 11cqw, 76px);
+  --m: calc(var(--pw) * 0.62 + 8px);
+  position: relative;
+  width: 100%;
+  max-width: 36rem;
+  margin: auto;
+  min-height: calc(var(--c) * var(--cols));
+  padding-bottom: 8px;
+}
+
+/* ---------- título: etiqueta Dymo ---------- */
+.title {
+  position: absolute;
+  z-index: 2;
+  top: calc(var(--c) * 0.5 - 1.05em);
+  left: 2px;
+  margin: 0;
+  font-size: clamp(13px, 3.8cqw, 16px);
+  line-height: 1;
+}
+
+.dymo {
+  rotate: -2.5deg;
+}
+
+/* ---------- palavra cruzada ---------- */
+.defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.crossword {
+  position: absolute;
+  top: 0;
+  right: 0;
+  user-select: none;
+  width: calc(var(--c) * var(--rows));
+  height: calc(var(--c) * var(--cols));
+}
+
+.cell {
+  /* composição alta = transposta da larga */
+  --col: var(--wr);
+  --row: var(--wc);
+  --gfx: var(--fy);
+  --gfy: var(--fx);
+  position: absolute;
+  z-index: 1;
+  left: calc(var(--col) * var(--c));
+  top: calc(var(--row) * var(--c));
+  width: var(--c);
+  height: var(--c);
+}
+
+/* O E fica por cima dos fios: eles saem de baixo da peça cravada. */
+.cell[data-kind='cross'] {
+  z-index: 4;
+}
+
+/* Grade da cruzada riscada a giz na esteira (casas contíguas), com a numeração. */
+.cell::before {
+  content: '';
+  position: absolute;
+  inset: -0.75px;
+  border: 1.5px solid var(--chalk);
+}
+
+.cell[data-num-tall]::after {
+  content: attr(data-num-tall);
+  position: absolute;
+  left: 7%;
+  top: 5%;
+  font-size: max(9px, calc(var(--c) * 0.12));
+  font-weight: 650;
+  line-height: 1;
+  color: var(--color-ruler);
+  opacity: 0.8;
+}
+
+.piece {
+  position: absolute;
+  inset: 0;
+  translate: calc(var(--jx) * 1.4%) calc(var(--jy) * 1.4%);
+  rotate: var(--jr);
+}
+
+.wobble {
+  --boil-x: 0.5px;
+  --boil-r: 0.45deg;
+  width: 100%;
+  height: 100%;
+}
+
+.glyph {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.glyphText {
+  font-family: var(--font-sans);
+  font-size: 108px;
+  font-weight: 900;
+  font-stretch: 96%;
+}
+
+/* Sombra dura do recorte e a margem de papel deixada pela tesoura. */
+.glyphShadow {
+  fill: var(--shadow);
+  stroke: var(--shadow);
+  stroke-width: 7px;
+  stroke-linejoin: round;
+  translate: 3px 4.5px;
+}
+
+.glyphRim {
+  fill: var(--color-paper);
+  stroke: var(--color-paper);
+  stroke-width: 7px;
+  stroke-linejoin: round;
+}
+
+.barPaper {
+  fill: var(--color-paper);
+}
+
+.barGreen {
+  fill: #cfe5c6;
+}
+
+/* Pontos da matricial: cada fiada com um passo diferente, para parecer letra e não traço. */
+.printDots {
+  fill: none;
+  stroke: var(--color-mimeo);
+  stroke-opacity: 0.5;
+  stroke-width: 1.15px;
+  stroke-linecap: round;
+}
+
+.printDots0 {
+  stroke-dasharray: 0 1.47 0 2.93;
+}
+
+.printDots1 {
+  stroke-dasharray: 0 1.47;
+  stroke-dashoffset: 0.7;
+}
+
+.printDots2 {
+  stroke-dasharray: 0 1.47 0 1.47 0 2.93;
+}
+
+.photoBase {
+  fill: var(--color-mimeo);
+}
+
+/* A folha (listagem ou foto) é uma só: cada letra mostra o trecho da sua casa. */
+.sheet {
+  translate: calc(var(--col) * -100px) calc(var(--row) * -100px);
+}
+
+.wideOnly {
+  display: none;
+}
+
+.seam {
+  stroke: var(--color-mat);
+  stroke-width: 2.2px;
+  opacity: 0.55;
+}
+
+/* ---------- fichas pautadas ---------- */
+.cards {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-gap);
+  width: calc(100% - (var(--rows) - var(--xr)) * var(--c) - var(--gap));
+  /* em telas altas as fichas se espalham ao longo da coluna de TECNOLOGIA */
+  min-height: calc(var(--cols) * var(--c));
+  margin: 0;
+  padding: calc((var(--xc) + 1) * var(--c) + var(--m)) 0 calc(var(--c) * 0.2);
+  list-style: none;
+}
+
+.slot {
+  position: relative;
+  --pin-r: 20px;
+  --from-x: -70vw;
+  --from-y: 3vh;
+  --from-r: -9deg;
+  --to-x: -45vw;
+  --to-y: -6vh;
+  --to-r: -14deg;
+}
+
+.slot2 {
+  --from-r: 7deg;
+  --to-r: 12deg;
+}
+
+/* As duas primeiras crescem: a ficha fica no topo do seu espaço e o fio desce até a seguinte. */
+.slot1,
+.slot2 {
+  flex-grow: 1;
+}
+
+.cardMove {
+  position: relative;
+  z-index: 2;
+  /* gira em torno do próprio alfinete (canto superior direito na composição alta) */
+  transform-origin: calc(100% - var(--pin-in)) var(--pin-in);
+}
+
+.slot1 .cardMove {
+  rotate: -0.7deg;
+}
+
+.slot2 .cardMove {
+  rotate: 1.1deg;
+}
+
+.slot3 .cardMove {
+  rotate: -0.9deg;
+}
+
+.slot .card {
+  filter: drop-shadow(3px 5px 0 var(--shadow));
+}
+
+.cardSheet {
+  border-radius: 4px;
+  padding: 0.75em 1.05em 0.2em;
+  font-size: clamp(14.5px, 4cqw, 16px);
+  line-height: 1.55;
+}
+
+.cardTitle {
+  margin: 0 -1.05em 0.3em;
+  padding: 0 1.05em 0.32em;
+  font-size: 1.1em;
+  font-weight: 760;
+  font-stretch: 104%;
+  line-height: 1.25;
+  color: var(--color-ink);
+  border-bottom: 2px solid var(--rule-red);
+  /* o alfinete fica no canto do título: o texto não passa por baixo dele */
+  padding-left: calc(1.05em + var(--pin-l, 0px));
+  padding-right: calc(1.05em + var(--pin-r, 0px));
+}
+
+/* Pauta: uma linha por linha de texto, mais uma em branco no fim da ficha. */
+.cardText {
+  margin: 0 -1.05em;
+  padding: 0 1.05em 1lh;
+  color: var(--color-ink-soft);
+  background: linear-gradient(transparent calc(100% - 1px), var(--rule) calc(100% - 1px)) 0 0 / 100% 1lh;
+}
+
+/* Espaço que o texto contorna, por baixo da foto grampeada (que sobra para fora da ficha). */
+.photoRoom {
+  float: left;
+  width: calc(var(--pw) - 4px);
+  height: calc(var(--pw) * 0.78 - 0.75em);
+  margin: 0 10px 2px -6px;
+}
+
+/* ---------- foto 3×4 grampeada (data-shared="photo": a foto da abertura vem voando) ---------- */
+.photoMove {
+  position: absolute;
+  z-index: 5;
+  top: calc(var(--pw) * -0.6);
+  left: 10px;
+  width: var(--pw);
+  rotate: -4deg;
+}
+
+.photoSheet {
+  padding: 3px;
+}
+
+.photoCrop {
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+}
+
+.photoCrop img {
+  height: 100%;
+  object-fit: cover;
+  object-position: 46% 30%;
+}
+
+.staple {
+  position: absolute;
+  z-index: 1;
+  top: 3px;
+  left: 50%;
+  width: 22px;
+  height: 5px;
+  margin-left: -11px;
+  rotate: 7deg;
+  border-radius: 1px;
+  background: linear-gradient(#f4f4f0, #a9a9b2 55%, #6f6f7a);
+  box-shadow: 1px 2px 0 var(--shadow);
+}
+
+/* ---------- alfinetes ---------- */
+.slot .pin {
+  z-index: 4;
+  top: calc(var(--pin-in) - 10px);
+  right: calc(var(--pin-in) - 10px);
+}
+
+/* ---------- fios ---------- */
+.threads,
+.crossPinBox {
+  /* centro do E, na composição alta (coluna da direita, linha de SAÚDE) */
+  --ex: calc(100% - (var(--rows) - var(--xr) - 0.5) * var(--c));
+  --ey: calc((var(--xc) + 0.5) * var(--c));
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
+}
+
+.crossPinBox {
+  z-index: 6;
+}
+
+.thread {
+  position: absolute;
+  display: block;
+  left: calc(var(--ex) - 18px);
+  top: var(--ey);
+  width: 36px;
+  height: hypot(var(--dx), var(--dy));
+  transform-origin: 18px 0;
+  rotate: calc(atan2(var(--dy), var(--dx)) - 90deg);
+}
+
+.thread svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.thread path {
+  fill: none;
+  stroke: var(--thread);
+  stroke-width: 2.4px;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.thread .threadShadow {
+  stroke: var(--shadow);
+  stroke-width: 2px;
+}
+
+/* Torção da linha: um fio claro tracejado por cima. */
+.thread .threadTwist {
+  stroke: var(--thread-hi);
+  stroke-width: 1px;
+  stroke-dasharray: 2 3;
+  stroke-linecap: butt;
+}
+
+/* Pose final: esticado. */
+.threadSlack {
+  opacity: 0;
+}
+
+/* Alta: um fio só — do E até a 1ª ficha e, de alfinete em alfinete, pelas outras. */
+.thread1 {
+  --dx: calc(var(--c) * -0.5 - var(--gap) - var(--pin-in));
+  --dy: calc(var(--c) * 0.5 + var(--m) + var(--pin-in));
+}
+
+.thread2,
+.thread3 {
+  display: none;
+}
+
+.slot .drop {
+  z-index: 3;
+  left: auto;
+  right: calc(var(--pin-in) - 18px);
+  top: var(--pin-in);
+  height: calc(100% + var(--card-gap));
+  rotate: none;
+}
+
+.crossPin {
+  left: calc(var(--ex) - 10px);
+  top: calc(var(--ey) - 10px);
+}
+
+/* Navegadores sem funções trigonométricas no CSS: sem fios calculados (os trechos verticais
+   da composição alta não dependem delas). */
+@supports not ((rotate: atan2(1px, 1px)) and (height: hypot(1px, 1px))) {
+  .threads {
+    display: none;
+  }
+}
+
+/* =========================================================================
+   Composição larga: prancha 16:10 (container "board") centrada no canvas, em unidades
+   da prancha. A cruzada domina; as fichas ficam nos três vãos que os fios alcançam sem
+   cruzar letras: à esquerda, acima à direita e abaixo. Cada ficha é presa pelo canto de
+   cima mais próximo do E e cresce para baixo (rolagem, nunca corte, em pranchas baixas).
+   ========================================================================= */
+@container canvas (min-width: 760px) and (min-aspect-ratio: 1/1) {
+  .frame {
+    --u: 1cqw;
+    --c: calc(var(--u) * 7.2);
+    --gx: calc(var(--u) * 25.5);
+    --gy: calc(var(--u) * 5.5);
+    --pw: calc(var(--u) * 5.6);
+    /* âncoras das fichas: canto de cima preso pelo alfinete */
+    --s1x: calc(var(--u) * 24.5);
+    --s1y: calc(var(--u) * 24.5);
+    --s2x: calc(var(--u) * 62);
+    --s2y: calc(var(--u) * 7);
+    --s3x: calc(var(--u) * 41);
+    --s3y: calc(var(--u) * 45.5);
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: min(100cqw, 160cqh);
+    height: min(62.5cqw, 100cqh);
+    max-width: none;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    translate: -50% -50%;
+    container: board / size;
+  }
+
+  /* A etiqueta fica colada ao lado do S, como o título da própria cruzada. */
+  .title {
+    top: calc(var(--gy) + var(--c) * 0.32);
+    left: auto;
+    right: calc(var(--u) * 100 - var(--gx) - var(--c) * 0.92);
+    font-size: clamp(12px, calc(var(--u) * 1.3), 17px);
+  }
+
+  .crossword {
+    top: var(--gy);
+    left: var(--gx);
+    right: auto;
+    width: calc(var(--c) * var(--cols));
+    height: calc(var(--c) * var(--rows));
+  }
+
+  .cell {
+    --col: var(--wc);
+    --row: var(--wr);
+    --gfx: var(--fx);
+    --gfy: var(--fy);
+  }
+
+  .cell[data-num-tall]::after {
+    content: none;
+  }
+
+  .cell[data-num-wide]::after {
+    content: attr(data-num-wide);
+    position: absolute;
+    left: 7%;
+    top: 5%;
+    font-size: max(9px, calc(var(--c) * 0.12));
+    font-weight: 650;
+    line-height: 1;
+    color: var(--color-ruler);
+    opacity: 0.8;
+  }
+
+  .wideOnly {
+    display: inline;
+  }
+
+  .tallOnly {
+    display: none;
+  }
+
+  .cards {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: auto;
+    min-height: 0;
+    padding: 0;
+  }
+
+  .slot {
+    position: absolute;
+  }
+
+  .slot1 {
+    left: calc(var(--s1x) - var(--u) * 22.5);
+    top: var(--s1y);
+    width: calc(var(--u) * 22.5);
+    --from-x: -32vw;
+    --from-y: 5vh;
+    --from-r: -10deg;
+    --to-x: -26vw;
+    --to-y: -14vh;
+    --to-r: -16deg;
+  }
+
+  .slot2 {
+    left: var(--s2x);
+    top: var(--s2y);
+    width: calc(var(--u) * 24.5);
+    --from-x: 26vw;
+    --from-y: -32vh;
+    --from-r: 12deg;
+    --to-x: 24vw;
+    --to-y: -30vh;
+    --to-r: 15deg;
+  }
+
+  .slot2,
+  .slot3 {
+    --pin-l: 20px;
+    --pin-r: 0px;
+  }
+
+  .slot3 {
+    left: var(--s3x);
+    top: var(--s3y);
+    width: calc(var(--u) * 28);
+    --from-x: 10vw;
+    --from-y: 30vh;
+    --from-r: 8deg;
+    --to-x: 6vw;
+    --to-y: 40vh;
+    --to-r: 11deg;
+  }
+
+  .slot1 .cardMove {
+    rotate: -1.6deg;
+  }
+
+  .slot2 .cardMove {
+    rotate: 1.8deg;
+    transform-origin: var(--pin-in) var(--pin-in);
+  }
+
+  .slot3 .cardMove {
+    rotate: -1.2deg;
+    transform-origin: var(--pin-in) var(--pin-in);
+  }
+
+  .cardSheet {
+    font-size: clamp(12px, calc(var(--u) * 1.22), 16.5px);
+  }
+
+  .slot2 .pin,
+  .slot3 .pin {
+    right: auto;
+    left: calc(var(--pin-in) - 10px);
+  }
+
+  .threads,
+  .crossPinBox {
+    --ex: calc(var(--gx) + (var(--xc) + 0.5) * var(--c));
+    --ey: calc(var(--gy) + (var(--xr) + 0.5) * var(--c));
+  }
+
+  .thread1 {
+    --dx: calc(var(--s1x) - var(--pin-in) - var(--ex));
+    --dy: calc(var(--s1y) + var(--pin-in) - var(--ey));
+  }
+
+  .thread2 {
+    --dx: calc(var(--s2x) + var(--pin-in) - var(--ex));
+    --dy: calc(var(--s2y) + var(--pin-in) - var(--ey));
+    display: block;
+  }
+
+  .thread3 {
+    --dx: calc(var(--s3x) + var(--pin-in) - var(--ex));
+    --dy: calc(var(--s3y) + var(--pin-in) - var(--ey));
+    display: block;
+  }
+
+  .slot .drop {
+    display: none;
+  }
+}
+
+/* =========================================================================
+   ENTRADA — ~27 quadros (2,2 s); --t encurta na revisita
+   q0      corte; a foto da abertura (se vier dela) começa o voo FLIP (4 poses, global)
+   q1      grade riscada a giz e etiqueta Dymo colada
+   q2–q14  letras colocadas como peças de cruzada, uma por quadro, alternando as palavras
+   q15–17  o E do cruzamento desce por último; o alfinete o crava no q16
+   q17–19  os fios saem de baixo do E em 3 trechos (ainda frouxos)
+   q18–26  as fichas deslizam por baixo dos fios (2 em 2 quadros); cada alfinete bate e
+           o seu fio estica no mesmo quadro (q21, q23, q25); grampo na foto no q24
+   ========================================================================= */
+
+@keyframes chalk-in {
+  0% {
+    opacity: 0;
+  }
+  50%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes dymo-in {
+  0% {
+    opacity: 0;
+  }
+  33.333% {
+    opacity: 1;
+    transform: translate(-4px, -9px) rotate(-6deg) scale(1.22);
+  }
+  66.666%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Peça levantada (maior, sombra longe) → achata 1 quadro → assenta. */
+@keyframes piece-drop {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+    transform: translateY(-9%) scale(1.3);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(1.5%) scale(1.07, 0.9);
+  }
+  75%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes shadow-lift {
+  25% {
+    transform: translate(6px, 9px);
+  }
+  50% {
+    transform: translate(-1.5px, -2.5px);
+  }
+  75%,
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes pin-strike {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+    transform: translate(-5px, -12px) scale(1.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(0.8);
+  }
+  75%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* O fio é desenrolado a partir do E em três trechos. */
+@keyframes thread-pay {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+  }
+  25% {
+    opacity: 1;
+    clip-path: inset(-12px -12px 66% -12px);
+  }
+  50% {
+    opacity: 1;
+    clip-path: inset(-12px -12px 33% -12px);
+  }
+  75%,
+  100% {
+    opacity: 1;
+    clip-path: inset(-12px);
+  }
+}
+
+/* Frouxo até o alfinete bater; então esticado (troca seca, sem interpolação). */
+@keyframes slack-hold {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes taut-hold {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Ficha: longe → passa do ponto → assenta → afunda 1 quadro com o alfinete → assenta. */
+@keyframes card-in {
+  0% {
+    opacity: 0;
+  }
+  16.666% {
+    opacity: 1;
+    transform: translate(var(--from-x), var(--from-y)) rotate(var(--from-r)) scale(1.05);
+  }
+  33.333% {
+    opacity: 1;
+    transform: translate(calc(var(--from-x) * -0.035), calc(var(--from-y) * -0.035))
+      rotate(calc(var(--from-r) * -0.18)) scale(1.02);
+  }
+  50% {
+    opacity: 1;
+    transform: none;
+  }
+  66.666% {
+    opacity: 1;
+    transform: scale(0.985);
+  }
+  83.333%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes staple-in {
+  0% {
+    opacity: 0;
+  }
+  33.333% {
+    opacity: 1;
+    transform: translateY(-9px) scale(1.6);
+  }
+  66.666%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Sem FLIP (chegada direta ou de outra cena): a foto cai sobre a ficha já presa. */
+@keyframes print-drop {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+    transform: translate(-10px, -16px) rotate(-9deg) scale(1.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(0.96);
+  }
+  75%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Quadro em que cada fio estica = quadro em que o alfinete da ficha bate. */
+.thread1,
+.slot1 {
+  --taut: 21;
+}
+.thread2,
+.slot2 {
+  --taut: 23;
+}
+.thread3,
+.slot3 {
+  --taut: 25;
+}
+/* Os fios saem do E no q16 (desenrolados em q17–19). Na alta, o trecho que desce de um
+   alfinete sai quando a ficha de baixo está chegando e estica quando o alfinete dela bate. */
+.thread {
+  --pay: 16;
+}
+.slot1 .drop {
+  --pay: 19;
+  --taut: 23;
+}
+.slot2 .drop {
+  --pay: 21;
+  --taut: 25;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='about'] #about) .cell::before,
+:global(html[data-mode='stage'][data-motion='full'][data-scene='about'] #about) .cell::after {
+  animation: chalk-in calc(var(--frame) * 2) step-end both;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='about'] #about) .dymo {
+  animation: dymo-in calc(var(--frame) * 3) step-end both;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='about'] #about) .piece {
+  animation: piece-drop calc(var(--frame) * 4) step-end both;
+  animation-delay: calc(var(--frame) * (1 + var(--k)) * var(--t));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='about'] #about) .glyphShadow {
+  animation: shadow-lift calc(var(--frame) * 4) step-end both;
+  animation-delay: calc(var(--frame) * (1 + var(--k)) * var(--t));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='about'] #about) .crossPin {
+  animation: pin-strike calc(var(--frame) * 4) step-end both;
+  animation-delay: calc(var(--frame) * 14 * var(--t));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='about'] #about) .thread {
+  animation: thread-pay calc(var(--frame) * 4) step-end both;
+  animation-delay: calc(var(--frame) * var(--pay) * var(--t));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='about'] #about) .threadSlack {
+  animation: slack-hold calc(var(--frame) * var(--taut) * var(--t)) step-end both;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='about'] #about) .threadTaut {
+  animation: taut-hold calc(var(--frame) * var(--taut) * var(--t)) step-end both;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='about'] #about) .cardMove {
+  animation: card-in calc(var(--frame) * 6) step-end both;
+  animation-delay: calc(var(--frame) * (var(--taut) - 4) * var(--t));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='about'] #about) .slot .pin {
+  animation: pin-strike calc(var(--frame) * 4) step-end both;
+  animation-delay: calc(var(--frame) * (var(--taut) - 2) * var(--t));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='about'] #about) .photo:not([data-flip]) .photoPrint {
+  animation: print-drop calc(var(--frame) * 4) step-end both;
+  animation-delay: calc(var(--frame) * 20 * var(--t));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='about'] #about) .staple {
+  animation: staple-in calc(var(--frame) * 3) step-end both;
+  animation-delay: calc(var(--frame) * 22 * var(--t));
+}
+
+/* =========================================================================
+   SAÍDA — 4 quadros: as fichas são arrancadas dos alfinetes, os fios afrouxam e caem,
+   as letras se desmontam a partir do cruzamento. O E fica cravado com os alfinetes.
+   ========================================================================= */
+@keyframes card-yank {
+  0% {
+    transform: none;
+  }
+  25% {
+    transform: translate(calc(var(--to-x) * 0.03), calc(var(--to-y) * 0.03)) scale(1.03);
+  }
+  50% {
+    transform: translate(var(--to-x), var(--to-y)) rotate(var(--to-r));
+  }
+  75%,
+  100% {
+    transform: translate(calc(var(--to-x) * 2.2), calc(var(--to-y) * 2.2)) rotate(calc(var(--to-r) * 2));
+    opacity: 0;
+  }
+}
+
+@keyframes thread-drop {
+  0% {
+    transform: none;
+  }
+  33.333% {
+    transform: translateX(4px);
+    opacity: 0.7;
+  }
+  66.666%,
+  100% {
+    transform: translateX(10px);
+    opacity: 0;
+  }
+}
+
+@keyframes piece-fling {
+  0% {
+    transform: none;
+  }
+  33.333% {
+    transform: translateY(-5%) scale(1.1);
+  }
+  66.666% {
+    transform: translate(calc(var(--gfx) * 24vmax), calc(var(--gfy) * 24vmax)) rotate(calc(var(--jr) * 8));
+  }
+  100% {
+    transform: translate(calc(var(--gfx) * 70vmax), calc(var(--gfy) * 70vmax)) rotate(calc(var(--jr) * 16));
+    opacity: 0;
+  }
+}
+
+@keyframes dymo-off {
+  0% {
+    transform: none;
+  }
+  33.333% {
+    transform: translate(-4px, -8px) rotate(-7deg) scale(1.1);
+  }
+  66.666%,
+  100% {
+    transform: translate(-18vw, -26vh) rotate(-28deg);
+    opacity: 0;
+  }
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='about'] #about) .canvas {
+  animation: none;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='about'] #about) .cardMove {
+  animation: card-yank calc(var(--frame) * 4) step-end forwards;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='about'] #about) .threadSlack {
+  animation: none;
+  opacity: 1;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='about'] #about) .threadTaut {
+  animation: none;
+  opacity: 0;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='about'] #about) .thread {
+  animation: thread-drop calc(var(--frame) * 3) step-end forwards;
+  animation-delay: var(--frame);
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='about'] #about) .piece {
+  animation: piece-fling calc(var(--frame) * 3) step-end forwards;
+  animation-delay: calc(var(--frame) * (1 + var(--boil-phase) * 0.5));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='about'] #about) .cell[data-kind='cross'] .piece {
+  animation: none;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='about'] #about) .dymo {
+  animation: dymo-off calc(var(--frame) * 3) step-end forwards;
+  animation-delay: var(--frame);
+}
+
+/* Indo adiante, a foto continua grampeada e sai junto com a 1ª ficha. Voltando para a
+   abertura, ela é a peça que viaja (a da abertura faz o FLIP), então some aqui. */
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='about'][data-dir='1'] #about) .photo {
+  visibility: visible;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='about'][data-dir='1'] #about) .photoMove {
+  animation: card-yank calc(var(--frame) * 4) step-end forwards;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-leaving='about'][data-dir='-1'] #about) .photoMove {
+  visibility: hidden;
+}
