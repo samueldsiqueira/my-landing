@@ -5,9 +5,66 @@
 @import 'swiper/css/navigation';
 @import 'swiper/css/pagination';
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
+/* A página é uma apresentação em tela única: o scroll troca de cena */
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: #000;
+}
+
+/* --- Stop motion --- */
+
+/* "Boil": tremida quadro a quadro típica de animação feita à mão */
+@keyframes boil {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(0.6px, -0.6px) rotate(-0.4deg); }
+  50% { transform: translate(-0.6px, 0.4px) rotate(0.3deg); }
+  75% { transform: translate(0.4px, 0.6px) rotate(-0.2deg); }
+}
+
+.boil {
+  display: inline-block;
+  animation: boil 0.5s steps(1) infinite;
+}
+
+/* Granulado de película, trocando de quadro a ~8 fps */
+@keyframes grain {
+  0% { background-position: 0 0; }
+  20% { background-position: -40px 30px; }
+  40% { background-position: 25px -50px; }
+  60% { background-position: -60px -10px; }
+  80% { background-position: 45px 55px; }
+}
+
+.grain {
+  opacity: 0.08;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 0.6s steps(1) infinite;
+}
+
+.vignette {
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.7) 100%);
+}
+
+/* Indicador de "role" pulando em 3 quadros */
+@keyframes hop {
+  0%, 100% { transform: translateY(0); }
+  33% { transform: translateY(4px); }
+  66% { transform: translateY(8px); }
+}
+
+.hop {
+  animation: hop 0.9s steps(1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boil,
+  .grain,
+  .hop {
+    animation: none;
+  }
 }
 
 /* Custom scrollbar */
