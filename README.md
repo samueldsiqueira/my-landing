@@ -28,7 +28,9 @@ atualizados a cada hora (ISR). O token nunca vai para o navegador.
    na Vercel e/ou em `.env.local`. **Não use o prefixo `NEXT_PUBLIC_`.**
 3. Opcional: ajuste títulos, descrições, ordem ou oculte projetos em `src/content/projects.ts`.
 
-Sem token, a cena mostra um convite para os repositórios no GitHub.
+Sem token, a cena mostra um convite para os repositórios no GitHub. Para testar a folha de
+contato sem rede, gere o build com `PROJECTS_FIXTURE=1` (cinco projetos de exemplo) ou
+`PROJECTS_FIXTURE=error` (falha da API); nunca defina essa variável em produção.
 
 ## Conteúdo
 
