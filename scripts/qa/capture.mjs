@@ -62,6 +62,8 @@ for (const vpName of vps) {
   if (read) {
     await page.goto(`${base}/${query}`, { waitUntil: 'networkidle' });
     await page.evaluate(() => document.fonts.ready);
+    // content-visibility: auto não renderiza as seções fora da tela, nem na captura inteira.
+    await page.addStyleTag({ content: '.scene { content-visibility: visible !important; }' });
     await page.screenshot({ path: `${out}/read-${vpName}.png`, fullPage: true });
     await context.close();
     continue;

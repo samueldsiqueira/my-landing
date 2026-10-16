@@ -269,8 +269,42 @@ html[data-mode='stage'][data-scene='experience'] .mat {
   translate: 1.2% 0.6%;
   rotate: 0.9deg;
 }
+/* Contato: a câmera recua e mostra a borda da esteira sobre a bancada (último plano do
+   making-of). A esteira tem 112% da tela; a escala deixa uma faixa da bancada à vista. */
+html[data-mode='stage'][data-scene='contact'] body {
+  background: radial-gradient(
+    120% 110% at 50% 38%,
+    color-mix(in oklab, var(--color-ink) 80%, var(--color-kraft)),
+    var(--color-ink)
+  );
+}
 html[data-mode='stage'][data-scene='contact'] .mat {
-  scale: 0.96;
+  scale: 0.86;
+  border-radius: 14px;
+  box-shadow:
+    inset 0 0 0 12px var(--color-mat-deep),
+    8px 14px 0 rgb(0 0 0 / 0.35);
+}
+@media (min-width: 760px) and (min-aspect-ratio: 1/1) {
+  html[data-mode='stage'][data-scene='contact'] .mat {
+    scale: 0.82;
+  }
+}
+
+/* Recuo da câmera em 2 cortes ao chegar no contato. */
+@keyframes mat-pullback {
+  0% {
+    transform: scale(1.16);
+  }
+  50% {
+    transform: scale(1.07);
+  }
+  100% {
+    transform: none;
+  }
+}
+html[data-mode='stage'][data-motion='full'][data-scene='contact'] .mat {
+  animation: mat-pullback calc(var(--frame) * 3) step-end both;
 }
 
 /* =========================================================================
