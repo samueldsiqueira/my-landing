@@ -3,7 +3,8 @@
 /* =========================================================================
    Tokens — "Mesa de Montagem"
    ========================================================================= */
-@theme {
+/* static: emite todas as variáveis, mesmo as usadas só nos CSS Modules das cenas. */
+@theme static {
   --color-mat: #23463a;
   --color-mat-deep: #1a382e;
   --color-ruler: #cfe0b4;
@@ -270,25 +271,505 @@ html[data-mode='stage'][data-scene='contact'] .mat {
    - `transform` é da coreografia; composição usa as propriedades translate/rotate/scale.
    ========================================================================= */
 
-/* Tremor de quadros parados ("boil"). Use num elemento interno sem translate/rotate próprios. */
+/* Tremor de quadros parados ("boil"). Use num elemento interno sem translate/rotate próprios.
+   Desempenho: valores fixos (sem var()) para animar fora da thread principal; ciclo LONGO
+   (120 poses pseudoaleatórias, 15 s) porque o React escuta animationiteration na raiz e cada
+   volta de uma animação curta acordaria a thread principal. Só roda na cena visível; :where()
+   mantém a especificidade baixa, então a coreografia da cena prevalece. */
 @keyframes boil {
   0% {
-    translate: 0 0;
+    translate: 0.6px -0.6px;
+    rotate: -0.4deg;
+  }
+  0.833% {
+    translate: 0.3px 0.5px;
+    rotate: -0.2deg;
+  }
+  1.667% {
+    translate: 0px 0px;
     rotate: 0deg;
   }
-  33.333% {
-    translate: var(--boil-x, 0.6px) calc(var(--boil-x, 0.6px) * -1);
-    rotate: calc(var(--boil-r, 0.4deg) * -1);
+  2.5% {
+    translate: 0.6px -0.6px;
+    rotate: -0.4deg;
   }
-  66.666% {
-    translate: calc(var(--boil-x, 0.6px) * -0.7) calc(var(--boil-x, 0.6px) * 0.6);
-    rotate: calc(var(--boil-r, 0.4deg) * 0.8);
+  3.333% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  4.167% {
+    translate: 0.3px 0.5px;
+    rotate: -0.2deg;
+  }
+  5% {
+    translate: -0.55px -0.25px;
+    rotate: 0.42deg;
+  }
+  5.833% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  6.667% {
+    translate: 0.3px 0.5px;
+    rotate: -0.2deg;
+  }
+  7.5% {
+    translate: -0.55px -0.25px;
+    rotate: 0.42deg;
+  }
+  8.333% {
+    translate: 0px 0px;
+    rotate: 0deg;
+  }
+  9.167% {
+    translate: 0.3px 0.5px;
+    rotate: -0.2deg;
+  }
+  10% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  10.833% {
+    translate: 0.45px 0.15px;
+    rotate: 0.15deg;
+  }
+  11.667% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  12.5% {
+    translate: 0.6px -0.6px;
+    rotate: -0.4deg;
+  }
+  13.333% {
+    translate: 0.45px 0.15px;
+    rotate: 0.15deg;
+  }
+  14.167% {
+    translate: -0.55px -0.25px;
+    rotate: 0.42deg;
+  }
+  15% {
+    translate: 0.6px -0.6px;
+    rotate: -0.4deg;
+  }
+  15.833% {
+    translate: -0.55px -0.25px;
+    rotate: 0.42deg;
+  }
+  16.667% {
+    translate: 0.6px -0.6px;
+    rotate: -0.4deg;
+  }
+  17.5% {
+    translate: 0px 0px;
+    rotate: 0deg;
+  }
+  18.333% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  19.167% {
+    translate: -0.55px -0.25px;
+    rotate: 0.42deg;
+  }
+  20% {
+    translate: 0.6px -0.6px;
+    rotate: -0.4deg;
+  }
+  20.833% {
+    translate: 0px 0px;
+    rotate: 0deg;
+  }
+  21.667% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  22.5% {
+    translate: -0.55px -0.25px;
+    rotate: 0.42deg;
+  }
+  23.333% {
+    translate: 0px 0px;
+    rotate: 0deg;
+  }
+  24.167% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  25% {
+    translate: 0.3px 0.5px;
+    rotate: -0.2deg;
+  }
+  25.833% {
+    translate: 0.45px 0.15px;
+    rotate: 0.15deg;
+  }
+  26.667% {
+    translate: 0.6px -0.6px;
+    rotate: -0.4deg;
+  }
+  27.5% {
+    translate: 0.3px 0.5px;
+    rotate: -0.2deg;
+  }
+  28.333% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  29.167% {
+    translate: 0.45px 0.15px;
+    rotate: 0.15deg;
+  }
+  30% {
+    translate: -0.55px -0.25px;
+    rotate: 0.42deg;
+  }
+  30.833% {
+    translate: 0.3px 0.5px;
+    rotate: -0.2deg;
+  }
+  31.667% {
+    translate: 0.45px 0.15px;
+    rotate: 0.15deg;
+  }
+  32.5% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  33.333% {
+    translate: 0px 0px;
+    rotate: 0deg;
+  }
+  34.167% {
+    translate: 0.6px -0.6px;
+    rotate: -0.4deg;
+  }
+  35% {
+    translate: 0px 0px;
+    rotate: 0deg;
+  }
+  35.833% {
+    translate: 0.6px -0.6px;
+    rotate: -0.4deg;
+  }
+  36.667% {
+    translate: 0.45px 0.15px;
+    rotate: 0.15deg;
+  }
+  37.5% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  38.333% {
+    translate: 0.6px -0.6px;
+    rotate: -0.4deg;
+  }
+  39.167% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  40% {
+    translate: 0.45px 0.15px;
+    rotate: 0.15deg;
+  }
+  40.833% {
+    translate: -0.55px -0.25px;
+    rotate: 0.42deg;
+  }
+  41.667% {
+    translate: 0.3px 0.5px;
+    rotate: -0.2deg;
+  }
+  42.5% {
+    translate: 0.45px 0.15px;
+    rotate: 0.15deg;
+  }
+  43.333% {
+    translate: 0px 0px;
+    rotate: 0deg;
+  }
+  44.167% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  45% {
+    translate: -0.55px -0.25px;
+    rotate: 0.42deg;
+  }
+  45.833% {
+    translate: 0.6px -0.6px;
+    rotate: -0.4deg;
+  }
+  46.667% {
+    translate: 0px 0px;
+    rotate: 0deg;
+  }
+  47.5% {
+    translate: 0.3px 0.5px;
+    rotate: -0.2deg;
+  }
+  48.333% {
+    translate: 0px 0px;
+    rotate: 0deg;
+  }
+  49.167% {
+    translate: 0.6px -0.6px;
+    rotate: -0.4deg;
+  }
+  50% {
+    translate: 0.3px 0.5px;
+    rotate: -0.2deg;
+  }
+  50.833% {
+    translate: 0px 0px;
+    rotate: 0deg;
+  }
+  51.667% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  52.5% {
+    translate: 0.45px 0.15px;
+    rotate: 0.15deg;
+  }
+  53.333% {
+    translate: 0px 0px;
+    rotate: 0deg;
+  }
+  54.167% {
+    translate: 0.3px 0.5px;
+    rotate: -0.2deg;
+  }
+  55% {
+    translate: 0px 0px;
+    rotate: 0deg;
+  }
+  55.833% {
+    translate: -0.55px -0.25px;
+    rotate: 0.42deg;
+  }
+  56.667% {
+    translate: 0.3px 0.5px;
+    rotate: -0.2deg;
+  }
+  57.5% {
+    translate: -0.55px -0.25px;
+    rotate: 0.42deg;
+  }
+  58.333% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  59.167% {
+    translate: 0px 0px;
+    rotate: 0deg;
+  }
+  60% {
+    translate: -0.55px -0.25px;
+    rotate: 0.42deg;
+  }
+  60.833% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  61.667% {
+    translate: 0px 0px;
+    rotate: 0deg;
+  }
+  62.5% {
+    translate: -0.55px -0.25px;
+    rotate: 0.42deg;
+  }
+  63.333% {
+    translate: 0px 0px;
+    rotate: 0deg;
+  }
+  64.167% {
+    translate: -0.55px -0.25px;
+    rotate: 0.42deg;
+  }
+  65% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  65.833% {
+    translate: 0.45px 0.15px;
+    rotate: 0.15deg;
+  }
+  66.667% {
+    translate: 0.6px -0.6px;
+    rotate: -0.4deg;
+  }
+  67.5% {
+    translate: 0.3px 0.5px;
+    rotate: -0.2deg;
+  }
+  68.333% {
+    translate: 0.45px 0.15px;
+    rotate: 0.15deg;
+  }
+  69.167% {
+    translate: -0.55px -0.25px;
+    rotate: 0.42deg;
+  }
+  70% {
+    translate: 0.45px 0.15px;
+    rotate: 0.15deg;
+  }
+  70.833% {
+    translate: 0.3px 0.5px;
+    rotate: -0.2deg;
+  }
+  71.667% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  72.5% {
+    translate: 0.45px 0.15px;
+    rotate: 0.15deg;
+  }
+  73.333% {
+    translate: 0.6px -0.6px;
+    rotate: -0.4deg;
+  }
+  74.167% {
+    translate: -0.55px -0.25px;
+    rotate: 0.42deg;
+  }
+  75% {
+    translate: 0.3px 0.5px;
+    rotate: -0.2deg;
+  }
+  75.833% {
+    translate: 0.6px -0.6px;
+    rotate: -0.4deg;
+  }
+  76.667% {
+    translate: 0.3px 0.5px;
+    rotate: -0.2deg;
+  }
+  77.5% {
+    translate: 0px 0px;
+    rotate: 0deg;
+  }
+  78.333% {
+    translate: 0.6px -0.6px;
+    rotate: -0.4deg;
+  }
+  79.167% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  80% {
+    translate: 0.45px 0.15px;
+    rotate: 0.15deg;
+  }
+  80.833% {
+    translate: 0.6px -0.6px;
+    rotate: -0.4deg;
+  }
+  81.667% {
+    translate: 0.3px 0.5px;
+    rotate: -0.2deg;
+  }
+  82.5% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  83.333% {
+    translate: 0.3px 0.5px;
+    rotate: -0.2deg;
+  }
+  84.167% {
+    translate: 0.45px 0.15px;
+    rotate: 0.15deg;
+  }
+  85% {
+    translate: 0px 0px;
+    rotate: 0deg;
+  }
+  85.833% {
+    translate: 0.6px -0.6px;
+    rotate: -0.4deg;
+  }
+  86.667% {
+    translate: 0px 0px;
+    rotate: 0deg;
+  }
+  87.5% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  88.333% {
+    translate: -0.55px -0.25px;
+    rotate: 0.42deg;
+  }
+  89.167% {
+    translate: 0.45px 0.15px;
+    rotate: 0.15deg;
+  }
+  90% {
+    translate: 0.3px 0.5px;
+    rotate: -0.2deg;
+  }
+  90.833% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  91.667% {
+    translate: -0.55px -0.25px;
+    rotate: 0.42deg;
+  }
+  92.5% {
+    translate: 0.3px 0.5px;
+    rotate: -0.2deg;
+  }
+  93.333% {
+    translate: -0.55px -0.25px;
+    rotate: 0.42deg;
+  }
+  94.167% {
+    translate: 0.45px 0.15px;
+    rotate: 0.15deg;
+  }
+  95% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  95.833% {
+    translate: 0px 0px;
+    rotate: 0deg;
+  }
+  96.667% {
+    translate: -0.55px -0.25px;
+    rotate: 0.42deg;
+  }
+  97.5% {
+    translate: -0.42px 0.36px;
+    rotate: 0.32deg;
+  }
+  98.333% {
+    translate: 0.3px 0.5px;
+    rotate: -0.2deg;
+  }
+  99.167% {
+    translate: 0.45px 0.15px;
+    rotate: 0.15deg;
   }
 }
 
-html[data-mode='stage'][data-motion='full'] .boil {
-  animation: boil calc(var(--boil-frame) * 3) step-end infinite;
-  animation-delay: calc(var(--boil-frame) * var(--boil-phase, 0) * -1);
+:where(
+    html[data-mode='stage'][data-motion='full'][data-scene='inicio'] #inicio,
+    html[data-mode='stage'][data-motion='full'][data-scene='about'] #about,
+    html[data-mode='stage'][data-motion='full'][data-scene='skills'] #skills,
+    html[data-mode='stage'][data-motion='full'][data-scene='projects'] #projects,
+    html[data-mode='stage'][data-motion='full'][data-scene='experience'] #experience,
+    html[data-mode='stage'][data-motion='full'][data-scene='contact'] #contact
+  )
+  .boil {
+  animation: boil calc(var(--boil-frame) * 120) step-end infinite;
+  animation-delay: calc(var(--boil-frame) * var(--boil-phase, 0) * -7);
 }
 
 /* Oscilação de exposição entre fotos: no máximo ~3% de luminância, nunca um flash. */
@@ -303,33 +784,201 @@ html[data-mode='stage'][data-motion='full'] .boil {
 
 @keyframes flicker {
   0% {
+    opacity: 0.01;
+  }
+  1.563% {
+    opacity: 0.026;
+  }
+  3.125% {
     opacity: 0.018;
   }
-  12.5% {
+  4.688% {
+    opacity: 0.016;
+  }
+  6.25% {
+    opacity: 0.018;
+  }
+  7.813% {
+    opacity: 0.016;
+  }
+  9.375% {
     opacity: 0.004;
   }
-  25% {
+  10.938% {
+    opacity: 0.028;
+  }
+  12.5% {
+    opacity: 0.01;
+  }
+  14.063% {
+    opacity: 0;
+  }
+  15.625% {
+    opacity: 0.004;
+  }
+  17.188% {
+    opacity: 0;
+  }
+  18.75% {
     opacity: 0.026;
+  }
+  20.313% {
+    opacity: 0.004;
+  }
+  21.875% {
+    opacity: 0.01;
+  }
+  23.438% {
+    opacity: 0.026;
+  }
+  25% {
+    opacity: 0.004;
+  }
+  26.563% {
+    opacity: 0.026;
+  }
+  28.125% {
+    opacity: 0.004;
+  }
+  29.688% {
+    opacity: 0;
+  }
+  31.25% {
+    opacity: 0.004;
+  }
+  32.813% {
+    opacity: 0.01;
+  }
+  34.375% {
+    opacity: 0.004;
+  }
+  35.938% {
+    opacity: 0.018;
   }
   37.5% {
     opacity: 0.01;
   }
-  50% {
+  39.063% {
+    opacity: 0.026;
+  }
+  40.625% {
     opacity: 0.022;
   }
-  62.5% {
+  42.188% {
+    opacity: 0.026;
+  }
+  43.75% {
+    opacity: 0.01;
+  }
+  45.313% {
+    opacity: 0.028;
+  }
+  46.875% {
     opacity: 0;
   }
-  75% {
+  48.438% {
+    opacity: 0.004;
+  }
+  50% {
+    opacity: 0.026;
+  }
+  51.563% {
+    opacity: 0;
+  }
+  53.125% {
     opacity: 0.016;
   }
-  87.5% {
+  54.688% {
     opacity: 0.028;
+  }
+  56.25% {
+    opacity: 0.016;
+  }
+  57.813% {
+    opacity: 0.018;
+  }
+  59.375% {
+    opacity: 0.028;
+  }
+  60.938% {
+    opacity: 0.018;
+  }
+  62.5% {
+    opacity: 0.016;
+  }
+  64.063% {
+    opacity: 0.004;
+  }
+  65.625% {
+    opacity: 0.026;
+  }
+  67.188% {
+    opacity: 0.004;
+  }
+  68.75% {
+    opacity: 0.026;
+  }
+  70.313% {
+    opacity: 0.01;
+  }
+  71.875% {
+    opacity: 0.018;
+  }
+  73.438% {
+    opacity: 0.016;
+  }
+  75% {
+    opacity: 0.018;
+  }
+  76.563% {
+    opacity: 0.028;
+  }
+  78.125% {
+    opacity: 0.026;
+  }
+  79.688% {
+    opacity: 0;
+  }
+  81.25% {
+    opacity: 0.026;
+  }
+  82.813% {
+    opacity: 0;
+  }
+  84.375% {
+    opacity: 0.028;
+  }
+  85.938% {
+    opacity: 0.018;
+  }
+  87.5% {
+    opacity: 0;
+  }
+  89.063% {
+    opacity: 0.018;
+  }
+  90.625% {
+    opacity: 0.026;
+  }
+  92.188% {
+    opacity: 0.016;
+  }
+  93.75% {
+    opacity: 0.022;
+  }
+  95.313% {
+    opacity: 0.028;
+  }
+  96.875% {
+    opacity: 0.018;
+  }
+  98.438% {
+    opacity: 0.022;
   }
 }
 
 html[data-mode='stage'][data-motion='full'] .flicker {
-  animation: flicker calc(var(--boil-frame) * 8) step-end infinite;
+  animation: flicker calc(var(--boil-frame) * 64) step-end infinite;
 }
 
 /* Sombra da mão do animador cruzando o set entre dois quadros. */
@@ -342,8 +991,15 @@ html[data-mode='stage'][data-motion='full'] .flicker {
   z-index: 30;
   pointer-events: none;
   opacity: 0;
-  background: radial-gradient(36% 28% at 50% 42%, rgb(0 0 0 / 0.42), transparent 72%);
-  filter: blur(16px);
+  /* Gradiente com queda longa no lugar de filter: blur — mesma sombra difusa, sem rasterizar
+     uma camada desfocada do tamanho da tela a cada passagem. */
+  background: radial-gradient(
+    40% 32% at 50% 42%,
+    rgb(0 0 0 / 0.4),
+    rgb(0 0 0 / 0.26) 38%,
+    rgb(0 0 0 / 0.1) 62%,
+    transparent 80%
+  );
 }
 
 html[data-dir='-1'] .hand {
@@ -430,8 +1086,9 @@ html[data-mode='stage'][data-motion='full'] .scene[data-leaving] .scene-canvas {
   animation: scene-leave calc(var(--frame) * 4) step-end forwards;
 }
 
-/* A peça compartilhada da cena que sai some no primeiro quadro: quem viaja é a da cena seguinte. */
-html[data-mode='stage'][data-motion='full'] .scene[data-leaving] [data-shared] {
+/* A peça que vai viajar some da cena que sai no primeiro quadro: quem viaja é a da cena seguinte.
+   (A máquina marca com data-traveling só as peças que também existem na cena de destino.) */
+html[data-mode='stage'][data-motion='full'] .scene[data-leaving] [data-traveling] {
   visibility: hidden;
 }
 

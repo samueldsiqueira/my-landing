@@ -102,7 +102,8 @@ modo leitura vale sempre a composição alta — de propósito: vira um document
 ### Peças compartilhadas entre cenas
 
 Marque com `data-shared="chave"` a peça que viaja (ex.: a foto da abertura vira o 3×4 da cena
-Sobre: `data-shared="photo"` nas duas). A máquina mede a peça na cena que sai e aplica
+Sobre: `data-shared="photo"` nas duas). Só viajam peças presentes nas duas cenas; nesse caso a
+máquina esconde a da cena que sai (`data-traveling`), mede onde ela estava e aplica
 `data-flip` com `--flip-x/--flip-y/--flip-s` na que entra (keyframe global `flip-in`, 4 poses).
 O elemento com `data-shared` não pode ter `transform` próprio nem outra animação; anime os filhos.
 
@@ -130,6 +131,11 @@ animada e deixe o estático como base.
 - Anime só `transform`, `opacity` e, com moderação, `clip-path`. Nada de animar `filter`,
   `box-shadow`, layout ou `background-position` em loop. `text-shadow` só em poucos quadros.
 - Sem flashes; tremores ≤ 2 px.
+- **Nada de `infinite` com ciclo curto.** O React escuta `animationiteration` na raiz; cada volta
+  de uma animação infinita acorda a thread principal (16 letras com ciclo de 375 ms custavam ~35%
+  de CPU parada). Para tremor use a classe global `boil` (ciclo de 15 s); se precisar de outro
+  loop, faça um ciclo ≥ 10 s ou dispare animações curtas por JS só quando a cena estiver visível.
+- Keyframes com `var()` não rodam no compositor: use valores fixos em animações contínuas.
 
 ## Tokens
 
@@ -164,3 +170,7 @@ node scripts/qa/capture.mjs --mode read --vp desk,mob --out /tmp/qa
 ```
 
 `?qa=1` expõe `window.__stage` (`go`, `finish`, `phase`, `seek(ms)`, `play`).
+
+`seek` só alcança animações que o navegador ainda lista: use `fill-mode: both` (a convenção) —
+uma animação sem preenchimento que já terminou some de `getAnimations()` e o quadro capturado
+sai errado. Para quadros iniciais confiáveis, capture a partir de uma navegação (`--from`).

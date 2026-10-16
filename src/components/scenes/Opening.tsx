@@ -48,7 +48,13 @@ export default function Opening() {
           <p className="sr-only">{rolesSentence}</p>
           <div className={s.dymoStack} aria-hidden="true">
             {person.roles.map((role, k) => (
-              <Dymo key={role} className={s.dymo} style={{ '--k': k } as CSSProperties}>
+              <Dymo
+                key={role}
+                className={s.dymo}
+                style={{ '--k': k } as CSSProperties}
+                data-role=""
+                {...(k === 0 ? { 'data-on': '', 'data-first': '' } : {})}
+              >
                 {role}
               </Dymo>
             ))}

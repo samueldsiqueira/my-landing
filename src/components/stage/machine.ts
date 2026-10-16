@@ -185,7 +185,8 @@ const transition = async (to: number, source: InputSource) => {
   const fromId = sceneIds[from];
   const toId = sceneIds[to];
   const fromEl = sceneEl(fromId);
-  if (!fromEl || !sceneEl(toId)) return;
+  const toEl = sceneEl(toId);
+  if (!fromEl || !toEl) return;
 
   const root = html();
   const full = readMotion() === 'full';
@@ -196,16 +197,22 @@ const transition = async (to: number, source: InputSource) => {
   const active = document.activeElement;
   const moveFocus = !active || active === document.body || fromEl.contains(active);
 
-  // Peças compartilhadas: mede onde estão antes de a cena sair.
+  // Peças compartilhadas: só viajam as que existem também na cena de destino. Mede onde
+  // estão antes de a cena sair e as marca para sumirem da cena que sai (data-traveling).
   const shared = new Map<string, DOMRect>();
+  const traveling: HTMLElement[] = [];
   if (full) {
+    const destination = new Set(
+      Array.from(toEl.querySelectorAll<HTMLElement>('[data-shared]'), (el) => el.dataset.shared),
+    );
     fromEl.querySelectorAll<HTMLElement>('[data-shared]').forEach((el) => {
       const rect = el.getBoundingClientRect();
-      if (rect.width && rect.height) shared.set(el.dataset.shared!, rect);
+      if (!destination.has(el.dataset.shared) || !rect.width || !rect.height) return;
+      shared.set(el.dataset.shared!, rect);
+      el.setAttribute('data-traveling', '');
+      traveling.push(el);
     });
   }
-
-  markSeen(fromId);
 
   if (full) {
     if (handOn(fromId, toId)) replayHand();
@@ -217,6 +224,9 @@ const transition = async (to: number, source: InputSource) => {
 
   fromEl.removeAttribute('data-leaving');
   delete root.dataset.leaving;
+  traveling.forEach((el) => el.removeAttribute('data-traveling'));
+  // Marca como vista só depois da saída: assim os seletores de revisita não disputam com os de saída.
+  markSeen(fromId);
   await arrive(to, { dir, source, moveFocus, shared, run });
 };
 

@@ -1013,11 +1013,7 @@
 }
 
 /* Indo adiante, a foto continua grampeada e sai junto com a 1ª ficha. Voltando para a
-   abertura, ela é a peça que viaja (a da abertura faz o FLIP), então some aqui. */
-:global(html[data-mode='stage'][data-motion='full'][data-leaving='about'][data-dir='1'] #about) .photo {
-  visibility: visible;
-}
-
+   abertura, ela é a peça que viaja (a máquina a marca com data-traveling), então some aqui. */
 :global(html[data-mode='stage'][data-motion='full'][data-leaving='about'][data-dir='1'] #about) .photoMove {
   animation: card-yank calc(var(--frame) * 4) step-end forwards;
 }

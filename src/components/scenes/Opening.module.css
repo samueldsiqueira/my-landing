@@ -80,11 +80,6 @@
   font-stretch: 100%;
 }
 
-.letter :global(.boil) {
-  --boil-x: 0.7px;
-  --boil-r: 0.5deg;
-}
-
 .letter[data-near] {
   text-shadow: 0.07em 0.11em 0 var(--shadow-soft);
 }
@@ -342,29 +337,38 @@
   }
 }
 
-/* Perfura (10 passos), segura, é arrancada em 2 quadros e some até a próxima volta. */
-@keyframes dymo-cycle {
+/* Perfura em 10 passos (a fita avança letra a letra) e fica. O revezamento entre os cargos é
+   disparado pela ilha OpeningPresence a cada 3 s, com animações curtas: nada roda entre uma
+   troca e outra, nem com a cena oculta. */
+@keyframes dymo-punch {
   0% {
-    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+    opacity: 1;
+    clip-path: inset(0 100% 0 0);
     animation-timing-function: steps(10, end);
   }
-  9.26% {
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  100% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* Arrancada em 2 quadros. */
+@keyframes dymo-tear {
+  0% {
     opacity: 1;
     transform: none;
   }
-  30% {
+  33.333% {
+    opacity: 1;
     transform: translate(2px, -6px) rotate(-5deg);
   }
-  31% {
-    transform: translate(18px, -34px) rotate(-14deg);
+  66.666% {
     opacity: 1;
-  }
-  32%,
-  100% {
     transform: translate(18px, -34px) rotate(-14deg);
+  }
+  100% {
     opacity: 0;
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    transform: translate(18px, -34px) rotate(-14deg);
   }
 }
 
@@ -429,9 +433,21 @@
   animation-delay: calc(var(--frame) * (3 + var(--i)) * var(--t));
 }
 
-:global(html[data-mode='stage'][data-motion='full'][data-scene='inicio'] #inicio) .dymo {
-  animation: dymo-cycle 9s step-end infinite both;
-  animation-delay: calc(var(--frame) * 18 * var(--t) + var(--k) * 3s);
+/* Com movimento, só a etiqueta da vez aparece (data-on); a primeira já vem do servidor. */
+:global(html[data-mode='stage'][data-motion='full']) .dymo:not([data-on]):not([data-off]) {
+  opacity: 0;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='inicio'] #inicio) .dymo[data-on] {
+  animation: dymo-punch calc(var(--frame) * 10) both;
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='inicio'] #inicio) .dymo[data-on][data-first] {
+  animation-delay: calc(var(--frame) * 18 * var(--t));
+}
+
+:global(html[data-mode='stage'][data-motion='full'][data-scene='inicio'] #inicio) .dymo[data-off] {
+  animation: dymo-tear calc(var(--frame) * 3) step-end forwards;
 }
 
 :global(html[data-mode='stage'][data-motion='full'][data-scene='inicio'] #inicio) .links li {
