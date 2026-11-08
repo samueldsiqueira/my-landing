@@ -1,7 +1,8 @@
-// Máquina de cenas, sem React. A fonte de verdade são os atributos do <html>
-// (data-scene, data-mode, data-motion...), definidos primeiro pelo script de boot e depois
-// por esta máquina; o CSS reage a eles e o React apenas os lê (useSyncExternalStore).
+// Máquina da jornada, sem React. A fonte de verdade são os atributos do <html>
+// (data-scene, data-mode, data-motion, data-travel...), definidos primeiro pelo script de boot
+// e depois por esta máquina; o CSS reage a eles e o React apenas os lê (useSyncExternalStore).
 import { scenes, type SceneId } from '@/content/profile';
+import { aliasMap } from '@/lib/boot';
 
 export type Mode = 'stage' | 'read';
 export type Motion = 'full' | 'reduced';
@@ -9,11 +10,10 @@ export type InputSource = 'wheel' | 'key' | 'touch' | 'click' | 'hash';
 type Phase = 'idle' | 'exiting' | 'entering';
 
 export const sceneIds = scenes.map((scene) => scene.id) as SceneId[];
-const aliases: Record<string, SceneId> = Object.fromEntries(scenes.map((scene) => [scene.alias, scene.id]));
+const aliases = aliasMap as Record<string, SceneId>;
 const last = sceneIds.length - 1;
 
-const FRAME_MS = 1000 / 12;
-const EXIT_CAP_MS = 700;
+const EXIT_CAP_MS = 400;
 const WHEEL_THRESHOLD = 40;
 const WHEEL_GESTURE_GAP = 240;
 const SWIPE_MIN = 56;
@@ -32,10 +32,6 @@ export const readMode = (): Mode => (html().dataset.mode === 'stage' ? 'stage' :
 export const readMotion = (): Motion => (html().dataset.motion === 'reduced' ? 'reduced' : 'full');
 const sceneEl = (id: SceneId) => document.getElementById(id);
 
-/** Transições que ganham a sombra da mão cruzando o set. */
-const handOn = (from: SceneId, to: SceneId) =>
-  to === 'contact' || (from === 'inicio' && to === 'about') || (from === 'contact' && to === 'inicio');
-
 const finiteAnimations = (root: Element) =>
   root
     .getAnimations({ subtree: true })
@@ -46,8 +42,6 @@ const settle = (animations: Animation[], capMs?: number) => {
   if (!capMs) return all;
   return Promise.race([all, new Promise((resolve) => setTimeout(resolve, capMs))]);
 };
-
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /** True se algum elemento rolável entre o alvo e a cena ainda pode rolar na direção pedida. */
 export const canScrollInside = (target: EventTarget | null, dir: number) => {
@@ -82,7 +76,7 @@ const syncScrollable = (id: SceneId) => {
 
 const announce = (index: number) => {
   const live = document.getElementById('stage-live');
-  if (live) live.textContent = `${scenes[index].label}, cena ${index + 1} de ${sceneIds.length}`;
+  if (live) live.textContent = `${scenes[index].label}, etapa ${index + 1} de ${sceneIds.length}`;
 };
 
 const markSeen = (id: SceneId) => {
@@ -94,15 +88,8 @@ const markSeen = (id: SceneId) => {
   try {
     sessionStorage.setItem('stage:seen', value);
   } catch {
-    // Armazenamento indisponível (aba privada): a abertura apenas não encurta.
+    // Armazenamento indisponível (aba privada): as missões só não aparecem já cumpridas.
   }
-};
-
-const replayHand = () => {
-  const root = html();
-  root.removeAttribute('data-hand');
-  void root.offsetWidth;
-  root.dataset.hand = 'move';
 };
 
 /** Completa a coreografia de entrada em curso (pular). */
@@ -137,35 +124,28 @@ interface ArriveOptions {
   dir: number;
   source: InputSource;
   moveFocus: boolean;
-  shared: Map<string, DOMRect>;
   run: number;
 }
 
-/** Troca a cena visível e cuida de tudo que acompanha a chegada (FLIP, foco, URL, anúncio). */
-const arrive = async (to: number, { dir, source, moveFocus, shared, run }: ArriveOptions) => {
+/**
+ * Troca a etapa e cuida do que acompanha a chegada: a caminhada e a chegada do herói
+ * (data-travel enquanto durarem; o CSS move o caminho, anima os passos e abre a missão),
+ * foco, URL e anúncio.
+ */
+const arrive = async (to: number, { dir, source, moveFocus, run }: ArriveOptions) => {
   const root = html();
   const toId = sceneIds[to];
   const toEl = sceneEl(toId);
   if (!toEl) return;
+  const travel = readMotion() === 'full' && to !== state.cur;
+  if (travel) {
+    // Tira e repõe o atributo para reiniciar as animações de caminhada mesmo no mesmo sentido.
+    delete root.dataset.travel;
+    void root.offsetWidth;
+    root.dataset.travel = dir > 0 ? 'fwd' : 'back';
+  }
   root.dataset.scene = toId;
   state.cur = to;
-
-  if (readMotion() === 'full' && shared.size) {
-    toEl.querySelectorAll<HTMLElement>('[data-shared]').forEach((el) => {
-      const origin = shared.get(el.dataset.shared!);
-      el.removeAttribute('data-flip');
-      if (!origin) return;
-      const rect = el.getBoundingClientRect();
-      if (!rect.width) return;
-      el.style.setProperty('--flip-x', `${origin.left + origin.width / 2 - (rect.left + rect.width / 2)}px`);
-      el.style.setProperty('--flip-y', `${origin.top + origin.height / 2 - (rect.top + rect.height / 2)}px`);
-      el.style.setProperty('--flip-s', String(origin.width / rect.width));
-      void el.offsetWidth;
-      el.setAttribute('data-flip', '');
-    });
-  } else {
-    toEl.querySelectorAll('[data-flip]').forEach((el) => el.removeAttribute('data-flip'));
-  }
 
   const scroller = toEl.querySelector<HTMLElement>('.scene-scroll');
   if (scroller) scroller.scrollTop = dir > 0 || source !== 'wheel' ? 0 : scroller.scrollHeight;
@@ -177,15 +157,15 @@ const arrive = async (to: number, { dir, source, moveFocus, shared, run }: Arriv
   history.replaceState(null, '', to === 0 ? base : `${base}#${toId}`);
 
   await trackEnter(toId, run);
+  if (travel && state.token === run) delete root.dataset.travel;
 };
 
 const transition = async (to: number, source: InputSource) => {
   const run = ++state.token;
   const from = state.cur;
   const fromId = sceneIds[from];
-  const toId = sceneIds[to];
   const fromEl = sceneEl(fromId);
-  const toEl = sceneEl(toId);
+  const toEl = sceneEl(sceneIds[to]);
   if (!fromEl || !toEl) return;
 
   const root = html();
@@ -197,25 +177,8 @@ const transition = async (to: number, source: InputSource) => {
   const active = document.activeElement;
   const moveFocus = !active || active === document.body || fromEl.contains(active);
 
-  // Peças compartilhadas: só viajam as que existem também na cena de destino. Mede onde
-  // estão antes de a cena sair e as marca para sumirem da cena que sai (data-traveling).
-  const shared = new Map<string, DOMRect>();
-  const traveling: HTMLElement[] = [];
+  // Saída: a janela da missão se fecha antes de o herói seguir caminho.
   if (full) {
-    const destination = new Set(
-      Array.from(toEl.querySelectorAll<HTMLElement>('[data-shared]'), (el) => el.dataset.shared),
-    );
-    fromEl.querySelectorAll<HTMLElement>('[data-shared]').forEach((el) => {
-      const rect = el.getBoundingClientRect();
-      if (!destination.has(el.dataset.shared) || !rect.width || !rect.height) return;
-      shared.set(el.dataset.shared!, rect);
-      el.setAttribute('data-traveling', '');
-      traveling.push(el);
-    });
-  }
-
-  if (full) {
-    if (handOn(fromId, toId)) replayHand();
     fromEl.setAttribute('data-leaving', '');
     root.dataset.leaving = fromId;
     await settle(finiteAnimations(fromEl), EXIT_CAP_MS);
@@ -224,10 +187,9 @@ const transition = async (to: number, source: InputSource) => {
 
   fromEl.removeAttribute('data-leaving');
   delete root.dataset.leaving;
-  traveling.forEach((el) => el.removeAttribute('data-traveling'));
-  // Marca como vista só depois da saída: assim os seletores de revisita não disputam com os de saída.
+  // Marca como concluída só depois da saída: os seletores de revisita não disputam com os de saída.
   markSeen(fromId);
-  await arrive(to, { dir, source, moveFocus, shared, run });
+  await arrive(to, { dir, source, moveFocus, run });
 };
 
 export function go(target: number | SceneId, source: InputSource = 'click') {
@@ -249,28 +211,8 @@ export function go(target: number | SceneId, source: InputSource = 'click') {
 export const next = (source: InputSource = 'click') => go(state.cur + 1, source);
 export const prev = (source: InputSource = 'click') => go(state.cur - 1, source);
 
-/** Rebobinar: as cenas passam de trás para frente, dois quadros cada, sem coreografia. */
-export async function rewind() {
-  if (readMode() !== 'stage' || readMotion() !== 'full' || state.phase !== 'idle' || state.cur === 0) {
-    go(0);
-    return;
-  }
-  const root = html();
-  const run = ++state.token;
-  state.phase = 'exiting';
-  markSeen(sceneIds[state.cur]);
-  root.dataset.rewind = '';
-  root.dataset.dir = '-1';
-  for (let i = state.cur - 1; i >= 1; i--) {
-    root.dataset.scene = sceneIds[i];
-    await wait(FRAME_MS * 2);
-    if (state.token !== run) return;
-  }
-  delete root.dataset.rewind;
-  const active = document.activeElement;
-  const moveFocus = !active || active === document.body || !!active.closest('.scene');
-  await arrive(0, { dir: -1, source: 'click', moveFocus, shared: new Map(), run });
-}
+/** Recomeçar: o herói volta caminhando até a vila inicial. */
+export const rewind = () => go(0);
 
 export function setMotion(value: Motion) {
   html().dataset.motion = value;
@@ -289,9 +231,6 @@ export function init() {
   const root = html();
   state.cur = Math.max(0, sceneIds.indexOf(root.dataset.scene as SceneId));
   delete root.dataset.boot;
-  document.addEventListener('animationend', (event) => {
-    if (event.animationName === 'hand-sweep') root.removeAttribute('data-hand');
-  });
   let resizeTimer = 0;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
@@ -316,8 +255,10 @@ export function attachInputs() {
     const dx = event.deltaX * scale;
     const gap = event.timeStamp - wheel.last;
     wheel.last = event.timeStamp;
-    if (Math.abs(dx) > Math.abs(dy) || !dy) return;
-    const dir = dy > 0 ? 1 : -1;
+    // O caminho é horizontal: a roda vertical e o gesto lateral do trackpad avançam igual.
+    const delta = Math.abs(dx) > Math.abs(dy) ? dx : dy;
+    if (!delta) return;
+    const dir = delta > 0 ? 1 : -1;
     if (gap > WHEEL_GESTURE_GAP) {
       wheel.acc = 0;
       wheel.scrolling = false;
@@ -330,7 +271,7 @@ export function attachInputs() {
       wheel.scrolling = true;
       return;
     }
-    wheel.acc += dy;
+    wheel.acc += delta;
     if (Math.abs(wheel.acc) >= WHEEL_THRESHOLD) {
       wheel.acc = 0;
       wheel.locked = true;
@@ -360,6 +301,11 @@ export function attachInputs() {
     const t = event.changedTouches[0];
     const dy = start.y - t.clientY;
     const dx = start.x - t.clientX;
+    // Deslizar para a esquerda avança no caminho (como num jogo de plataforma).
+    if (Math.abs(dx) >= SWIPE_MIN && Math.abs(dx) > Math.abs(dy) * 1.3) {
+      go(state.cur + (dx > 0 ? 1 : -1), 'touch');
+      return;
+    }
     if (Math.abs(dy) < SWIPE_MIN || Math.abs(dy) < Math.abs(dx) * 1.3) return;
     const dir = dy > 0 ? 1 : -1;
     if (dir > 0 ? start.down : start.up) return;
@@ -380,6 +326,14 @@ export function attachInputs() {
     let dir = 0;
     let jump: number | null = null;
     switch (event.key) {
+      case 'ArrowRight':
+        go(state.cur + 1, 'key');
+        event.preventDefault();
+        return;
+      case 'ArrowLeft':
+        go(state.cur - 1, 'key');
+        event.preventDefault();
+        return;
       case 'ArrowDown':
       case 'PageDown':
         dir = 1;

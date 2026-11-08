@@ -1,13 +1,13 @@
 import { expect, test } from '@playwright/test';
 import { htmlData, openStage, sceneIds, settle, waitScene } from './helpers';
 
-test('modo leitura: todas as seções visíveis, página rolável, sem interface de cenas', async ({ page }) => {
+test('modo leitura: todas as etapas visíveis, página rolável, sem interface de jogo', async ({ page }) => {
   await page.goto('/?modo=leitura');
   expect((await htmlData(page)).mode).toBe('read');
   for (const id of sceneIds) await expect(page.locator(`#${id}`)).toBeVisible();
   const scrollable = await page.evaluate(() => document.documentElement.scrollHeight > window.innerHeight * 3);
   expect(scrollable).toBe(true);
-  await expect(page.getByRole('link', { name: 'Ver como cenas' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Jogar a jornada' })).toBeVisible();
   const running = await page.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running').length);
   expect(running).toBe(0);
 });
@@ -27,15 +27,15 @@ test.describe('movimento reduzido', () => {
     await openStage(page);
     expect((await htmlData(page)).motion).toBe('reduced');
     expect(await page.evaluate(() => document.getAnimations().length)).toBe(0);
-    if (isMobile) await page.getByRole('button', { name: /Próxima cena/ }).click();
+    if (isMobile) await page.getByRole('button', { name: /Avançar/ }).click();
     else await page.keyboard.press('ArrowDown');
-    await waitScene(page, 'about');
+    await waitScene(page, 'origem');
     expect(await page.evaluate(() => document.getAnimations().length)).toBe(0);
   });
 });
 
 test('o botão de movimento reduzido vale para a próxima visita', async ({ page, isMobile }) => {
-  test.skip(isMobile, 'o botão fica na folha de índice no mobile');
+  test.skip(isMobile, 'o botão fica no diálogo do mapa no celular');
   await openStage(page);
   await settle(page);
   const toggle = page.getByRole('button', { name: 'Movimento reduzido' }).first();

@@ -1,20 +1,12 @@
 import type { Metadata, Viewport } from 'next';
-import { Archivo, Doto } from 'next/font/google';
+import { Pixelify_Sans } from 'next/font/google';
 import { bootScript } from '@/lib/boot';
 import { jobs, person, siteUrl, skillGroups } from '@/content/profile';
 import './globals.css';
 
-const archivo = Archivo({
+const pixel = Pixelify_Sans({
   subsets: ['latin'],
-  axes: ['wdth'],
-  variable: '--font-archivo',
-  display: 'swap',
-});
-
-const doto = Doto({
-  subsets: ['latin'],
-  axes: ['ROND'],
-  variable: '--font-doto',
+  variable: '--font-pixel',
   display: 'swap',
 });
 
@@ -48,7 +40,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#23463a',
+  themeColor: '#120d26',
   colorScheme: 'dark',
   width: 'device-width',
   initialScale: 1,
@@ -72,7 +64,7 @@ const jsonLd = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     // O script de boot ajusta atributos data-* do <html> antes da hidratação.
-    <html lang="pt-BR" className={`${archivo.variable} ${doto.variable}`} suppressHydrationWarning>
+    <html lang="pt-BR" className={pixel.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: bootScript }} />
       </head>

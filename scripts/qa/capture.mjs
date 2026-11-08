@@ -32,7 +32,7 @@ const VIEWPORTS = {
 
 const base = args.base ?? 'http://localhost:3000';
 const out = args.out ?? 'qa-shots';
-const scenes = (args.scenes ?? 'inicio,about,skills,projects,experience,contact').split(',');
+const scenes = (args.scenes ?? 'inicio,origem,indra,kenzie,tim,senai,grimorio,projetos,contato').split(',');
 const vps = (args.vp ?? 'desk,mob').split(',');
 const frames = args.frames ? args.frames.split(',').map(Number) : null;
 const reduced = args.motion === 'reduced';

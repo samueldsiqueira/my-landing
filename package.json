@@ -1,6 +1,6 @@
 {
   "name": "my-single-pages",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "engines": {
     "node": ">=20.9.0"
@@ -12,7 +12,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test:e2e": "playwright test",
-    "assets": "bash scripts/build-assets.sh"
+    "sprites": "node scripts/pixel/build.mjs"
   },
   "dependencies": {
     "next": "16.3.8",

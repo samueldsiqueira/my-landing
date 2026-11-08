@@ -1,11 +1,13 @@
 # Samuel D' Siqueira — portfólio
 
-Landing page pessoal em forma de animação stop-motion em papel: cada seção é uma cena montada
-sobre uma esteira de corte, trocada por roda do mouse, teclado, toque ou pelo índice.
+Portfólio em forma de jogo: a carreira de Samuel contada como a jornada de um mago em pixel art.
+O herói segue o caminho, aceita as missões (cada etapa acadêmica e profissional), conclui tarefas
+e ganha XP e atributos. A página não rola: ao avançar, o cenário muda em volta do herói.
 
 - **Stack:** Next.js 16 (App Router), React 19, Tailwind CSS 4, TypeScript.
-- **Animação:** CSS puro (`@keyframes` com `step-end`, pose a pose a 12 fps), sem biblioteca.
-- **Guia das cenas e da gramática de movimento:** [`docs/MOTION.md`](docs/MOTION.md).
+- **Jogo:** CSS (sprites em passos, transições, contadores) sobre atributos do `<html>`; React só
+  para os comandos. Arte em pixel desenhada em código (`npm run sprites`).
+- **Como funciona e como editar:** [`docs/GAME.md`](docs/GAME.md).
 
 ## Rodando
 
@@ -16,11 +18,11 @@ npm run dev
 ```
 
 Scripts: `npm run build`, `npm start`, `npm run lint`, `npm run typecheck`, `npm run test:e2e`,
-`npm run assets` (regenera a foto em meio-tom e as texturas; requer ImageMagick).
+`npm run sprites` (regenera toda a pixel art em `public/game`).
 
 ## Projetos da Vercel
 
-A cena "Projetos" lista os projetos da sua conta na Vercel, buscados **no servidor** e
+A etapa "Missões secundárias" lista os projetos da sua conta na Vercel, buscados **no servidor** e
 atualizados a cada hora (ISR). O token nunca vai para o navegador.
 
 1. Crie um token em <https://vercel.com/account/tokens> com leitura de projetos e deployments.
@@ -28,18 +30,18 @@ atualizados a cada hora (ISR). O token nunca vai para o navegador.
    na Vercel e/ou em `.env.local`. **Não use o prefixo `NEXT_PUBLIC_`.**
 3. Opcional: ajuste títulos, descrições, ordem ou oculte projetos em `src/content/projects.ts`.
 
-Sem token, a cena mostra um convite para os repositórios no GitHub. Para testar a folha de
-contato sem rede, gere o build com `PROJECTS_FIXTURE=1` (cinco projetos de exemplo) ou
+Sem token, o mural mostra um convite para os repositórios no GitHub. Para testar o mural sem rede, gere o build com `PROJECTS_FIXTURE=1` (cinco projetos de exemplo) ou
 `PROJECTS_FIXTURE=error` (falha da API); nunca defina essa variável em produção.
 
 ## Conteúdo
 
-Textos, cargos, experiências e tecnologias ficam em `src/content/profile.ts`. A duração de cada
-emprego é calculada automaticamente a partir das datas.
+Textos, cargos, experiências e tecnologias ficam em `src/content/profile.ts`; a jornada (missões,
+tarefas, XP e atributos) em `src/content/journey.ts`. A duração de cada emprego é calculada
+automaticamente a partir das datas.
 
 ## Modos de visualização
 
-- **Cenas** (padrão com JavaScript): uma cena por vez, em tela cheia.
+- **Jogo** (padrão com JavaScript): uma etapa por vez; ← → , roda, deslizar ou os botões.
 - **Página única:** `?modo=leitura`, ou o link "Ver em uma página". Também é o que buscadores,
   leitores sem JavaScript e a impressão recebem.
 - **Movimento reduzido:** segue `prefers-reduced-motion` e pode ser ligado no botão da interface.
