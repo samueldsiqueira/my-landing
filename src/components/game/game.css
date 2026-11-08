@@ -115,7 +115,9 @@
   }
 }
 
-html[data-mode='stage'][data-motion='full'] .g-game {
+/* Transições só durante a caminhada (data-travel): ao abrir a página direto numa etapa, nada
+   "anda" sozinho (as unidades de contêiner só se resolvem depois do primeiro layout). */
+html[data-mode='stage'][data-motion='full'][data-travel] .g-game {
   transition:
     --g-xp 900ms steps(18) var(--travel),
     --g-fill 900ms steps(18) var(--travel),
@@ -154,8 +156,8 @@ html[data-mode='stage'][data-motion='full'] .g-game {
   background-position: 50% 0;
 }
 
-html[data-mode='stage'][data-motion='full'] .g-sky,
-html[data-mode='stage'][data-motion='full'] .g-far {
+html[data-mode='stage'][data-motion='full'][data-travel] .g-sky,
+html[data-mode='stage'][data-motion='full'][data-travel] .g-far {
   transition: opacity 500ms steps(4) calc(var(--travel) * 0.35);
 }
 
@@ -185,11 +187,8 @@ html[data-mode='stage'][data-motion='full'][data-travel='back'] .g-far {
   translate: calc(var(--i) * -100cqw) 0;
 }
 
-html[data-mode='stage'][data-motion='full'] .g-track {
+html[data-mode='stage'][data-motion='full'][data-travel] .g-track {
   transition: translate var(--travel) cubic-bezier(0.45, 0, 0.55, 1);
-}
-
-html[data-travel] .g-track {
   will-change: translate;
 }
 
