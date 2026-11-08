@@ -280,6 +280,58 @@ export function aiOrb(frame = 0) {
 }
 
 /** Grimório: púlpito com o livro aberto brilhando e estante atrás. */
+/** Laboratório virtual: prédio claro com cúpula de vidro em grade holográfica e placa "VR". */
+export function vrLab() {
+  const p = new Pix(96, 84);
+  const wall = '#e4eaf6';
+  const wallShade = '#b8c3db';
+  const trim = '#8c97b8';
+  const glass = '#5fd6f0';
+  const glassHi = '#bff6ff';
+  const glassDark = '#2f8fc0';
+  // antena com luz
+  p.line(48, 8, 48, 15, trim).set(48, 7, '#7ff0ff').set(47, 7, glassHi).set(49, 7, glassHi);
+  // cúpula de vidro com grade
+  p.ellipse(48, 40, 30, 26, (x, y) => {
+    if (y >= 40) return null;
+    if (x % 6 === 0 || y % 6 === 0) return glassDark;
+    return x < 44 && y < 28 ? glassHi : glass;
+  });
+  p.rect(14, 38, 68, 3, trim);
+  // corpo do prédio
+  p.rect(8, 41, 80, 37, wall).rect(70, 41, 18, 37, wallShade).rect(8, 41, 80, 1, '#ffffff');
+  for (const x of [12, 24, 62, 74]) {
+    p.rect(x, 48, 10, 10, glassDark).rect(x + 1, 49, 8, 8, glass).set(x + 2, 50, glassHi).set(x + 3, 50, glassHi).set(x + 2, 51, glassHi);
+  }
+  // placa "VR"
+  p.rect(36, 44, 24, 9, C.purpleDeep);
+  p.grid(['G.G.GG.', 'G.G.G.G', 'G.G.GG.', 'G.G.G.G', '.G..G.G'], { G: C.gold }, 45, 46);
+  // porta de vidro
+  p.rect(40, 58, 16, 20, glassDark).rect(41, 59, 6, 19, glass).rect(49, 59, 6, 19, glass);
+  p.set(42, 60, glassHi).set(50, 60, glassHi);
+  // degraus
+  p.rect(4, 78, 88, 3, wallShade).rect(0, 81, 96, 3, trim);
+  p.outline(OUT);
+  return p;
+}
+
+/** Óculos de realidade virtual flutuando; as lentes alternam ciano e lilás. */
+export function vrHeadset(frame = 0) {
+  const p = new Pix(24, 16);
+  const lens = frame ? '#b48cff' : '#5fd6f0';
+  const sparks = frame
+    ? [[22, 1], [2, 14]]
+    : [[1, 1], [21, 14]];
+  sparks.forEach(([x, y]) => p.set(x, y, C.crystalHi));
+  p.rect(0, 6, 3, 3, C.purple).rect(21, 6, 3, 3, C.purple);
+  p.rect(3, 3, 18, 10, '#2b2f4a').rect(3, 3, 18, 1, '#4a5078');
+  p.rect(5, 5, 6, 5, lens).rect(13, 5, 6, 5, lens);
+  p.set(6, 6, '#e8fdff').set(14, 6, '#e8fdff');
+  p.clear(11, 11).clear(12, 11).clear(11, 12).clear(12, 12);
+  p.outline(OUT);
+  return p;
+}
+
 export function grimoire() {
   const p = new Pix(84, 76);
   // estante
@@ -376,6 +428,7 @@ export const ICONS = {
   automacao: ['....KKK....', '.K.KOOOK.K.', 'KOKOOOOOKOK', '.KOOoooOOK.', 'KOOoKKKoOOK', 'KOOoK.KoOOK', 'KOOoKKKoOOK', '.KOOoooOOK.', 'KOKOOOOOKOK', '.K.KOOOK.K.', '....KKK....'],
   integracao: ['...........', '.KKKK......', 'KGGGGK.....', 'KGKKGK.KKK.', 'KGK.KGKGGGK', '.KGGGKGKKGK', 'KGGGKGK.KGK', 'KGKKGK.KKGK', 'KGGGK..KGK.', '.KKK....K..', '...........'],
   saude: ['...........', '.KKK...KKK.', 'KHHHK.KHHHK', 'KHhHHKHHHHK', 'KHHHHHHHHHK', 'KHHWHHHHHHK', '.KHWHWHWHK.', '..KHHHWHK..', '...KHHHK...', '....KHK....', '.....K.....'],
+  educacao: ['...........', '....KKK....', '..KKSSSKK..', 'KKSSSGGGGKK', '..KKSSSKKG.', '...KsssK.G.', '...KsssK.G.', '...KsssK.G.', '....KKK.GGG', '........GGG', '...........'],
   ia: ['.....K.....', '....KSK....', '....KSK....', '..KKSsSKK..', 'KKSSsssSSKK', 'KSssssssSK.', 'KKSSsssSSKK', '..KKSsSKK..', '....KSK....', '....KSK....', '.....K.....'],
 };
 

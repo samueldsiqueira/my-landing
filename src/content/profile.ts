@@ -1,14 +1,18 @@
 import type { IconType } from 'react-icons';
 import { FaMasksTheater } from 'react-icons/fa6';
+import { TbGhost2, TbRocket } from 'react-icons/tb';
 import {
+  SiClaude,
   SiCss,
   SiDocker,
   SiFastapi,
   SiGit,
+  SiGooglegemini,
   SiHtml5,
   SiJavascript,
   SiLinux,
   SiMariadb,
+  SiMoodle,
   SiNextdotjs,
   SiNodedotjs,
   SiPostgresql,
@@ -17,6 +21,7 @@ import {
   SiReact,
   SiSelenium,
   SiTypescript,
+  SiUnity,
 } from 'react-icons/si';
 
 export const person = {
@@ -24,7 +29,7 @@ export const person = {
   givenName: 'Samuel',
   familyName: "D' Siqueira",
   roles: ['Desenvolvedor de Software', 'Analista de Sistemas', 'Especialista em IA'],
-  summary: 'Analista de Sistemas e desenvolvedor de software. Integra sistemas na área da saúde e cria agentes de IA.',
+  summary: 'Analista de Sistemas e desenvolvedor de software. Integra sistemas nas áreas de saúde e educação e cria agentes de IA.',
   email: 'samueldsiqueira@gmail.com',
   whatsapp: { display: '21 98113-4252', href: 'https://wa.me/5521981134252' },
   linkedin: 'https://www.linkedin.com/in/samuel-d-siqueira',
@@ -44,6 +49,7 @@ export const scenes = [
   { id: 'faculdade', label: 'Universidade', aliases: ['formacao', 'academia', 'universidade'] },
   { id: 'tim', label: 'Torres de Transmissão', aliases: ['torres'] },
   { id: 'senai', label: 'Santuário da Saúde', aliases: ['atual', 'santuario'] },
+  { id: 'educacao', label: 'Laboratório Virtual', aliases: ['laboratorio', 'simuladores'] },
   { id: 'grimorio', label: 'Grimório', aliases: ['tecnologias', 'skills'] },
   { id: 'projetos', label: 'Missões secundárias', aliases: ['projects'] },
   { id: 'contato', label: 'Próxima missão', aliases: ['contact'] },
@@ -100,6 +106,24 @@ export const skillGroups: SkillGroup[] = [
       { name: 'Next.js', icon: SiNextdotjs },
       { name: 'Node.js', icon: SiNodedotjs },
       { name: 'FastAPI', icon: SiFastapi },
+    ],
+  },
+  {
+    id: 'ia',
+    label: 'IA e agentes',
+    items: [
+      { name: 'Claude Code', icon: SiClaude },
+      { name: 'Gemini', icon: SiGooglegemini },
+      { name: 'Kiro', icon: TbGhost2 },
+      { name: 'Antigravity', icon: TbRocket },
+    ],
+  },
+  {
+    id: 'educacao',
+    label: 'Educação e realidade virtual',
+    items: [
+      { name: 'Moodle', icon: SiMoodle },
+      { name: 'Unity', icon: SiUnity },
     ],
   },
   {

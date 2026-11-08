@@ -33,6 +33,8 @@ save('radio', P.radioTower());
 save('robot', sheet([P.robot(0), P.robot(1)]));
 save('sanctuary', P.sanctuary());
 save('orb', sheet([P.aiOrb(0), P.aiOrb(1)]));
+save('lab', P.vrLab());
+save('headset', sheet([P.vrHeadset(0), P.vrHeadset(1)]));
 save('grimoire', P.grimoire());
 save('board', P.questBoard());
 save('tent', P.tent());

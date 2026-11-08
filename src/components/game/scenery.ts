@@ -11,6 +11,7 @@ export const skies: Record<SceneId, string[]> = {
   faculdade: ['#7bb2e8', '#f2d6a2', '#ffe8b8'],
   tim: ['#3a1e5c', '#b0456a', '#ff8a5a', '#ffc36b'],
   senai: ['#0b2a3a', '#155a6a', '#2b8f94'],
+  educacao: ['#141a46', '#2a3d7a', '#3f74a8', '#7fc8d8'],
   grimorio: ['#160f33', '#33215f', '#6a3f8f'],
   projetos: ['#6fb0ea', '#a6d4f5', '#e4f4ff'],
   contato: ['#050716', '#0e1436', '#1e2350'],
@@ -61,6 +62,10 @@ export const landmarks: Record<SceneId, Prop[]> = {
   senai: [
     { src: 'sanctuary', w: 100, h: 82, x: 27 },
     { src: 'orb', w: 20, h: 20, x: 53, base: 70, frames: 2, cycle: 1000, float: true },
+  ],
+  educacao: [
+    { src: 'lab', w: 96, h: 84, x: 26 },
+    { src: 'headset', w: 24, h: 16, x: 53, base: 70, frames: 2, cycle: 1400, float: true },
   ],
   grimorio: [{ src: 'grimoire', w: 84, h: 76, x: 30 }],
   projetos: [{ src: 'board', w: 84, h: 70, x: 30 }],

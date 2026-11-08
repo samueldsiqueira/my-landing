@@ -3,7 +3,7 @@
 // recompensas (XP e atributos), que são metáfora — a progressão conta a história, não mede nada.
 import { about, education, jobs, person, type Education, type Job, type SceneId } from './profile';
 
-export type AttrId = 'codigo' | 'suporte' | 'automacao' | 'integracao' | 'saude' | 'ia';
+export type AttrId = 'codigo' | 'suporte' | 'automacao' | 'integracao' | 'saude' | 'educacao' | 'ia';
 
 export const attributes: { id: AttrId; label: string; short: string }[] = [
   { id: 'codigo', label: 'Código', short: 'COD' },
@@ -11,6 +11,7 @@ export const attributes: { id: AttrId; label: string; short: string }[] = [
   { id: 'automacao', label: 'Automação', short: 'AUT' },
   { id: 'integracao', label: 'Integração', short: 'INT' },
   { id: 'saude', label: 'Saúde', short: 'SAÚ' },
+  { id: 'educacao', label: 'Educação', short: 'EDU' },
   { id: 'ia', label: 'IA', short: 'IA' },
 ];
 
@@ -123,7 +124,7 @@ export const stages: Stage[] = [
       'Conciliar os estudos com o suporte na Indra e com o estágio na TIM',
     ],
     xp: 600,
-    gains: { codigo: 4 },
+    gains: { codigo: 4, educacao: 3 },
   },
   {
     id: 'tim',
@@ -166,6 +167,25 @@ export const stages: Stage[] = [
     report: job('senai').description,
     xp: 1000,
     gains: { integracao: 5, saude: 5, ia: 4 },
+  },
+  {
+    id: 'educacao',
+    kind: 'quest',
+    chapter: 'Capítulo 6',
+    place: 'Laboratório Virtual',
+    title: 'Tecnologia para a educação',
+    job: job('senai'),
+    intro:
+      'Em 2026, ainda no SENAI Soluções Digitais, o mago levou seus feitiços para a educação: ambientes de aprendizagem, laboratórios de realidade virtual e simuladores.',
+    tasks: [
+      'Atuar em projetos de tecnologia para a educação',
+      'Trabalhar com o Moodle, ambiente virtual de aprendizagem',
+      'Laboratórios de realidade virtual com Unity',
+      'Simuladores para a área da educação com Unity',
+    ],
+    xp: 800,
+    gains: { educacao: 5, codigo: 1 },
+    items: ['Moodle', 'Unity'],
   },
   {
     id: 'grimorio',

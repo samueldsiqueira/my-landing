@@ -356,7 +356,11 @@ export function attachInputs() {
         if (state.phase === 'entering') finishEnter();
         return;
       default:
-        if (/^[1-9]$/.test(event.key) && Number(event.key) <= sceneIds.length) jump = Number(event.key) - 1;
+        // 1–9 levam às nove primeiras etapas e 0 à décima, como na fileira de números do teclado.
+        if (/^[0-9]$/.test(event.key)) {
+          const n = event.key === '0' ? 10 : Number(event.key);
+          if (n <= sceneIds.length) jump = n - 1;
+        }
     }
 
     if (jump !== null) {

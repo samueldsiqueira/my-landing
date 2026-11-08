@@ -166,6 +166,39 @@ const far = {
     }
   },
 
+  // Laboratório virtual: crepúsculo, campus com cúpulas e formas holográficas no céu.
+  educacao(p) {
+    stars(p, 'educacao', 30, 50, ['#d6fffa', '#bfe9ff']);
+    const cube = (x, y, s, c) => {
+      const d = Math.round(s / 2);
+      p.line(x, y, x + s, y, c).line(x + s, y, x + s, y + s, c).line(x + s, y + s, x, y + s, c).line(x, y + s, x, y, c);
+      p.line(x + d, y - d, x + s + d, y - d, c).line(x + s + d, y - d, x + s + d, y + s - d, c);
+      p.line(x, y, x + d, y - d, c).line(x + s, y, x + s + d, y - d, c).line(x + s, y + s, x + s + d, y + s - d, c);
+    };
+    cube(60, 40, 10, '#7ff0ff');
+    cube(210, 28, 8, '#c9a6ff');
+    cube(272, 60, 6, '#7ff0ff');
+    ridge(p, { base: 120, parts: [[2, 4], [5, 2, 1]], color: '#2c3f70', rim: '#3d5590' });
+    const block = (x, w, h, dome = 0) => {
+      const top = 124 - h;
+      if (dome)
+        p.ellipse(x + w / 2, top, dome, dome * 0.8, (xx, yy) => (yy >= top ? null : xx < x + w / 2 ? '#6fb8e0' : '#4a8cc0'));
+      p.rect(x, top, w, h + 8, '#3b4f86').rect(x, top, 1, h + 8, '#5670a8');
+      windows(p, x, top, w, h, '#9ff3ff', `lab${x}`, 0.45);
+    };
+    block(14, 30, 22, 10);
+    block(64, 18, 34);
+    block(96, 40, 16, 14);
+    block(170, 24, 28);
+    block(210, 36, 20, 11);
+    block(262, 20, 38);
+    block(292, 22, 18);
+    ridge(p, { base: 132, parts: [[3, 3], [7, 1.5, 1]], color: '#2a5a66', rim: '#3c7a86' });
+    for (const x of [8, 56, 150, 200, 254, 310]) roundTree(p, x, 136, 5 + (x % 3), '#2f6f6a', '#45918a', '#3d2a1e');
+    const r = rng('holo');
+    for (let i = 0; i < 20; i++) p.set(Math.floor(r() * p.w), 134 + Math.floor(r() * 12), r() < 0.5 ? '#7ff0ff' : '#c9a6ff');
+  },
+
   // Torres de transmissão: pôr do sol, rochas e antenas treliçadas com luz vermelha.
   tim(p) {
     disc(p, 90, 110, 26, '#ffb35c', '#ff9a4a');
@@ -361,6 +394,10 @@ const ground = {
     for (const x of [12, 58, 101, 140]) {
       p.set(x, 1, '#c9fbff').rect(x - 1, 2, 3, 3, '#7ee0e6').set(x + 1, 3, '#3c9fb0');
     }
+  },
+  educacao(p) {
+    grassy('g-educacao', { back: '#3f8a7a', backRim: '#5fb09a', front: '#2a5f58', frontDark: '#1d4440', path: '#c9d3e6', pathLight: '#e6edf8', pathDark: '#9aa6c0', edge: '#6d7a99' })(p);
+    cobbles(p, { stone: '#d3dbec', light: '#eef3fb', dark: '#a3aec8', mortar: '#5fc8e0' });
   },
   grimorio(p) {
     grassy('g-grimorio', { back: '#3b2f5e', backRim: '#4f4080', front: '#241c40', frontDark: '#18122e', edge: '#2a2048' })(p);

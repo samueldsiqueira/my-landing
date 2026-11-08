@@ -13,7 +13,7 @@ test.describe('jornada (desktop)', () => {
     await waitScene(page, 'origem');
     await expect(page.locator('#origem-title')).toBeFocused();
     await expect(page).toHaveURL(/#origem$/);
-    await expect(page.locator('#stage-live')).toHaveText('Origem, etapa 2 de 9');
+    await expect(page.locator('#stage-live')).toHaveText('Origem, etapa 2 de 10');
     await expect(page.locator('nav[aria-label="Mapa da jornada"] [aria-current="step"]')).toContainText('Origem');
 
     await settle(page);
@@ -61,6 +61,12 @@ test.describe('jornada (desktop)', () => {
     await settle(page);
     await page.keyboard.press('4');
     await waitScene(page, 'faculdade');
+    await settle(page);
+    await page.keyboard.press('7');
+    await waitScene(page, 'educacao');
+    await settle(page);
+    await page.keyboard.press('0');
+    await waitScene(page, 'contato');
     await settle(page);
     await page.locator('nav[aria-label="Mapa da jornada"] a', { hasText: 'Grimório' }).click();
     await waitScene(page, 'grimorio');
@@ -168,7 +174,7 @@ test.describe('jornada (celular)', () => {
     await waitScene(page, 'origem');
     await settle(page);
 
-    await page.getByRole('button', { name: /Origem/ }).filter({ hasText: 'de 9' }).click();
+    await page.getByRole('button', { name: /Origem/ }).filter({ hasText: 'de 10' }).click();
     const dialog = page.getByRole('dialog', { name: 'Mapa da jornada' });
     await expect(dialog).toBeVisible();
     await dialog.getByRole('link', { name: /Próxima missão/ }).click();
