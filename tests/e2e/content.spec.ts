@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { about, contact, jobs, person, skillGroups } from '../../src/content/profile';
+import { about, contact, education, jobs, person, skillGroups } from '../../src/content/profile';
 
 test.describe('conteúdo no HTML do servidor', () => {
   test('todo o conteúdo e os links chegam sem JavaScript', async ({ request }) => {
@@ -31,6 +31,10 @@ test.describe('conteúdo no HTML do servidor', () => {
       expect(text).toContain(job.company);
       expect(text).toContain(job.title);
       for (const paragraph of job.description) expect(text).toContain(paragraph);
+    }
+    for (const item of education) {
+      expect(text).toContain(item.institution);
+      expect(text).toContain(item.course);
     }
     for (const href of [person.linkedin, person.github, person.whatsapp.href, `mailto:${person.email}`]) {
       expect(html, href).toContain(`href="${href}"`);

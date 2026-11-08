@@ -141,7 +141,7 @@ export function guildBooth() {
   return p;
 }
 
-/** Kenzie: torre da academia arcana, telhado cônico, bandeirola com livro, janelas acesas. */
+/** Faculdade: torre da universidade, telhado cônico, bandeirola com livro, janelas acesas. */
 export function academyTower() {
   const p = new Pix(70, 108);
   bricks(p, 14, 34, 42, 74, '#a7a3c4', '#c4c0dc', '#7c7898');

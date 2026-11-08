@@ -66,7 +66,7 @@ function TitlePanel({ stage }: { stage: Stage }) {
 
 /** Missão de carreira: narrativa, tarefas cumpridas, recompensas e relatório completo. */
 function QuestPanel({ stage, index, asOf }: { stage: Stage; index: number; asOf: string }) {
-  const { job } = stage;
+  const { job, school } = stage;
   const p = progress[index];
   return (
     <Scene id={stage.id} kind={stage.kind}>
@@ -84,6 +84,17 @@ function QuestPanel({ stage, index, asOf }: { stage: Stage; index: number; asOf:
             {formatDuration(job.start, job.end ?? asOf)} · {job.location}
           </span>
           {job.end === null && <span className="g-badge">Missão em andamento</span>}
+        </p>
+      )}
+      {school && (
+        <p className="g-meta">
+          <strong>{school.institution}</strong> · {school.course}
+          <br />
+          <span>
+            <time dateTime={school.start}>{formatMonth(school.start)}</time> –{' '}
+            <time dateTime={school.end}>{formatMonth(school.end)}</time> · {formatDuration(school.start, school.end)} ·{' '}
+            {school.field}
+          </span>
         </p>
       )}
       <p className="g-intro">{stage.intro}</p>

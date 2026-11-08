@@ -1,7 +1,7 @@
 // A jornada do mago: cada etapa da carreira vira uma missão no caminho. Os fatos vêm de
 // profile.ts (empregos, textos); aqui ficam só a narrativa de jogo, as tarefas resumidas e as
 // recompensas (XP e atributos), que são metáfora — a progressão conta a história, não mede nada.
-import { about, jobs, person, type Job, type SceneId } from './profile';
+import { about, education, jobs, person, type Education, type Job, type SceneId } from './profile';
 
 export type AttrId = 'codigo' | 'suporte' | 'automacao' | 'integracao' | 'saude' | 'ia';
 
@@ -33,8 +33,8 @@ export interface Stage {
   /** Título da missão. */
   title: string;
   job?: Job;
-  /** Período por extenso quando não vem de um emprego. */
-  period?: string;
+  /** Curso (instituição, período) quando a etapa é de formação. */
+  school?: Education;
   /** Narrativa curta, na voz do jogo, mas só com fatos. */
   intro: string;
   tasks: string[];
@@ -52,6 +52,12 @@ export interface Stage {
 const job = (id: string) => {
   const found = jobs.find((item) => item.id === id);
   if (!found) throw new Error(`emprego desconhecido: ${id}`);
+  return found;
+};
+
+const school = (id: string) => {
+  const found = education.find((item) => item.id === id);
+  if (!found) throw new Error(`curso desconhecido: ${id}`);
   return found;
 };
 
@@ -103,21 +109,21 @@ export const stages: Stage[] = [
     gains: { suporte: 5, integracao: 1 },
   },
   {
-    id: 'kenzie',
+    id: 'faculdade',
     kind: 'quest',
     chapter: 'Capítulo 3',
-    place: 'Academia Kenzie',
-    title: 'Formação de Desenvolvedor Front-End',
+    place: 'Torre da Universidade',
+    title: 'Análise e Desenvolvimento de Sistemas',
+    school: school('ucam'),
     intro:
-      'Para entender os sistemas por dentro, o mago entrou para a academia e concluiu o bootcamp da Kenzie Academy, formando-se Desenvolvedor Front-End.',
+      'Para entender os sistemas por dentro, o mago entrou para a Universidade Candido Mendes e cursou Tecnologia em Análise e Desenvolvimento de Sistemas.',
     tasks: [
-      'Concluir o bootcamp de Desenvolvedor Front-End da Kenzie Academy',
-      'Construir os projetos do curso: Kenzie Hub, Hamburgueria e Nu Kenzie',
-      'Projeto final em equipe: Center RPG',
+      'Ingressar na graduação em fevereiro de 2022',
+      'Cursar até julho de 2024, na área de Tecnologia da Informação',
+      'Conciliar os estudos com o suporte na Indra e com o estágio na TIM',
     ],
     xp: 600,
     gains: { codigo: 4 },
-    items: ['Front-End'],
   },
   {
     id: 'tim',

@@ -8,7 +8,7 @@ export const skies: Record<SceneId, string[]> = {
   inicio: ['#2a2a6e', '#7a4fa8', '#f08aa0', '#ffc98a'],
   origem: ['#070a1e', '#121a44', '#24306a'],
   indra: ['#5aa0e8', '#8cc4f2', '#cfe8fb'],
-  kenzie: ['#7bb2e8', '#f2d6a2', '#ffe8b8'],
+  faculdade: ['#7bb2e8', '#f2d6a2', '#ffe8b8'],
   tim: ['#3a1e5c', '#b0456a', '#ff8a5a', '#ffc36b'],
   senai: ['#0b2a3a', '#155a6a', '#2b8f94'],
   grimorio: ['#160f33', '#33215f', '#6a3f8f'],
@@ -50,7 +50,7 @@ export const landmarks: Record<SceneId, Prop[]> = {
     { src: 'booth', w: 90, h: 74, x: 22 },
     { src: 'signpost-4', w: 46, h: 58, x: 46, labels: ['Brasil', 'América Latina', 'EUA', 'Europa'] },
   ],
-  kenzie: [
+  faculdade: [
     { src: 'tower', w: 70, h: 108, x: 30 },
     { src: 'owl', w: 14, h: 16, x: 50, frames: 2, cycle: 3200 },
   ],

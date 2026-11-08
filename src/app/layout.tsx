@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Pixelify_Sans } from 'next/font/google';
 import { bootScript } from '@/lib/boot';
-import { jobs, person, siteUrl, skillGroups } from '@/content/profile';
+import { education, jobs, person, siteUrl, skillGroups } from '@/content/profile';
 import './globals.css';
 
 const pixel = Pixelify_Sans({
@@ -53,6 +53,7 @@ const jsonLd = {
   name: person.name,
   jobTitle: jobs[0].title,
   worksFor: { '@type': 'Organization', name: jobs[0].company },
+  alumniOf: education.map((item) => ({ '@type': 'CollegeOrUniversity', name: item.institution })),
   description: person.summary,
   url: siteUrl,
   image: `${siteUrl}/og.png`,

@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 
-export const sceneIds = ['inicio', 'origem', 'indra', 'kenzie', 'tim', 'senai', 'grimorio', 'projetos', 'contato'] as const;
+export const sceneIds = ['inicio', 'origem', 'indra', 'faculdade', 'tim', 'senai', 'grimorio', 'projetos', 'contato'] as const;
 
 export const htmlData = (page: Page) =>
   page.evaluate(() => ({ ...document.documentElement.dataset }) as Record<string, string | undefined>);

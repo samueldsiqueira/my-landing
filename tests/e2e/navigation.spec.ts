@@ -60,7 +60,7 @@ test.describe('jornada (desktop)', () => {
     await waitScene(page, 'inicio');
     await settle(page);
     await page.keyboard.press('4');
-    await waitScene(page, 'kenzie');
+    await waitScene(page, 'faculdade');
     await settle(page);
     await page.locator('nav[aria-label="Mapa da jornada"] a', { hasText: 'Grimório' }).click();
     await waitScene(page, 'grimorio');

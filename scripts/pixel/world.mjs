@@ -151,8 +151,8 @@ const far = {
     for (const x of [10, 60, 95, 150, 210, 250, 300]) roundTree(p, x, 136, 5 + (x % 3), '#3c8048', '#5aa860', '#5d3a1e');
   },
 
-  // Academia: tarde dourada, montanhas, livros voando.
-  kenzie(p) {
+  // Universidade: tarde dourada, montanhas, livros voando.
+  faculdade(p) {
     cloud(p, 70, 30, 44, '#fff3d9', '#f5d9a8');
     cloud(p, 250, 18, 30, '#fff3d9', '#f5d9a8');
     peaks(p, { base: 116, list: [[30, 30, 50], [140, 46, 60], [250, 38, 56]], color: '#9a86c9', rim: '#b6a4de', snow: '#ece4ff' });
@@ -337,8 +337,8 @@ const ground = {
     grassy('g-indra')(p);
     cobbles(p, { stone: '#a9a7b8', light: '#c9c7d6', dark: '#7d7b91', mortar: '#6a687c' });
   },
-  kenzie(p) {
-    grassy('g-kenzie')(p);
+  faculdade(p) {
+    grassy('g-faculdade')(p);
     const r = rng('flowers');
     for (let i = 0; i < 20; i++) {
       const x = Math.floor(r() * p.w);
