@@ -36,13 +36,17 @@ export const person = {
 
 export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://my-landing-olive.vercel.app';
 
+/** Etapas da jornada, na ordem do caminho. `aliases`: âncoras antigas e em português. */
 export const scenes = [
-  { id: 'inicio', label: 'Início', alias: 'inicio' },
-  { id: 'about', label: 'Sobre', alias: 'sobre' },
-  { id: 'skills', label: 'Tecnologias', alias: 'tecnologias' },
-  { id: 'projects', label: 'Projetos', alias: 'projetos' },
-  { id: 'experience', label: 'Experiência', alias: 'experiencia' },
-  { id: 'contact', label: 'Contato', alias: 'contato' },
+  { id: 'inicio', label: 'Início', aliases: ['home'] },
+  { id: 'origem', label: 'Origem', aliases: ['sobre', 'about'] },
+  { id: 'indra', label: 'Guilda do Suporte', aliases: ['experiencia', 'experience'] },
+  { id: 'faculdade', label: 'Universidade', aliases: ['formacao', 'academia', 'universidade'] },
+  { id: 'tim', label: 'Torres de Transmissão', aliases: ['torres'] },
+  { id: 'senai', label: 'Santuário da Saúde', aliases: ['atual', 'santuario'] },
+  { id: 'grimorio', label: 'Grimório', aliases: ['tecnologias', 'skills'] },
+  { id: 'projetos', label: 'Missões secundárias', aliases: ['projects'] },
+  { id: 'contato', label: 'Próxima missão', aliases: ['contact'] },
 ] as const;
 
 export type SceneId = (typeof scenes)[number]['id'];
@@ -179,6 +183,28 @@ export const jobs: Job[] = [
       'Desenvolvimento de novos padrões e processos para otimização do atendimento.',
     ],
     note: 'Esta função engloba a função anterior de "Analista de Suporte Técnico".',
+  },
+];
+
+export interface Education {
+  id: string;
+  institution: string;
+  course: string;
+  field: string;
+  /** Mês de início no formato AAAA-MM. */
+  start: string;
+  /** Mês de término no formato AAAA-MM. */
+  end: string;
+}
+
+export const education: Education[] = [
+  {
+    id: 'ucam',
+    institution: 'Universidade Candido Mendes',
+    course: 'Tecnologia em Análise e Desenvolvimento de Sistemas',
+    field: 'Tecnologia da Informação',
+    start: '2022-02',
+    end: '2024-07',
   },
 ];
 

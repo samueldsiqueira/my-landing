@@ -8,7 +8,7 @@ const serious = (violations: Violations) =>
   violations.filter((violation) => violation.impact === 'serious' || violation.impact === 'critical');
 
 for (const id of sceneIds) {
-  test(`axe: cena ${id} sem violações sérias`, async ({ page }) => {
+  test(`axe: etapa ${id} sem violações sérias`, async ({ page }) => {
     await openStage(page, `#${id}`);
     await waitScene(page, id);
     await settle(page);

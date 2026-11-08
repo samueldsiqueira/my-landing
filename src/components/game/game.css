@@ -1,0 +1,1582 @@
+/* =========================================================================
+   A Jornada do Mago — estilos do jogo
+   Arte em pixels de public/game, ampliada por --px (inteiro) sem suavização.
+   Mundo virtual de 180 px de altura: chão de 40 px na base; o herói pisa no caminho.
+   O modo jogo depende de html[data-mode='stage']; sem isso (sem JS, ?modo=leitura,
+   impressão) a página vira um diário de bordo comum, rolável.
+   ========================================================================= */
+
+@property --g-xp {
+  syntax: '<integer>';
+  inherits: true;
+  initial-value: 0;
+}
+@property --g-lv {
+  syntax: '<integer>';
+  inherits: true;
+  initial-value: 1;
+}
+@property --g-fill {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+@property --g-codigo {
+  syntax: '<integer>';
+  inherits: true;
+  initial-value: 1;
+}
+@property --g-suporte {
+  syntax: '<integer>';
+  inherits: true;
+  initial-value: 1;
+}
+@property --g-automacao {
+  syntax: '<integer>';
+  inherits: true;
+  initial-value: 1;
+}
+@property --g-integracao {
+  syntax: '<integer>';
+  inherits: true;
+  initial-value: 1;
+}
+@property --g-saude {
+  syntax: '<integer>';
+  inherits: true;
+  initial-value: 1;
+}
+@property --g-ia {
+  syntax: '<integer>';
+  inherits: true;
+  initial-value: 1;
+}
+
+:root {
+  /* Caminhada entre etapas. */
+  --travel: 1400ms;
+  /* Altura do mundo e escala da arte. Largo: o mundo ocupa a tela, a missão flutua à direita.
+     Alto (celular em pé): mundo em cima, missão embaixo. */
+  --world-h: 46svh;
+  --px-div: 180;
+  /* Escala dos pixels da interface (molduras, botões). */
+  --u: 2px;
+  --hud-top: 10px;
+  --ui-bg: #16122e;
+  --ui-bg-2: #211a44;
+  --ui-ink: #f4efff;
+  --ui-muted: #cfc4ee;
+  --ui-gold: #f6c853;
+  --ui-gold-hi: #fff1b0;
+  --ui-purple: #9461ea;
+  --ui-cyan: #5ff2e2;
+  --ui-green: #3ccf7a;
+  --ui-line: #3b2f6e;
+}
+
+@media (min-width: 760px) and (min-aspect-ratio: 5/4) {
+  :root {
+    --world-h: 100svh;
+    --px-div: 205;
+    --u: 3px;
+    --hud-top: 16px;
+  }
+}
+
+@media (max-height: 500px) and (min-aspect-ratio: 5/4) {
+  :root {
+    --u: 2px;
+    --hud-top: 8px;
+  }
+}
+
+.g-game,
+.g-game * {
+  image-rendering: pixelated;
+}
+
+/* ---------------------------------------------------------------- mundo */
+.g-game {
+  position: fixed;
+  inset: 0 0 auto;
+  height: var(--world-h);
+  z-index: 0;
+  overflow: hidden;
+  background: #120d26;
+  /* Escala inteira da arte (pixels nítidos), calculada aqui para valer também no modo leitura. */
+  --px: max(2px, calc(var(--world-h) / var(--px-div)));
+  /* Valores da ficha (as regras por etapa vêm de GameStyles). */
+  --i: 0;
+}
+
+@supports (width: round(down, 10px, 1px)) {
+  .g-game {
+    --px: max(2px, round(down, calc(var(--world-h) / var(--px-div)), 1px));
+  }
+}
+
+/* Transições só durante a caminhada (data-travel): ao abrir a página direto numa etapa, nada
+   "anda" sozinho (as unidades de contêiner só se resolvem depois do primeiro layout). */
+html[data-mode='stage'][data-motion='full'][data-travel] .g-game {
+  transition:
+    --g-xp 900ms steps(18) var(--travel),
+    --g-fill 900ms steps(18) var(--travel),
+    --g-lv 1ms step-end calc(var(--travel) + 200ms),
+    --g-codigo 600ms steps(6) calc(var(--travel) + 500ms),
+    --g-suporte 600ms steps(6) calc(var(--travel) + 500ms),
+    --g-automacao 600ms steps(6) calc(var(--travel) + 500ms),
+    --g-integracao 600ms steps(6) calc(var(--travel) + 500ms),
+    --g-saude 600ms steps(6) calc(var(--travel) + 500ms),
+    --g-ia 600ms steps(6) calc(var(--travel) + 500ms);
+}
+
+.g-world {
+  position: absolute;
+  inset: 0;
+  container-type: size;
+}
+
+.g-sky,
+.g-far {
+  position: absolute;
+  left: 0;
+  right: 0;
+  opacity: 0;
+}
+
+.g-sky {
+  inset: 0;
+}
+
+.g-far {
+  bottom: calc(30 * var(--px));
+  height: calc(150 * var(--px));
+  background-repeat: repeat-x;
+  background-size: calc(320 * var(--px)) 100%;
+  background-position: 50% 0;
+}
+
+html[data-mode='stage'][data-motion='full'][data-travel] .g-sky,
+html[data-mode='stage'][data-motion='full'][data-travel] .g-far {
+  transition: opacity 500ms steps(4) calc(var(--travel) * 0.35);
+}
+
+/* Paralaxe: o fundo novo chega deslizando um pouco no sentido da caminhada. */
+html[data-mode='stage'][data-motion='full'][data-travel='fwd'] .g-far {
+  animation: g-far-fwd var(--travel) cubic-bezier(0.4, 0, 0.6, 1);
+}
+html[data-mode='stage'][data-motion='full'][data-travel='back'] .g-far {
+  animation: g-far-back var(--travel) cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+@keyframes g-far-fwd {
+  from {
+    translate: 8% 0;
+  }
+}
+@keyframes g-far-back {
+  from {
+    translate: -8% 0;
+  }
+}
+
+/* O caminho: todos os trechos lado a lado; anda --i telas para a esquerda. */
+.g-track {
+  position: absolute;
+  inset: 0;
+  translate: calc(var(--i) * -100cqw) 0;
+}
+
+html[data-mode='stage'][data-motion='full'][data-travel] .g-track {
+  transition: translate var(--travel) cubic-bezier(0.45, 0, 0.55, 1);
+  will-change: translate;
+}
+
+.g-seg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--seg) * 100cqw);
+  width: 100cqw;
+}
+
+.g-ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(40 * var(--px));
+  background-repeat: repeat-x;
+  background-size: calc(160 * var(--px)) 100%;
+}
+
+.g-prop {
+  position: absolute;
+  left: calc(var(--x) * 1%);
+  bottom: calc(var(--base) * var(--px));
+  width: calc(var(--w) * var(--px));
+  height: calc(var(--h) * var(--px));
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+/* Folhas de sprites: uma tira com todos os quadros, deslocada em passos dentro de uma janela.
+   Só translate com porcentagens (sem var() nos keyframes): roda no compositor, sem repintar. */
+.g-prop[data-frames],
+.g-hero {
+  overflow: hidden;
+}
+
+.g-sprite {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.g-prop .g-sprite {
+  width: calc(var(--frames) * 100%);
+  animation: g-frames var(--cycle) steps(var(--frames)) infinite paused;
+}
+
+.g-prop[data-float] {
+  animation: g-float 1600ms steps(4) infinite paused;
+}
+
+@keyframes g-frames {
+  to {
+    translate: -100% 0;
+  }
+}
+
+@keyframes g-float {
+  50% {
+    translate: 0 -15%;
+  }
+}
+
+/* Texto das placas (por cima da arte, em pixels da fonte). */
+.g-sign {
+  position: absolute;
+  left: calc(4 * var(--px));
+  right: calc(8 * var(--px));
+  top: calc((4 + var(--b) * 9) * var(--px));
+  height: calc(7 * var(--px));
+  display: grid;
+  place-items: center;
+  font-family: var(--font-pixel);
+  font-size: calc(4.6 * var(--px));
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  color: #2b1a10;
+  letter-spacing: 0.02em;
+}
+
+/* ---------------------------------------------------------------- herói */
+.g-hero {
+  position: absolute;
+  left: 9%;
+  bottom: calc(18 * var(--px));
+  width: calc(40 * var(--px));
+  height: calc(54 * var(--px));
+  z-index: 2;
+}
+
+/* 8 quadros na tira: parado 0–1, andando 2–5, conjurando 6–7 (cada quadro = 12,5%). */
+.g-hero .g-sprite {
+  width: 800%;
+  background-image: url(/game/hero.png);
+  animation: g-idle 1200ms steps(2) infinite;
+}
+
+html[data-travel='back'] .g-hero {
+  scale: -1 1;
+}
+
+html[data-mode='stage'][data-motion='full'][data-travel] .g-hero .g-sprite {
+  animation:
+    g-walk 350ms steps(4) 4,
+    g-idle 1200ms steps(2) var(--travel) infinite;
+}
+
+@keyframes g-idle {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: -25% 0;
+  }
+}
+@keyframes g-walk {
+  from {
+    translate: -25% 0;
+  }
+  to {
+    translate: -75% 0;
+  }
+}
+@keyframes g-cast {
+  from {
+    translate: -75% 0;
+  }
+  to {
+    translate: -100% 0;
+  }
+}
+
+/* "Subiu de nível!" sobre a cabeça do herói (só na primeira chegada a uma missão). */
+.g-levelup {
+  position: absolute;
+  left: 9%;
+  bottom: calc(80 * var(--px));
+  z-index: 3;
+  margin: 0;
+  display: grid;
+  justify-items: center;
+  min-width: calc(40 * var(--px));
+  font-family: var(--font-pixel);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ui-gold-hi);
+  text-shadow:
+    2px 0 #1a1030,
+    -2px 0 #1a1030,
+    0 2px #1a1030,
+    0 -2px #1a1030,
+    3px 3px #1a1030;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.g-levelup span {
+  font-size: clamp(18px, calc(9 * var(--px)), 44px);
+}
+
+.g-levelup small {
+  margin-top: 4px;
+  font-size: clamp(12px, calc(5 * var(--px)), 22px);
+  color: var(--ui-cyan);
+}
+
+@keyframes g-levelup {
+  0% {
+    opacity: 1;
+    translate: 0 calc(6 * var(--px));
+  }
+  12% {
+    opacity: 1;
+    translate: 0 0;
+  }
+  80% {
+    opacity: 1;
+    translate: 0 calc(-3 * var(--px));
+  }
+  100% {
+    opacity: 0;
+    translate: 0 calc(-6 * var(--px));
+  }
+}
+
+/* ---------------------------------------------------------------- ficha (HUD) */
+.g-hud {
+  position: absolute;
+  top: var(--hud-top);
+  left: 12px;
+  right: 12px;
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px 12px;
+  font-family: var(--font-pixel);
+  color: var(--ui-ink);
+  pointer-events: none;
+}
+
+.g-card,
+.g-attrs {
+  border-style: solid;
+  border-width: calc(4 * var(--u));
+  border-image: url(/game/frame.png) 8 fill / calc(4 * var(--u)) stretch;
+}
+
+.g-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 8px 2px 2px;
+}
+
+.g-portrait {
+  flex: none;
+  width: calc(30 * var(--u));
+  height: calc(30 * var(--u));
+  background: #2a2350 url(/game/portrait.png) center / 100% no-repeat;
+  box-shadow: inset 0 0 0 2px #1a1030;
+}
+
+.g-who p {
+  margin: 0;
+  line-height: 1.1;
+}
+
+.g-name {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.g-class {
+  font-size: 12px;
+  color: var(--ui-muted);
+}
+
+.g-level {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.g-lv {
+  color: var(--ui-gold);
+  counter-reset: lv var(--g-lv);
+}
+.g-lv::after {
+  content: 'Nv. ' counter(lv);
+}
+
+.g-xpbar {
+  position: relative;
+  width: 84px;
+  height: 8px;
+  background: #0d0a1c;
+  box-shadow:
+    0 0 0 2px #1a1030,
+    inset 0 2px 0 #000;
+}
+
+.g-xpbar > span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--g-fill) * 100%);
+  background: linear-gradient(var(--ui-cyan) 0 50%, #1ea3b8 50%);
+}
+
+.g-xpnum {
+  counter-reset: xp var(--g-xp);
+  color: var(--ui-cyan);
+}
+.g-xpnum::after {
+  content: counter(xp) ' XP';
+}
+
+.g-attrs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin: 0;
+  padding: 4px 8px;
+  list-style: none;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.g-attrs li {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: 3px;
+}
+
+.g-ico {
+  display: inline-block;
+  width: calc(13 * var(--u));
+  height: calc(13 * var(--u));
+  background: center / 100% no-repeat;
+  vertical-align: middle;
+}
+
+.g-attrs .g-ico {
+  grid-row: span 2;
+}
+
+.g-attr-label {
+  color: var(--ui-muted);
+}
+
+.g-attr-val {
+  counter-reset: v var(--v);
+}
+.g-attr-val::after {
+  content: counter(v);
+}
+
+.g-pips {
+  grid-column: 2 / 4;
+  width: 40px;
+  height: 4px;
+  background:
+    linear-gradient(90deg, var(--ui-gold) 0 calc(var(--v) * 10%), transparent 0) 0 0 / 100% 100% no-repeat,
+    repeating-linear-gradient(90deg, #3b2f6e 0 3px, transparent 3px 4px);
+}
+
+/* Celular em pé: ficha compacta (atributos só com ícone e valor), para não cobrir o cenário. */
+@media not ((min-width: 760px) and (min-aspect-ratio: 5/4)) {
+  .g-hud {
+    gap: 6px;
+  }
+
+  .g-card {
+    gap: 8px;
+    padding: 0 6px 0 0;
+  }
+
+  .g-portrait {
+    width: 44px;
+    height: 44px;
+  }
+
+  .g-name {
+    font-size: 14px;
+  }
+
+  .g-class {
+    display: none;
+  }
+
+  .g-level {
+    margin-top: 2px;
+    font-size: 12px;
+  }
+
+  .g-xpbar {
+    width: 64px;
+  }
+
+  .g-attrs {
+    gap: 2px 8px;
+    padding: 2px 6px;
+  }
+
+  .g-attrs li {
+    grid-template-columns: auto auto;
+  }
+
+  .g-attrs .g-ico {
+    grid-row: auto;
+    width: 20px;
+    height: 20px;
+  }
+
+  .g-attr-label,
+  .g-pips {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------- janelas de missão */
+main.g-panels {
+  position: relative;
+  z-index: 5;
+}
+
+html[data-mode='stage'] main.g-panels {
+  position: fixed;
+  top: calc(var(--world-h) - 18px);
+  left: 8px;
+  right: 8px;
+  bottom: calc(66px + env(safe-area-inset-bottom));
+}
+
+html[data-mode='stage'] .scene {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+  content-visibility: hidden;
+}
+
+html[data-mode='stage'] .scene[data-leaving] {
+  visibility: visible;
+  content-visibility: visible;
+}
+
+html[data-mode='stage'] .scene-scroll {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ui-purple) transparent;
+}
+
+.scene-scroll {
+  color: var(--ui-ink);
+  border-style: solid;
+  border-width: calc(8 * var(--u));
+  border-image: url(/game/frame.png) 8 fill / calc(8 * var(--u)) stretch;
+  image-rendering: pixelated;
+}
+
+.scene-scroll:focus-visible {
+  outline: 3px solid var(--ui-cyan);
+  outline-offset: 2px;
+}
+
+.scene-canvas {
+  padding: 4px 8px 10px;
+  font-family: var(--font-pixel);
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+html[data-mode='stage'][data-motion='full'][data-travel] .scene:not([data-leaving]) .scene-scroll {
+  animation: g-panel-in 300ms steps(3) var(--travel) both;
+}
+
+html[data-mode='stage'][data-motion='full'] .scene[data-leaving] .scene-scroll {
+  animation: g-panel-out 200ms steps(2) forwards;
+}
+
+@keyframes g-panel-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.6, 0.2);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.03, 0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes g-panel-out {
+  to {
+    opacity: 0;
+    transform: scale(0.8, 0.3);
+  }
+}
+
+.g-kicker {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ui-cyan);
+}
+
+.g-title,
+.g-logo {
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--ui-gold);
+  text-shadow: 3px 3px 0 #1a1030;
+}
+
+.g-title {
+  font-size: clamp(24px, 3.2vw, 34px);
+}
+
+.g-logo {
+  font-size: clamp(34px, 5vw, 58px);
+}
+
+[data-scene-heading]:focus {
+  outline: none;
+}
+
+.g-meta {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: var(--ui-muted);
+}
+
+.g-meta strong {
+  color: var(--ui-ink);
+}
+
+.g-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0d0a1c;
+  background: var(--ui-green);
+  box-shadow: 0 0 0 2px #1a1030;
+}
+
+.g-intro {
+  margin: 10px 0 0;
+}
+
+.g-sub {
+  margin: 14px 0 6px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ui-gold);
+}
+
+.g-tasks,
+.g-side,
+.g-rewards ul,
+.g-roles,
+.g-links,
+.g-spells,
+.g-posters,
+.g-scrolls {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.g-tasks li {
+  position: relative;
+  padding: 3px 0 3px 26px;
+}
+
+/* Caixinha de tarefa: marcada (estado final); a animação parte da caixa vazia. */
+.g-check {
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 16px;
+  height: 16px;
+  background: #0d0a1c;
+  box-shadow:
+    0 0 0 2px var(--ui-gold),
+    inset 0 0 0 2px #0d0a1c;
+}
+
+.g-check::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  background: var(--ui-green);
+  clip-path: polygon(0 50%, 25% 50%, 40% 70%, 75% 10%, 100% 10%, 45% 100%, 35% 100%);
+  opacity: var(--done, 1);
+}
+
+/* A marca fica escondida (--done: 0) até a vez da tarefa. */
+@keyframes g-check {
+  from {
+    --done: 0;
+    background: #2a2350;
+  }
+}
+
+@keyframes g-task-in {
+  from {
+    opacity: 0;
+    translate: -8px 0;
+  }
+}
+
+.g-side li {
+  margin: 4px 0;
+}
+
+.g-side strong {
+  color: var(--ui-cyan);
+}
+
+.g-rewards {
+  margin-top: 12px;
+  padding-top: 4px;
+  border-top: 2px dashed var(--ui-line);
+}
+
+.g-rewards ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-weight: 700;
+}
+
+.g-rewards li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.g-rewards .g-ico {
+  width: 26px;
+  height: 26px;
+}
+
+.g-reward-xp {
+  color: var(--ui-gold);
+}
+
+.g-items {
+  color: var(--ui-cyan);
+}
+
+.g-report {
+  margin-top: 12px;
+  font-size: 15px;
+  color: var(--ui-muted);
+}
+
+.g-report summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--ui-ink);
+}
+
+.g-report p {
+  margin: 8px 0 0;
+}
+
+.g-note {
+  font-style: italic;
+}
+
+/* Abertura */
+.g-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.g-roles li {
+  padding: 2px 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0d0a1c;
+  background: var(--ui-purple);
+  box-shadow: 0 0 0 2px #1a1030;
+}
+
+.g-roles li:nth-child(2) {
+  background: var(--ui-cyan);
+}
+
+.g-roles li:nth-child(3) {
+  background: var(--ui-gold);
+}
+
+.g-start {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  font-size: 20px;
+  font-weight: 700;
+  text-decoration: none;
+  color: #2b1a10;
+  border-style: solid;
+  border-width: calc(4 * var(--u));
+  border-image: url(/game/button-gold.png) 4 fill / calc(4 * var(--u)) stretch;
+  /* Cor real por baixo da moldura: contraste garantido mesmo sem a imagem. */
+  background: var(--ui-gold) padding-box;
+  padding: 2px 10px;
+}
+
+.g-start:hover {
+  filter: brightness(1.08);
+}
+
+html[data-mode='stage'][data-motion='full'] .g-start span {
+  display: inline-block;
+  animation: g-blink 1000ms steps(2) infinite;
+}
+
+@keyframes g-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.g-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: 14px;
+}
+
+.g-links a,
+.g-poster-links a,
+.g-restart a,
+.g-report a {
+  color: var(--ui-cyan);
+  font-weight: 700;
+  text-underline-offset: 3px;
+}
+
+.g-hint {
+  margin: 14px 0 0;
+  font-size: 13px;
+  color: var(--ui-muted);
+}
+
+/* Grimório */
+.g-spells {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  gap: 6px;
+}
+
+.g-spells li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 4px 8px;
+  font-size: 15px;
+  font-weight: 700;
+  background: var(--ui-bg-2);
+  box-shadow:
+    0 0 0 2px #1a1030,
+    inset 0 0 0 2px var(--ui-line);
+}
+
+.g-spells svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  color: var(--ui-cyan);
+}
+
+/* Mural */
+.g-posters {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.g-posters li {
+  padding: 8px 12px;
+  color: #2b1a10;
+  background: #f3e3b8;
+  box-shadow:
+    0 0 0 2px #1a1030,
+    4px 4px 0 #0d0a1c;
+}
+
+.g-posters h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.g-posters p {
+  margin: 4px 0 0;
+  font-size: 15px;
+}
+
+.g-poster-links {
+  display: flex;
+  gap: 14px;
+}
+
+.g-poster-links a {
+  color: #43218a;
+}
+
+.g-empty {
+  margin-top: 10px;
+}
+
+/* Final */
+.g-scrolls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.g-scrolls a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 6px 12px;
+  color: #2b1a10;
+  text-decoration: none;
+  background: #f3e3b8;
+  box-shadow:
+    0 0 0 2px #1a1030,
+    4px 4px 0 #0d0a1c;
+}
+
+.g-scrolls a:hover {
+  background: var(--ui-gold-hi);
+}
+
+.g-scrolls svg {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  color: #43218a;
+}
+
+.g-scrolls span {
+  display: grid;
+  line-height: 1.2;
+}
+
+.g-scrolls small {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.g-copywrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 12px;
+}
+
+html:not([data-mode]) .g-copywrap {
+  display: none;
+}
+
+.g-toast {
+  font-weight: 700;
+  color: var(--ui-green);
+}
+
+html[data-motion='full'] .g-toast {
+  animation: g-task-in 250ms steps(2) both;
+}
+
+.g-copyfail {
+  flex-basis: 100%;
+  color: var(--ui-gold);
+}
+
+.g-restart {
+  margin: 14px 0 0;
+}
+
+.g-copy {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--ui-muted);
+}
+
+/* ---------------------------------------------------------------- botões */
+.g-button {
+  /* Fundo roxo real por baixo da moldura (contraste sem depender da imagem). */
+  background-color: #6534c4;
+  background-clip: padding-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 10px;
+  font-family: var(--font-pixel);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ui-ink);
+  text-decoration: none;
+  border-style: solid;
+  border-width: calc(4 * var(--u));
+  border-image: url(/game/button.png) 4 fill / calc(4 * var(--u)) stretch;
+  cursor: pointer;
+  image-rendering: pixelated;
+}
+
+.g-button:hover:not(:disabled) {
+  filter: brightness(1.15);
+}
+
+.g-button:active:not(:disabled) {
+  translate: 0 2px;
+}
+
+.g-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.g-button-gold {
+  color: #2b1a10;
+  border-image-source: url(/game/button-gold.png);
+  background: var(--ui-gold) padding-box;
+}
+
+.g-button-small {
+  min-height: 40px;
+  font-size: 14px;
+}
+
+/* ---------------------------------------------------------------- comandos */
+.g-tools,
+.g-map,
+.g-steps,
+.g-bar {
+  position: fixed;
+  z-index: 6;
+  font-family: var(--font-pixel);
+}
+
+.g-tools {
+  display: none;
+}
+
+.g-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ui-ink);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.g-switch {
+  position: relative;
+  width: 30px;
+  height: 14px;
+  background: #0d0a1c;
+  box-shadow: 0 0 0 2px var(--ui-line);
+}
+
+.g-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 10px;
+  height: 10px;
+  background: var(--ui-muted);
+}
+
+.g-toggle[aria-pressed='true'] .g-switch::after {
+  left: 18px;
+  background: var(--ui-green);
+}
+
+.g-toollink {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ui-ink);
+  text-underline-offset: 3px;
+}
+
+.g-map {
+  display: none;
+}
+
+.g-steps {
+  display: none;
+}
+
+.g-bar {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+  background: #120d26;
+  box-shadow: 0 -4px 0 #1a1030;
+}
+
+.g-where {
+  display: grid;
+  justify-items: center;
+  min-height: 44px;
+  padding: 0;
+  font: inherit;
+  line-height: 1.15;
+  color: var(--ui-ink);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.g-where strong {
+  font-size: 16px;
+}
+
+.g-where small {
+  font-size: 12px;
+  color: var(--ui-muted);
+}
+
+.g-sheet {
+  width: min(420px, calc(100vw - 24px));
+  max-height: calc(100svh - 24px);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ui-ink);
+  font-family: var(--font-pixel);
+}
+
+.g-sheet::backdrop {
+  background: rgb(10 6 24 / 0.7);
+}
+
+.g-sheet-box {
+  padding: 8px 10px 10px;
+  border-style: solid;
+  border-width: calc(8 * var(--u));
+  border-image: url(/game/frame.png) 8 fill / calc(8 * var(--u)) stretch;
+  image-rendering: pixelated;
+}
+
+.g-sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.g-sheet-head h2 {
+  margin: 0;
+  font-size: 20px;
+  color: var(--ui-gold);
+}
+
+.g-sheet-list {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.g-sheet-list a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-weight: 700;
+  color: var(--ui-ink);
+  text-decoration: none;
+}
+
+.g-sheet-list a[aria-current] {
+  color: var(--ui-gold);
+}
+
+.g-node {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ui-ink);
+  background: var(--ui-bg-2);
+  box-shadow: 0 0 0 2px #1a1030;
+}
+
+a[aria-current] > .g-node {
+  color: #2b1a10;
+  background: var(--ui-gold);
+}
+
+.g-sheet-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 2px dashed var(--ui-line);
+}
+
+/* Celular deitado: mundo inteiro na tela, missão à direita, barra fina embaixo. */
+@media (max-height: 500px) and (min-aspect-ratio: 5/4) {
+  :root {
+    --world-h: 100svh;
+  }
+
+  html[data-mode='stage'] main.g-panels {
+    top: 8px;
+    left: auto;
+    right: 8px;
+    bottom: calc(58px + env(safe-area-inset-bottom));
+    width: min(52vw, 480px);
+  }
+
+  .g-attrs {
+    display: none;
+  }
+
+  .g-bar {
+    left: auto;
+    width: min(52vw, 480px);
+    right: 8px;
+    padding: 4px 0;
+    background: none;
+    box-shadow: none;
+  }
+}
+
+/* Telas largas: mapa embaixo à esquerda, botões à direita, missão flutuando à direita. */
+@media (min-width: 760px) and (min-aspect-ratio: 5/4) and (min-height: 501px) {
+  .g-bar {
+    display: none;
+  }
+
+  .g-tools {
+    top: var(--hud-top);
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 4px 10px;
+    background: rgb(18 13 38 / 0.82);
+    box-shadow: 0 0 0 2px #1a1030;
+  }
+
+  html[data-mode='stage'] main.g-panels {
+    top: calc(var(--hud-top) + 54px);
+    left: auto;
+    right: 20px;
+    bottom: 96px;
+    width: min(560px, 41vw);
+  }
+
+  .g-map {
+    left: 16px;
+    bottom: 16px;
+    display: block;
+  }
+
+  .g-map ol {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 6px 8px;
+    list-style: none;
+    background: rgb(18 13 38 / 0.82);
+    box-shadow: 0 0 0 2px #1a1030;
+  }
+
+  .g-map li + li::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 2px;
+    margin: 0 2px;
+    vertical-align: middle;
+    background: var(--ui-line);
+  }
+
+  .g-map a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ui-ink);
+    text-decoration: none;
+    vertical-align: middle;
+  }
+
+  .g-map .g-node-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .g-map a[aria-current] .g-node-label,
+  .g-map a:hover .g-node-label,
+  .g-map a:focus-visible .g-node-label {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    padding-right: 4px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ui-gold);
+  }
+
+  .g-steps {
+    right: 20px;
+    bottom: 16px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .g-next {
+    min-height: 56px;
+    padding: 0 14px;
+    font-size: 18px;
+    color: #2b1a10;
+    border-image-source: url(/game/button-gold.png);
+    background: var(--ui-gold) padding-box;
+  }
+
+  .g-next-text {
+    display: grid;
+    text-align: right;
+    line-height: 1.1;
+  }
+
+  .g-next-text small {
+    font-size: 12px;
+    color: #5d3a1e;
+  }
+
+  .g-prev {
+    min-height: 56px;
+    min-width: 56px;
+  }
+
+  .g-hud {
+    right: auto;
+    max-width: 52vw;
+  }
+
+  .g-name {
+    font-size: 17px;
+  }
+
+  .g-xpbar {
+    width: 120px;
+  }
+
+  .scene-canvas {
+    font-size: 17px;
+  }
+
+  /* Abertura: a janela de título fica mais perto do centro. */
+  html[data-mode='stage'] .scene[data-kind='title'] .scene-scroll {
+    top: 8%;
+  }
+}
+
+/* ---------------------------------------------------------------- leitura / sem JS */
+.g-readbar {
+  display: none;
+}
+
+html:not([data-mode='stage']) .g-tools,
+html:not([data-mode='stage']) .g-map,
+html:not([data-mode='stage']) .g-steps,
+html:not([data-mode='stage']) .g-bar,
+html:not([data-mode='stage']) .g-hud,
+html:not([data-mode='stage']) .g-levelup,
+html:not([data-mode='stage']) [data-stage-only] {
+  display: none;
+}
+
+html:not([data-mode='stage']) .g-game {
+  position: relative;
+  height: min(52svh, 460px);
+  --world-h: min(52svh, 460px);
+}
+
+html:not([data-mode='stage']) .g-readbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  padding: 8px 16px;
+  font-family: var(--font-pixel);
+  background: #120d26;
+  box-shadow: 0 4px 0 #1a1030;
+}
+
+.g-readbar ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.g-readbar a {
+  color: var(--ui-ink);
+  font-weight: 700;
+  text-underline-offset: 3px;
+}
+
+.g-readname {
+  color: var(--ui-gold) !important;
+}
+
+.g-readswitch {
+  margin-left: auto;
+  color: var(--ui-cyan) !important;
+}
+
+html:not([data-mode='stage']) main.g-panels {
+  display: grid;
+  gap: 24px;
+  max-width: 48rem;
+  margin: 24px auto 48px;
+  padding: 0 12px;
+}
+
+html:not([data-mode='stage']) .scene {
+  scroll-margin-top: 64px;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 520px;
+}
+
+/* Movimento reduzido: nada anda nem pisca; a ficha mostra os valores na hora. */
+html[data-motion='reduced'] *,
+html[data-motion='reduced'] *::before,
+html[data-motion='reduced'] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+@media print {
+  html,
+  body {
+    height: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+  .g-game,
+  .g-tools,
+  .g-map,
+  .g-steps,
+  .g-bar,
+  .g-readbar {
+    display: none !important;
+  }
+  .scene {
+    position: relative !important;
+    visibility: visible !important;
+    content-visibility: visible !important;
+    break-inside: avoid;
+  }
+  .scene-scroll {
+    position: static !important;
+    overflow: visible !important;
+    color: #000 !important;
+    border: 2px solid #000 !important;
+    border-image: none !important;
+  }
+}

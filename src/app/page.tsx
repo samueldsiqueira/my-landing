@@ -1,11 +1,5 @@
 import { Director } from '@/components/stage/Director';
-import { Stage } from '@/components/stage/Stage';
-import Opening from '@/components/scenes/Opening';
-import About from '@/components/scenes/About';
-import Skills from '@/components/scenes/Skills';
-import Projects from '@/components/scenes/Projects';
-import Experience from '@/components/scenes/Experience';
-import Contact from '@/components/scenes/Contact';
+import { Game } from '@/components/game/Game';
 import { currentMonth } from '@/lib/dates';
 import { getProjects } from '@/lib/vercel';
 
@@ -18,14 +12,7 @@ export default async function Home() {
 
   return (
     <Director>
-      <Stage>
-        <Opening />
-        <About />
-        <Skills />
-        <Projects result={projects} />
-        <Experience asOf={month} />
-        <Contact year={Number(month.slice(0, 4))} />
-      </Stage>
+      <Game projects={projects} asOf={month} year={Number(month.slice(0, 4))} />
     </Director>
   );
 }

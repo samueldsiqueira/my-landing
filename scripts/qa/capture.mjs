@@ -32,7 +32,7 @@ const VIEWPORTS = {
 
 const base = args.base ?? 'http://localhost:3000';
 const out = args.out ?? 'qa-shots';
-const scenes = (args.scenes ?? 'inicio,about,skills,projects,experience,contact').split(',');
+const scenes = (args.scenes ?? 'inicio,origem,indra,faculdade,tim,senai,grimorio,projetos,contato').split(',');
 const vps = (args.vp ?? 'desk,mob').split(',');
 const frames = args.frames ? args.frames.split(',').map(Number) : null;
 const reduced = args.motion === 'reduced';
@@ -62,6 +62,8 @@ for (const vpName of vps) {
   if (read) {
     await page.goto(`${base}/${query}`, { waitUntil: 'networkidle' });
     await page.evaluate(() => document.fonts.ready);
+    // content-visibility: auto não renderiza as seções fora da tela, nem na captura inteira.
+    await page.addStyleTag({ content: '.scene { content-visibility: visible !important; }' });
     await page.screenshot({ path: `${out}/read-${vpName}.png`, fullPage: true });
     await context.close();
     continue;

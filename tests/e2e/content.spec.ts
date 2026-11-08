@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { about, contact, jobs, person, skillGroups } from '../../src/content/profile';
+import { about, contact, education, jobs, person, skillGroups } from '../../src/content/profile';
 
 test.describe('conteúdo no HTML do servidor', () => {
   test('todo o conteúdo e os links chegam sem JavaScript', async ({ request }) => {
@@ -32,6 +32,10 @@ test.describe('conteúdo no HTML do servidor', () => {
       expect(text).toContain(job.title);
       for (const paragraph of job.description) expect(text).toContain(paragraph);
     }
+    for (const item of education) {
+      expect(text).toContain(item.institution);
+      expect(text).toContain(item.course);
+    }
     for (const href of [person.linkedin, person.github, person.whatsapp.href, `mailto:${person.email}`]) {
       expect(html, href).toContain(`href="${href}"`);
     }
@@ -62,9 +66,9 @@ test.describe('conteúdo no HTML do servidor', () => {
     }
   });
 
-  test('a foto publicada não carrega metadados EXIF/GPS', async ({ request }) => {
-    const bytes = await (await request.get('/img/samuel-halftone.png')).body();
-    expect(bytes.includes(Buffer.from('Exif'))).toBe(false);
+  test('a foto original não é publicada: o site usa só a pixel art', async ({ request }) => {
+    expect((await request.get('/game/hero.png')).ok()).toBe(true);
+    expect((await request.get('/img/samuel-halftone.png')).status()).toBe(404);
     expect((await request.get('/profile_picture.jpg')).status()).toBe(404);
   });
 });
