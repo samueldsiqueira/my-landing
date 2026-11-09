@@ -15,6 +15,7 @@ const hero = heroFrames();
 save('hero', sheet(hero));
 // Retrato do HUD: chapéu e rosto do quadro parado.
 save('portrait', hero[0].crop(6, 4, 30, 30));
+save('dust', sheet([P.dust(0), P.dust(1)]));
 
 for (const id of BIOMES) {
   save(`far-${id}`, farLayer(id));

@@ -58,8 +58,10 @@
 }
 
 :root {
-  /* Caminhada entre etapas. */
-  --travel: 1400ms;
+  /* Caminhada entre etapas: o herói sai por uma borda, a tela escurece, o cenário troca e ele
+     entra pela outra. --walk-n ciclos de passo cabem exatamente na caminhada. */
+  --travel: 2200ms;
+  --walk-n: 6;
   /* Altura do mundo e escala da arte. Largo: o mundo ocupa a tela, a missão flutua à direita.
      Alto (celular em pé): mundo em cima, missão embaixo. */
   --world-h: 46svh;
@@ -110,8 +112,6 @@
   background: #120d26;
   /* Escala inteira da arte (pixels nítidos), calculada aqui para valer também no modo leitura. */
   --px: max(2px, calc(var(--world-h) / var(--px-div)));
-  /* Valores da ficha (as regras por etapa vêm de GameStyles). */
-  --i: 0;
 }
 
 @supports (width: round(down, 10px, 1px)) {
@@ -162,48 +162,30 @@ html[data-mode='stage'][data-motion='full'][data-travel] .g-game {
   background-position: 50% 0;
 }
 
-html[data-mode='stage'][data-motion='full'][data-travel] .g-sky,
-html[data-mode='stage'][data-motion='full'][data-travel] .g-far {
-  transition: opacity 500ms steps(4) calc(var(--travel) * 0.35);
+/* O cenário fica parado. Na caminhada, céu, fundo e trecho de chão trocam de uma vez no meio do
+   escuro (ver .g-fade), enquanto o herói está fora da tela. */
+html[data-mode='stage'][data-motion='full'][data-travel='fwd'] :is(.g-sky, .g-far, .g-seg) {
+  transition:
+    opacity 0s calc(var(--travel) * 0.68),
+    visibility 0s calc(var(--travel) * 0.68);
+}
+html[data-mode='stage'][data-motion='full'][data-travel='back'] :is(.g-sky, .g-far, .g-seg) {
+  transition:
+    opacity 0s calc(var(--travel) * 0.32),
+    visibility 0s calc(var(--travel) * 0.32);
 }
 
-/* Paralaxe: o fundo novo chega deslizando um pouco no sentido da caminhada. */
-html[data-mode='stage'][data-motion='full'][data-travel='fwd'] .g-far {
-  animation: g-far-fwd var(--travel) cubic-bezier(0.4, 0, 0.6, 1);
-}
-html[data-mode='stage'][data-motion='full'][data-travel='back'] .g-far {
-  animation: g-far-back var(--travel) cubic-bezier(0.4, 0, 0.6, 1);
-}
-
-@keyframes g-far-fwd {
-  from {
-    translate: 8% 0;
-  }
-}
-@keyframes g-far-back {
-  from {
-    translate: -8% 0;
-  }
-}
-
-/* O caminho: todos os trechos lado a lado; anda --i telas para a esquerda. */
+/* Trechos de chão com os marcos: um por etapa, empilhados; só o da etapa atual aparece. */
 .g-track {
   position: absolute;
   inset: 0;
-  translate: calc(var(--i) * -100cqw) 0;
-}
-
-html[data-mode='stage'][data-motion='full'][data-travel] .g-track {
-  transition: translate var(--travel) cubic-bezier(0.45, 0, 0.55, 1);
-  will-change: translate;
 }
 
 .g-seg {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: calc(var(--seg) * 100cqw);
-  width: 100cqw;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
 }
 
 .g-ground {
@@ -282,6 +264,152 @@ html[data-mode='stage'][data-motion='full'][data-travel] .g-track {
 }
 
 /* ---------------------------------------------------------------- herói */
+/* A pista ocupa o mundo todo e é ela que anda: translate em % da própria largura (compositor,
+   sem unidades de contêiner). Avançando: sai pela direita (0–61%), espera no escuro, entra pela
+   esquerda (75–100%). Voltando é o espelho. Velocidade constante (~14 ms por 1% da largura);
+   step-end no trecho escuro faz o salto de borda a borda sem passar pela tela. */
+.g-lane {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+html[data-mode='stage'][data-motion='full'][data-travel='fwd'] .g-lane {
+  animation: g-lane-fwd var(--travel) linear;
+}
+html[data-mode='stage'][data-motion='full'][data-travel='back'] .g-lane {
+  animation: g-lane-back var(--travel) linear;
+}
+
+@keyframes g-lane-fwd {
+  0% {
+    translate: 0 0;
+  }
+  61% {
+    translate: 100% 0;
+    animation-timing-function: step-end;
+  }
+  75% {
+    translate: -40% 0;
+  }
+  100% {
+    translate: 0 0;
+  }
+}
+@keyframes g-lane-back {
+  0% {
+    translate: 0 0;
+  }
+  25% {
+    translate: -40% 0;
+    animation-timing-function: step-end;
+  }
+  39% {
+    translate: 100% 0;
+  }
+  100% {
+    translate: 0 0;
+  }
+}
+
+/* Escurece e clareia em degraus enquanto o herói está fora da tela (a ficha fica por cima). */
+.g-fade {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: #0e0a1c;
+  opacity: 0;
+  pointer-events: none;
+}
+
+html[data-mode='stage'][data-motion='full'][data-travel='fwd'] .g-fade {
+  animation: g-fade-fwd var(--travel) linear;
+}
+html[data-mode='stage'][data-motion='full'][data-travel='back'] .g-fade {
+  animation: g-fade-back var(--travel) linear;
+}
+
+@keyframes g-fade-fwd {
+  0% {
+    opacity: 0;
+  }
+  60% {
+    opacity: 0;
+    animation-timing-function: steps(3, end);
+  }
+  65% {
+    opacity: 1;
+  }
+  71% {
+    opacity: 1;
+    animation-timing-function: steps(3, end);
+  }
+  76% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes g-fade-back {
+  0% {
+    opacity: 0;
+  }
+  24% {
+    opacity: 0;
+    animation-timing-function: steps(3, end);
+  }
+  29% {
+    opacity: 1;
+  }
+  35% {
+    opacity: 1;
+    animation-timing-function: steps(3, end);
+  }
+  40% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Poeira dos passos, atrás do pé, só enquanto anda. */
+.g-dust {
+  position: absolute;
+  left: calc(9% + 2 * var(--px));
+  bottom: calc(18 * var(--px));
+  width: calc(12 * var(--px));
+  height: calc(8 * var(--px));
+  overflow: hidden;
+  opacity: 0;
+}
+
+.g-dust .g-sprite {
+  width: 200%;
+  background-image: url(/game/dust.png);
+}
+
+html[data-travel='back'] .g-dust {
+  left: calc(9% + 26 * var(--px));
+  scale: -1 1;
+}
+
+html[data-mode='stage'][data-motion='full'][data-travel] .g-dust {
+  animation: g-on var(--travel) step-end;
+}
+html[data-mode='stage'][data-motion='full'][data-travel] .g-dust .g-sprite {
+  animation: g-frames calc(var(--travel) / var(--walk-n) / 2) steps(2) calc(var(--walk-n) * 2);
+}
+
+@keyframes g-on {
+  from,
+  to {
+    opacity: 1;
+  }
+}
+
 .g-hero {
   position: absolute;
   left: 9%;
@@ -304,7 +432,7 @@ html[data-travel='back'] .g-hero {
 
 html[data-mode='stage'][data-motion='full'][data-travel] .g-hero .g-sprite {
   animation:
-    g-walk 350ms steps(4) 4,
+    g-walk calc(var(--travel) / var(--walk-n)) steps(4) var(--walk-n),
     g-idle 1200ms steps(2) var(--travel) infinite;
 }
 

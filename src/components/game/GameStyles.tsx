@@ -17,15 +17,16 @@ export function GameStyles() {
       const fresh = `${full}[data-scene='${id}']:not([data-seen~='${id}'])`;
       const attrs = attributes.map((a) => `--g-${a.id}:${p.attrs[a.id]}`).join(';');
       const rules = [
-        `${at} .g-game{--i:${i};--g-xp:${p.xp};--g-lv:${p.level};--g-fill:${p.fill.toFixed(3)};${attrs}}`,
+        `${at} .g-game{--g-xp:${p.xp};--g-lv:${p.level};--g-fill:${p.fill.toFixed(3)};${attrs}}`,
         `html[data-mode='stage'][data-scene='${id}'] #${id}{visibility:visible;content-visibility:visible}`,
         `${at} .g-sky[data-biome='${id}'],${at} .g-far[data-biome='${id}']{opacity:1}`,
+        `${at} .g-seg[data-stage='${id}']{opacity:1;visibility:visible}`,
         `${at} .g-seg[data-stage='${id}'] .g-prop :is(.g-sprite),${at} .g-seg[data-stage='${id}'] .g-prop[data-float]{animation-play-state:running}`,
       ];
       if (stage.xp) {
         rules.push(
           `${fresh} .g-levelup[data-stage='${id}']{animation:g-levelup 1600ms steps(1,end) var(--travel) forwards}`,
-          `${fresh} .g-hero .g-sprite{animation:g-walk 350ms steps(4) 4,g-cast 600ms steps(2) var(--travel) 2,g-idle 1200ms steps(2) calc(var(--travel) + 1200ms) infinite}`,
+          `${fresh} .g-hero .g-sprite{animation:g-walk calc(var(--travel) / var(--walk-n)) steps(4) var(--walk-n),g-cast 600ms steps(2) var(--travel) 2,g-idle 1200ms steps(2) calc(var(--travel) + 1200ms) infinite}`,
           `${fresh} #${id} .g-check{animation:g-check 1ms step-end calc(var(--travel) + 450ms + var(--k) * 260ms) both}`,
           `${fresh} #${id} .g-tasks li{animation:g-task-in 250ms steps(2) calc(var(--travel) + 350ms + var(--k) * 260ms) both}`,
         );

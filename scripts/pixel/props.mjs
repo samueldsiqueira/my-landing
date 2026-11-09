@@ -419,6 +419,19 @@ export function campfire(frame = 0) {
   return p;
 }
 
+/** Poeira dos passos (atrás do pé do herói): nuvenzinha que nasce e se espalha. Sem contorno. */
+export function dust(frame = 0) {
+  const p = new Pix(12, 8);
+  if (frame === 0) {
+    p.ellipse(4, 5.5, 3, 2.2, '#e9dcc3').ellipse(8.5, 6, 2, 1.6, '#d8c6a4');
+    p.set(3, 4, '#fff6e6');
+  } else {
+    p.ellipse(3.5, 4.5, 3, 2.4, '#d8c6a4').ellipse(8, 3.5, 2.6, 2, '#e9dcc3');
+    p.set(1, 1, '#e9dcc3').set(10, 1, '#d8c6a4');
+  }
+  return p;
+}
+
 /* -------------------------------- interface -------------------------------- */
 
 /** Ícones dos atributos (11×11). */
