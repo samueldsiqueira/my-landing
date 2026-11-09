@@ -46,6 +46,11 @@
   inherits: true;
   initial-value: 1;
 }
+@property --g-educacao {
+  syntax: '<integer>';
+  inherits: true;
+  initial-value: 1;
+}
 @property --g-ia {
   syntax: '<integer>';
   inherits: true;
@@ -127,6 +132,7 @@ html[data-mode='stage'][data-motion='full'][data-travel] .g-game {
     --g-automacao 600ms steps(6) calc(var(--travel) + 500ms),
     --g-integracao 600ms steps(6) calc(var(--travel) + 500ms),
     --g-saude 600ms steps(6) calc(var(--travel) + 500ms),
+    --g-educacao 600ms steps(6) calc(var(--travel) + 500ms),
     --g-ia 600ms steps(6) calc(var(--travel) + 500ms);
 }
 
@@ -478,7 +484,7 @@ html[data-mode='stage'][data-motion='full'][data-travel] .g-hero .g-sprite {
 .g-attrs {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 10px;
+  gap: 4px 6px;
   margin: 0;
   padding: 4px 8px;
   list-style: none;
@@ -504,6 +510,16 @@ html[data-mode='stage'][data-motion='full'][data-travel] .g-hero .g-sprite {
 
 .g-attrs .g-ico {
   grid-row: span 2;
+}
+
+/* Tela larga mas estreita (tablet deitado, notebook pequeno): os sete atributos não cabem numa
+   linha ao lado da janela da missão; duas linhas equilibradas (4 + 3) em vez de 6 + 1. */
+@media (min-width: 760px) and (max-width: 1279px) and (min-aspect-ratio: 5/4) {
+  .g-attrs {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    justify-content: start;
+  }
 }
 
 .g-attr-label {
@@ -930,7 +946,8 @@ html[data-mode='stage'][data-motion='full'] .g-start span {
 /* Grimório */
 .g-spells {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  /* Largura mínima para o nome mais longo ("Antigravity", "PostgreSQL") caber numa linha. */
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 6px;
 }
 

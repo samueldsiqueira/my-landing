@@ -31,6 +31,11 @@ muda é o caminho e o cenário em volta.
 
 Para **adicionar uma etapa**: inclua o id em `scenes`, a etapa em `stages`, o céu e os marcos em
 `src/components/game/scenery.ts`, e o cenário em `scripts/pixel/world.mjs` (`far` e `ground`).
+As teclas 1–9 levam às nove primeiras etapas e 0 à décima.
+
+Para **adicionar um atributo**: inclua-o em `attributes` (`journey.ts`), registre `--g-<id>` com
+`@property` e na lista de `transition` da caminhada em `game.css`, e desenhe o ícone em `ICONS`
+(`scripts/pixel/props.mjs`). Cada atributo vai de 1 a 10 (as barrinhas usam 10% por ponto).
 
 ## Arte
 
