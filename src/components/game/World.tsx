@@ -10,7 +10,8 @@ const img = (name: string) => `url(/game/${name}.png)`;
 /**
  * O mundo: céu, fundo, chão e marcos de cada etapa (um cenário por vez, parado) e o herói. Na
  * caminhada o herói atravessa a tela até a borda, a tela escurece, o cenário troca e ele entra
- * pelo outro lado. Puramente visual: o conteúdo está nas janelas de missão.
+ * pelo outro lado. Num salto de etapas ele abre um portal, entra, e sai por outro no destino.
+ * Puramente visual: o conteúdo está nas janelas de missão.
  */
 export function World() {
   return (
@@ -56,8 +57,15 @@ export function World() {
         ))}
       </div>
 
-      {/* A pista do herói: é ela que se move na caminhada (o cenário fica parado). */}
+      {/* A pista do herói: é ela que se move na caminhada (o cenário fica parado). Os portais do
+          teleporte ficam nela, atrás do herói: o de entrada à frente dele, o de saída no seu lugar. */}
       <div className="g-lane">
+        <span className="g-portal" data-portal="in">
+          <span className="g-sprite" />
+        </span>
+        <span className="g-portal" data-portal="out">
+          <span className="g-sprite" />
+        </span>
         <span className="g-dust">
           <span className="g-sprite" />
         </span>

@@ -59,7 +59,8 @@
 
 :root {
   /* Caminhada entre etapas: o herói sai por uma borda, a tela escurece, o cenário troca e ele
-     entra pela outra. --walk-n ciclos de passo cabem exatamente na caminhada. */
+     entra pela outra. --walk-n ciclos de passo cabem exatamente na caminhada. O teleporte
+     (salto de 2+ etapas) tem a sua duração em html[data-travel='warp']. */
   --travel: 2200ms;
   --walk-n: 6;
   /* Altura do mundo e escala da arte. Largo: o mundo ocupa a tela, a missão flutua à direita.
@@ -173,6 +174,11 @@ html[data-mode='stage'][data-motion='full'][data-travel='back'] :is(.g-sky, .g-f
   transition:
     opacity 0s calc(var(--travel) * 0.32),
     visibility 0s calc(var(--travel) * 0.32);
+}
+html[data-mode='stage'][data-motion='full'][data-travel='warp'] :is(.g-sky, .g-far, .g-seg) {
+  transition:
+    opacity 0s calc(var(--travel) * 0.54),
+    visibility 0s calc(var(--travel) * 0.54);
 }
 
 /* Trechos de chão com os marcos: um por etapa, empilhados; só o da etapa atual aparece. */
@@ -329,6 +335,9 @@ html[data-mode='stage'][data-motion='full'][data-travel='fwd'] .g-fade {
 html[data-mode='stage'][data-motion='full'][data-travel='back'] .g-fade {
   animation: g-fade-back var(--travel) linear;
 }
+html[data-mode='stage'][data-motion='full'][data-travel='warp'] .g-fade {
+  animation: g-fade-warp var(--travel) linear;
+}
 
 @keyframes g-fade-fwd {
   0% {
@@ -375,6 +384,29 @@ html[data-mode='stage'][data-motion='full'][data-travel='back'] .g-fade {
   }
 }
 
+@keyframes g-fade-warp {
+  0% {
+    opacity: 0;
+  }
+  46% {
+    opacity: 0;
+    animation-timing-function: steps(3, end);
+  }
+  50% {
+    opacity: 1;
+  }
+  58% {
+    opacity: 1;
+    animation-timing-function: steps(3, end);
+  }
+  62% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 /* Poeira dos passos, atrás do pé, só enquanto anda. */
 .g-dust {
   position: absolute;
@@ -396,10 +428,10 @@ html[data-travel='back'] .g-dust {
   scale: -1 1;
 }
 
-html[data-mode='stage'][data-motion='full'][data-travel] .g-dust {
+html[data-mode='stage'][data-motion='full']:is([data-travel='fwd'], [data-travel='back']) .g-dust {
   animation: g-on var(--travel) step-end;
 }
-html[data-mode='stage'][data-motion='full'][data-travel] .g-dust .g-sprite {
+html[data-mode='stage'][data-motion='full']:is([data-travel='fwd'], [data-travel='back']) .g-dust .g-sprite {
   animation: g-frames calc(var(--travel) / var(--walk-n) / 2) steps(2) calc(var(--walk-n) * 2);
 }
 
@@ -430,9 +462,16 @@ html[data-travel='back'] .g-hero {
   scale: -1 1;
 }
 
+/* Quadros do herói durante a viagem (--hero-travel), depois parado. A primeira chegada a uma
+   missão acrescenta o conjurar (GameStyles). */
+html[data-travel='fwd'],
+html[data-travel='back'] {
+  --hero-travel: g-walk calc(var(--travel) / var(--walk-n)) steps(4) var(--walk-n);
+}
+
 html[data-mode='stage'][data-motion='full'][data-travel] .g-hero .g-sprite {
   animation:
-    g-walk calc(var(--travel) / var(--walk-n)) steps(4) var(--walk-n),
+    var(--hero-travel),
     g-idle 1200ms steps(2) var(--travel) infinite;
 }
 
@@ -458,6 +497,174 @@ html[data-mode='stage'][data-motion='full'][data-travel] .g-hero .g-sprite {
   }
   to {
     translate: -100% 0;
+  }
+}
+
+/* ---------------------------------------------------------------- teleporte */
+/* Salto de 2+ etapas (voltar ao início, pular pelo mapa ou pelas teclas): o herói conjura, abre
+   um portal à sua frente e entra nele; o portal fecha, a tela escurece e o cenário troca; um
+   portal abre no lugar dele na etapa destino e ele sai andando. Sempre olhando para a direita.
+   Linha do tempo em % de --travel:
+     0–18 conjura · 6–17 portal de entrada abre · 22–42 entra · 42–48 o portal fecha
+     46–62 escuro (troca em 54) · 60–66 portal de saída abre · 68–88 sai · 88–94 o portal fecha */
+html[data-travel='warp'] {
+  --travel: 2600ms;
+  --hero-travel:
+    g-cast calc(var(--travel) * 0.09) steps(2) 2,
+    g-walk calc(var(--travel) * 0.1) steps(4) calc(var(--travel) * 0.22) 2,
+    g-walk calc(var(--travel) * 0.1) steps(4) calc(var(--travel) * 0.68) 2;
+}
+
+/* O portal de entrada abre logo à frente do herói (centro 49 px depois da borda esquerda dele);
+   o de saída, centrado nessa borda (cabe na tela mesmo em 360 px). Ficam atrás do herói,
+   fechados (scale 0) fora do teleporte. */
+.g-portal {
+  position: absolute;
+  bottom: calc(15 * var(--px));
+  width: calc(26 * var(--px));
+  height: calc(52 * var(--px));
+  overflow: hidden;
+  scale: 0;
+}
+
+.g-portal[data-portal='in'] {
+  left: calc(9% + 36 * var(--px));
+}
+
+.g-portal[data-portal='out'] {
+  left: calc(9% - 13 * var(--px));
+}
+
+.g-portal .g-sprite {
+  width: 300%;
+  background-image: url(/game/portal.png);
+}
+
+html[data-mode='stage'][data-motion='full'][data-travel='warp'] .g-portal .g-sprite {
+  animation: g-frames 360ms steps(3) infinite;
+}
+html[data-mode='stage'][data-motion='full'][data-travel='warp'] .g-portal[data-portal='in'] {
+  animation: g-portal-in var(--travel) linear;
+}
+html[data-mode='stage'][data-motion='full'][data-travel='warp'] .g-portal[data-portal='out'] {
+  animation: g-portal-out var(--travel) linear;
+}
+
+/* Abre como uma fenda que se alarga e fecha do mesmo jeito, em degraus. */
+@keyframes g-portal-in {
+  0% {
+    scale: 0;
+    animation-timing-function: step-end;
+  }
+  6% {
+    scale: 0.15 0.6;
+    animation-timing-function: step-end;
+  }
+  9.5% {
+    scale: 0.4 0.85;
+    animation-timing-function: step-end;
+  }
+  13% {
+    scale: 0.7 1;
+    animation-timing-function: step-end;
+  }
+  16.5% {
+    scale: 1;
+    animation-timing-function: step-end;
+  }
+  42% {
+    scale: 0.7 1;
+    animation-timing-function: step-end;
+  }
+  44% {
+    scale: 0.35 0.85;
+    animation-timing-function: step-end;
+  }
+  46% {
+    scale: 0.1 0.6;
+    animation-timing-function: step-end;
+  }
+  48%,
+  100% {
+    scale: 0;
+  }
+}
+@keyframes g-portal-out {
+  0% {
+    scale: 0;
+    animation-timing-function: step-end;
+  }
+  60% {
+    scale: 0.15 0.6;
+    animation-timing-function: step-end;
+  }
+  62% {
+    scale: 0.4 0.85;
+    animation-timing-function: step-end;
+  }
+  64% {
+    scale: 0.7 1;
+    animation-timing-function: step-end;
+  }
+  66% {
+    scale: 1;
+    animation-timing-function: step-end;
+  }
+  88% {
+    scale: 0.7 1;
+    animation-timing-function: step-end;
+  }
+  90% {
+    scale: 0.35 0.85;
+    animation-timing-function: step-end;
+  }
+  92% {
+    scale: 0.1 0.6;
+    animation-timing-function: step-end;
+  }
+  94%,
+  100% {
+    scale: 0;
+  }
+}
+
+/* O herói anda para dentro do portal e sai do outro. translate e clip-path em % da largura dele
+   (a mesma unidade, sem var()): o corte acompanha o passo e fica parado no centro do portal.
+   Entrada: centro a 122,5% da largura dele (o corte começa quando o passo chega lá, em 26,09%);
+   saída: centro na borda esquerda dele. Velocidade constante; some entre 42% e 68%. */
+html[data-mode='stage'][data-motion='full'][data-travel='warp'] .g-hero {
+  animation: g-hero-warp var(--travel) linear;
+}
+
+@keyframes g-hero-warp {
+  0% {
+    translate: 0 0;
+    clip-path: inset(0);
+  }
+  22% {
+    translate: 0 0;
+    clip-path: inset(0);
+  }
+  26.09% {
+    translate: 22.5% 0;
+    clip-path: inset(0);
+  }
+  42% {
+    translate: 110% 0;
+    clip-path: inset(0 87.5% 0 0);
+    animation-timing-function: step-end;
+  }
+  68% {
+    translate: -92% 0;
+    clip-path: inset(0 0 0 92%);
+  }
+  88% {
+    translate: 0 0;
+    clip-path: inset(0);
+  }
+  100% {
+    translate: 0 0;
+    clip-path: inset(0);
   }
 }
 

@@ -8,6 +8,8 @@ export type Mode = 'stage' | 'read';
 export type Motion = 'full' | 'reduced';
 export type InputSource = 'wheel' | 'key' | 'touch' | 'click' | 'hash';
 type Phase = 'idle' | 'exiting' | 'entering';
+/** Caminhada para a etapa vizinha (fwd/back) ou teleporte por portal num salto de 2+ etapas. */
+type Travel = 'fwd' | 'back' | 'warp';
 
 export const sceneIds = scenes.map((scene) => scene.id) as SceneId[];
 const aliases = aliasMap as Record<string, SceneId>;
@@ -122,27 +124,28 @@ const trackEnter = async (id: SceneId, run: number) => {
 
 interface ArriveOptions {
   dir: number;
+  kind: Travel;
   source: InputSource;
   moveFocus: boolean;
   run: number;
 }
 
 /**
- * Troca a etapa e cuida do que acompanha a chegada: a caminhada e a chegada do herói
- * (data-travel enquanto durarem; o CSS move o caminho, anima os passos e abre a missão),
+ * Troca a etapa e cuida do que acompanha a chegada: a viagem e a chegada do herói
+ * (data-travel enquanto durarem; o CSS faz a caminhada ou o teleporte e abre a missão),
  * foco, URL e anúncio.
  */
-const arrive = async (to: number, { dir, source, moveFocus, run }: ArriveOptions) => {
+const arrive = async (to: number, { dir, kind, source, moveFocus, run }: ArriveOptions) => {
   const root = html();
   const toId = sceneIds[to];
   const toEl = sceneEl(toId);
   if (!toEl) return;
   const travel = readMotion() === 'full' && to !== state.cur;
   if (travel) {
-    // Tira e repõe o atributo para reiniciar as animações de caminhada mesmo no mesmo sentido.
+    // Tira e repõe o atributo para reiniciar as animações da viagem mesmo no mesmo tipo e sentido.
     delete root.dataset.travel;
     void root.offsetWidth;
-    root.dataset.travel = dir > 0 ? 'fwd' : 'back';
+    root.dataset.travel = kind;
   }
   root.dataset.scene = toId;
   state.cur = to;
@@ -171,6 +174,8 @@ const transition = async (to: number, source: InputSource) => {
   const root = html();
   const full = readMotion() === 'full';
   const dir = to > from ? 1 : -1;
+  // Etapa vizinha: o herói caminha. Salto (voltar ao início, pular etapas): abre um portal.
+  const kind: Travel = Math.abs(to - from) > 1 ? 'warp' : dir > 0 ? 'fwd' : 'back';
   root.dataset.dir = String(dir);
   state.phase = 'exiting';
 
@@ -189,7 +194,7 @@ const transition = async (to: number, source: InputSource) => {
   delete root.dataset.leaving;
   // Marca como concluída só depois da saída: os seletores de revisita não disputam com os de saída.
   markSeen(fromId);
-  await arrive(to, { dir, source, moveFocus, run });
+  await arrive(to, { dir, kind, source, moveFocus, run });
 };
 
 export function go(target: number | SceneId, source: InputSource = 'click') {
@@ -211,7 +216,7 @@ export function go(target: number | SceneId, source: InputSource = 'click') {
 export const next = (source: InputSource = 'click') => go(state.cur + 1, source);
 export const prev = (source: InputSource = 'click') => go(state.cur - 1, source);
 
-/** Recomeçar: o herói volta caminhando até a vila inicial. */
+/** Recomeçar: o herói abre um portal e volta para a vila inicial. */
 export const rewind = () => go(0);
 
 export function setMotion(value: Motion) {

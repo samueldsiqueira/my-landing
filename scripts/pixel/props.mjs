@@ -432,6 +432,47 @@ export function dust(frame = 0) {
   return p;
 }
 
+/**
+ * Portal do teleporte: oval de pé com borda de cristal (a cor do cajado), anéis roxos e uma
+ * espiral de três braços girando para o centro escuro. 3 quadros (1/3 de braço por quadro),
+ * com faíscas em volta da borda.
+ */
+export function portal(frame = 0) {
+  const W = 26;
+  const H = 52;
+  const cx = W / 2;
+  const cy = H / 2;
+  const rx = 11;
+  const ry = 24;
+  const p = new Pix(W, H);
+  const turn = (frame % 3) * ((2 * Math.PI) / 9);
+  const ramp = [C.void, C.purpleDeep, C.purpleDark, C.purple, C.purpleLight];
+  p.ellipse(cx, cy, rx, ry, (x, y) => {
+    const nx = (x + 0.5 - cx) / rx;
+    const ny = (y + 0.5 - cy) / ry;
+    const r = Math.sqrt(nx * nx + ny * ny);
+    if (r > 0.86) return nx + ny < -0.5 ? C.crystalHi : nx + ny > 0.6 ? C.crystalDark : C.crystal;
+    if (r > 0.74) return C.purpleLight;
+    // Braços da espiral: o ângulo gira com o raio, e o quadro gira tudo.
+    const a = Math.atan2(ny, nx) + r * 5 + turn;
+    const arm = (((a % ((2 * Math.PI) / 3)) + (2 * Math.PI) / 3) % ((2 * Math.PI) / 3)) / ((2 * Math.PI) / 3);
+    const level = Math.min(4, Math.floor(r * 4.4) + (arm < 0.3 ? 2 : 0));
+    if (r < 0.16) return C.void;
+    return ramp[Math.max(0, level)];
+  });
+  // Brilho no centro (o fundo do portal).
+  p.set(cx - 1, cy - 1, C.crystalDark).set(cx, cy, C.purpleLight);
+  p.outline(OUT);
+  // Faíscas em volta, girando com a espiral.
+  const sparks = [
+    [[1, 12], [24, 20], [3, 38], [22, 45], [12, 0]],
+    [[0, 24], [25, 10], [24, 36], [5, 47], [14, 51]],
+    [[2, 5], [25, 28], [1, 31], [20, 50], [10, 1]],
+  ][frame % 3];
+  sparks.forEach(([x, y], i) => p.set(x, y, i % 2 ? C.crystalHi : C.spark));
+  return p;
+}
+
 /* -------------------------------- interface -------------------------------- */
 
 /** Ícones dos atributos (11×11). */

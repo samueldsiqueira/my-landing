@@ -116,6 +116,23 @@ test.describe('jornada (desktop)', () => {
     expect((await htmlData(page)).seen).toContain('origem');
   });
 
+  test('saltos de 2+ etapas teleportam; a etapa vizinha continua caminhando', async ({ page }) => {
+    await openStage(page);
+    await settle(page);
+    await page.keyboard.press('End');
+    await waitScene(page, 'contato');
+    expect((await htmlData(page)).travel).toBe('warp');
+    await page.waitForFunction(() => window.__stage!.phase() === 'idle', null, { timeout: 8000 });
+    expect((await htmlData(page)).travel).toBeUndefined();
+    await page.keyboard.press('ArrowLeft');
+    await waitScene(page, 'projetos');
+    expect((await htmlData(page)).travel).toBe('back');
+    await settle(page);
+    await page.locator('nav[aria-label="Mapa da jornada"] a', { hasText: 'Início' }).click();
+    await waitScene(page, 'inicio');
+    expect((await htmlData(page)).travel).toBe('warp');
+  });
+
   test('Tab nunca alcança elementos de etapas ocultas', async ({ page }) => {
     await openStage(page);
     await settle(page);
