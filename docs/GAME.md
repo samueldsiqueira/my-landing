@@ -10,10 +10,14 @@ muda é o caminho e o cenário em volta.
   antes da primeira pintura `data-mode` (`stage` = jogo, `read` = página única; ausente sem JS),
   `data-scene` (etapa atual, pelo hash), `data-motion` e `data-seen` (etapas já concluídas na
   sessão). A máquina (`src/components/stage/machine.ts`) atualiza esses atributos e, durante a
-  chegada a uma etapa, mantém `data-travel` (`fwd`/`back`).
+  chegada a uma etapa, mantém `data-travel`: `fwd`/`back` para a etapa vizinha (caminhada) e
+  `warp` para um salto de 2+ etapas (teleporte: voltar ao início, mapa, teclas 1–0, Home/End).
 - **O CSS faz o jogo.** O cenário fica parado; na caminhada o herói (`.g-lane`) atravessa a tela
   até a borda, a tela escurece (`.g-fade`), céu, fundo e trecho de chão (`.g-seg`) trocam no
   escuro e ele entra pela outra borda até o seu lugar, com passos em folha de sprites e poeira.
+  No teleporte ele conjura, abre um portal (`.g-portal`) à sua frente e entra nele (o corpo é
+  cortado no centro do portal); a tela escurece, o cenário troca e ele sai de outro portal no
+  seu lugar. A linha do tempo está comentada em `game.css` ("teleporte").
   Depois a janela da missão abre e as tarefas são marcadas.
   As regras por etapa (valores da ficha, qual cenário aparece, efeitos da primeira chegada)
   são geradas a partir dos dados em `src/components/game/GameStyles.tsx`.
@@ -50,7 +54,8 @@ npm run sprites        # scripts/pixel/build.mjs → public/game e ícones do si
 - `scripts/pixel/lib.mjs`: tela de pixels, primitivas, contorno automático, encoder PNG.
 - `scripts/pixel/hero.mjs`: o herói (40×54 px por quadro): parado ×2, andando ×4, conjurando ×2.
 - `scripts/pixel/world.mjs`: cenários (camada distante 320×150 e chão 160×40, emendáveis).
-- `scripts/pixel/props.mjs`: marcos de cada etapa, ícones dos atributos, molduras da interface.
+- `scripts/pixel/props.mjs`: marcos de cada etapa, poeira e portal do teleporte, ícones dos
+  atributos, molduras da interface.
 
 O mundo tem 180 px de altura virtual. O CSS amplia tudo por `--px` (inteiro) com
 `image-rendering: pixelated`. O chão ocupa os 40 px de baixo; o herói pisa no caminho.
@@ -70,6 +75,7 @@ O mundo tem 180 px de altura virtual. O CSS amplia tudo por `--px` (inteiro) com
 npm run build && npx next start -p 3000
 node scripts/qa/capture.mjs --scenes indra --vp desk,mob --out /tmp/qa
 node scripts/qa/capture.mjs --scenes indra --from origem --vp desk --frames 1,6,12,18,24,30 --out /tmp/qa
+node scripts/qa/capture.mjs --scenes contato --from inicio --vp desk,mob --frames 3,9,11,17,21,27 --out /tmp/qa  # teleporte
 node scripts/qa/capture.mjs --mode read --vp desk,mob --out /tmp/qa
 node scripts/og/render.mjs   # imagem de compartilhamento a partir da tela de título
 ```
