@@ -8,9 +8,9 @@ type Vars = CSSProperties & Record<`--${string}`, string | number>;
 const img = (name: string) => `url(/game/${name}.png)`;
 
 /**
- * O mundo: céu e fundo de cada etapa (um aparece por vez, em fusão), a faixa do caminho com
- * os marcos de todas as etapas lado a lado (desliza enquanto o herói anda) e o herói, sempre
- * no mesmo ponto da tela. Puramente visual: o conteúdo está nas janelas de missão.
+ * O mundo: céu, fundo, chão e marcos de cada etapa (um cenário por vez, parado) e o herói. Na
+ * caminhada o herói atravessa a tela até a borda, a tela escurece, o cenário troca e ele entra
+ * pelo outro lado. Puramente visual: o conteúdo está nas janelas de missão.
  */
 export function World() {
   return (
@@ -23,8 +23,8 @@ export function World() {
       ))}
 
       <div className="g-track">
-        {stages.map((stage, i) => (
-          <div key={stage.id} className="g-seg" data-stage={stage.id} style={{ '--seg': i } as Vars}>
+        {stages.map((stage) => (
+          <div key={stage.id} className="g-seg" data-stage={stage.id}>
             <div className="g-ground" style={{ backgroundImage: img(`ground-${stage.id}`) }} />
             {landmarks[stage.id].map((prop) => (
               <div
@@ -56,9 +56,16 @@ export function World() {
         ))}
       </div>
 
-      <div className="g-hero">
-        <span className="g-sprite" />
+      {/* A pista do herói: é ela que se move na caminhada (o cenário fica parado). */}
+      <div className="g-lane">
+        <span className="g-dust">
+          <span className="g-sprite" />
+        </span>
+        <div className="g-hero">
+          <span className="g-sprite" />
+        </div>
       </div>
+      <div className="g-fade" />
       {stages.map((stage, i) =>
         stage.xp ? (
           <p key={`lv-${stage.id}`} className="g-levelup" data-stage={stage.id}>

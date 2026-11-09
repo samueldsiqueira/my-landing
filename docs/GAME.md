@@ -11,8 +11,10 @@ muda é o caminho e o cenário em volta.
   `data-scene` (etapa atual, pelo hash), `data-motion` e `data-seen` (etapas já concluídas na
   sessão). A máquina (`src/components/stage/machine.ts`) atualiza esses atributos e, durante a
   chegada a uma etapa, mantém `data-travel` (`fwd`/`back`).
-- **O CSS faz o jogo.** O caminho desliza (`.g-track`), o céu e o fundo trocam em fusão, o
-  herói anda (folha de sprites em passos), a janela da missão abre e as tarefas são marcadas.
+- **O CSS faz o jogo.** O cenário fica parado; na caminhada o herói (`.g-lane`) atravessa a tela
+  até a borda, a tela escurece (`.g-fade`), céu, fundo e trecho de chão (`.g-seg`) trocam no
+  escuro e ele entra pela outra borda até o seu lugar, com passos em folha de sprites e poeira.
+  Depois a janela da missão abre e as tarefas são marcadas.
   As regras por etapa (valores da ficha, qual cenário aparece, efeitos da primeira chegada)
   são geradas a partir dos dados em `src/components/game/GameStyles.tsx`.
 - **A ficha (HUD) é CSS puro.** Nível, XP e atributos são propriedades registradas com
